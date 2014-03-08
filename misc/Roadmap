@@ -1,0 +1,40 @@
+version - 0.9
+
+	+ CSV import/export fix (pazi na custom fields0)
+
+
+features for next releases:
+---------------------------
+	
+	- Planned
+		
+		+ changelog for subnets, sections and ip addresses;
+		
+		+ Scan subnet for alive hosts and import
+			SNMP router table fetching
+			NMAP scan
+			Telnet scan
+						
+		+ Get next available subnet by providing mask;
+		
+		+ Create multiple networks with same bitmasks (when adding new);
+		
+		+ Subnets import with vlan information;
+		
+		+ Logs search;
+		
+		+ User actvity display;
+		
+		+ VLAN header ordering;
+		
+		+ Permissions for custom fields;
+		
+		
+		Martin Komon:
+		
+		+ Subnet importing via cli with switches;
+		
+	
+	- Optional
+		- RDNS zone file export (in admin!);
+		- IPv6 migration guide document;
