@@ -1,3 +1,64 @@
+== 1.0
+	
+	New features:
+	----------------------------
+	+ IP address page with IP address details and IP history (Changelog);
+	+ IP address changelog, subnet and section changelogs with full changelog under tools;
+	+ Favourite subnets for quick access;
+	+ Adding subnets from free space with automatic mask provided;
+	+ Automatic database validity check after upgrading and automatic field/table fix under administration;
+	+ Automatic weekly check for new phpipam version;
+
+	Enhancements:
+	----------------------------
+	+ Bootstrap 3;
+	+ UI enhancements;
+	+ Improved views based on browser width;
+	+ Widget order can now be set;
+	+ Widgets can be reordered (dragged) directly on dashboard;
+	+ Subnet can now be splitted to max 256 new subnets (16 before);
+	+ Scan settings are moved to Administration;
+	+ Widget management has moved to administration, which allows creation of new widgets;
+	+ Improved ICMP error detection;
+	+ Mail settings can now be set on gui (localhost / smtp);
+	+ Popup windows are now draggable;
+	+ VLAN adding in the fly enhancements;
+	+ Master section now shows all subnets in subsections;
+	+ Tools > devices redone;
+	+ DeviceTypes can now be edited/set/added;
+	+ Ping subnet enhancements;
+	+ Custom field types are now defineable (int/varchar/date/datetime/text/bool/set);
+	+ Date and timepicker popups if type = date/datetime;
+	+ For `set` and boolean custom fields dropdown is presented that users can pick;
+	
+	+ Favourite subnets widget;
+	+ IP requests widget;
+	+ Changelog widget;
+
+	Translations:
+	----------------------------
+	+ Added Brazil translation (Michel Braga Guimarães);
+
+	Bugfixes:
+	--------
+	+ UI fixes;
+	+ Fixed bug where last page of IP addresses was inaccessible;
+	+ IP address state change is now sent to all admins;
+	+ Fixed subnet displaying as 0.0.0.0/0 in details;
+	+ Fixed links to subnets form vlans and vrfs;
+	+ Fixed search result showing all folders if searched item is not IP address;
+	+ Fixed disapearing section when L2 section was selected as master section;
+	+ Fixed device ID showing in mail notification instead of hostname;
+	+ Fixed device ID showing in search results and export instead of hostname;	
+	+ Fixed search for subnet name returned no results;
+	+ Fixed apostophe in IP address description throws SQL error for scan results and XLS import;
+	+ Fixed requester email gets cut if longer than 32 chars;
+	+ Fixed admin folder edit appearing as subnet;
+	+ Fixed missing device/port in import;
+	+ Fixed master section delete did not delete subsections and belonging subnets/ips;
+	+ Fixed online status was not updated when running Ping status scans;
+	+ Fixed Folder name not appearing when deleting folder;
+
 == 0.9
 
 	New features:

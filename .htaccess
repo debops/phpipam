@@ -42,7 +42,12 @@ RewriteRule ^install/$ index.php?page=install
 # dashboard
 RewriteRule ^dashboard/$ index.php?page=dashboard
 
+# widgets
+RewriteRule ^widgets/(.*)/$ index.php?page=widgets&subpage=$1
+
 # subnets
+RewriteRule ^subnets/(.*)/(.*)/ipdetails/(.*)/$ index.php?page=subnets&section=$1&subnetId=$2&ipaddrid=$3 [L]
+RewriteRule ^subnets/(.*)/(.*)/changelog/$ index.php?page=subnets&section=$1&subnetId=$2&sPage=changelog [L]
 RewriteRule ^subnets/(.*)/(.*)/(.*)/$ index.php?page=subnets&section=$1&subnetId=$2&sPage=$3 [L]
 RewriteRule ^subnets/(.*)/(.*)/$ index.php?page=subnets&section=$1&subnetId=$2 [L]
 RewriteRule ^subnets/(.*)/$ index.php?page=subnets&section=$1 [L]
@@ -57,14 +62,18 @@ RewriteRule ^vlan/(.*)/(.*)/$ index.php?page=vlan&section=$1&vlanId=$2 [L]
 # vrfs
 RewriteRule ^vrf/(.*)/(.*)/$ index.php?page=vrf&section=$1&vrfId=$2 [L]
 
+# changelog override
+RewriteRule ^tools/changelog/(.*)/(.*)/$ index.php?page=tools&toolsId=changelog&cfilter=$1&climit=$2 [L]
+RewriteRule ^tools/changelog/(.*)/$ index.php?page=tools&toolsId=changelog&climit=$1 [L]
 # search override
 RewriteRule ^tools/search/(.*)$ index.php?page=tools&toolsId=search&ip=$1 [L]
-# hosts override
-RewriteRule ^tools/hosts/(.*)$ index.php?page=tools&toolsId=hosts&hostname=$1 [L]
+# devices override
+RewriteRule ^tools/devices/hosts/(.*)$ index.php?page=tools&toolsId=devices&deviceid=$1 [L]
 # tools
 RewriteRule ^tools/(.*)/$ index.php?page=tools&toolsId=$1 [L]
 RewriteRule ^tools/$ index.php?page=tools&toolsId=showAll [L]
 
 # admin
+RewriteRule ^administration/manageSection/sectionChangelog/(.*)/$ index.php?page=administration&adminId=sectionChangelog&sectionId=$1 [L]
 RewriteRule ^administration/(.*)/$ index.php?page=administration&adminId=$1 [L]
 RewriteRule ^administration/$ index.php?page=administration&adminId=showAll [L]

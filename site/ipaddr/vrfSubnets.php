@@ -25,11 +25,11 @@ else {
 	print "<tr>";
 	print "	<th class='small description'>"._('Subnet description')."</th>";
 	print "	<th>"._('Subnet')."</th>";
-	print "	<th class='small'>"._('Hosts check')."</th>";
-	print "	<th class='small'>"._('Used')."</th>";
-	print "	<th class='small'>% "._('Free')."</th>";
-	print "	<th class='small'>"._('Requests')."</th>";
-	print " <th></th>";
+	print "	<th class='small hidden-xs hidden-sm'>"._('Hosts check')."</th>";
+	print "	<th class='small hidden-xs hidden-sm'>"._('Used')."</th>";
+	print "	<th class='small hidden-xs hidden-sm'>% "._('Free')."</th>";
+	print "	<th class='small hidden-xs hidden-sm'>"._('Requests')."</th>";
+	print " <th class='actions'></th>";
 	print "</tr>";
 	
 	/* print each slave */
@@ -52,8 +52,8 @@ else {
 		    print "	<td><a href='subnets/$_REQUEST[section]/$slave[id]/'>".transform2long($slave['subnet'])."/$slave[mask]</a></td>";
 
 			# host check
-			if($slave['pingSubnet'] == 1) 				{ print '<td class="allowRequests small">'._('enabled').'</td>'; }
-			else 										{ print '<td class="allowRequests small"></td>'; }	
+			if($slave['pingSubnet'] == 1) 				{ print '<td class="allowRequests small hidden-xs hidden-sm">'._('enabled').'</td>'; }
+			else 										{ print '<td class="allowRequests small hidden-xs hidden-sm"></td>'; }	
 		    
 		    # count IP addresses
 			$hasSlaves = getAllSlaveSubnetsBySubnetId ($slave['id']); 
@@ -64,8 +64,8 @@ else {
 		
 		    
 			$calculate = calculateSubnetDetails ( gmp_strval($ipCount), $slave['mask'], $slave['subnet'] );
-		    print ' <td class="small">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
-		    print '	<td class="small">'. $calculate['freehosts_percent'] .'</td>';
+		    print ' <td class="small hidden-xs hidden-sm">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
+		    print '	<td class="small hidden-xs hidden-sm">'. $calculate['freehosts_percent'] .'</td>';
 		    
 		    # add to sum if IPv4
 		    if ( IdentifyAddress( $slave['subnet'] ) == "IPv4") {
@@ -74,26 +74,26 @@ else {
 		    }
 			
 			# allow requests
-			if($slave['allowRequests'] == 1) 			{ print '<td class="allowRequests small">'._('enabled').'</td>'; }
-			else 										{ print '<td class="allowRequests small"></td>'; }		
+			if($slave['allowRequests'] == 1) 			{ print '<td class="allowRequests small hidden-xs hidden-sm">'._('enabled').'</td>'; }
+			else 										{ print '<td class="allowRequests small hidden-xs hidden-sm"></td>'; }		
 			
 			# edit
 			$subnetPerm = checkSubnetPermission ($slave['id']);
 			if($subnetPerm == 3) {
-				print "	<td class='small'>";
+				print "	<td class='actions'>";
 				print "	<div class='btn-group'>";
-				print "		<button class='btn btn-mini editSubnet'     data-action='edit'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-pencil'></i></button>";
-				print "		<button class='btn btn-mini showSubnetPerm' data-action='show'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-tasks'></i></button>";
-				print "		<button class='btn btn-mini editSubnet'     data-action='delete' data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-remove'></i></button>";
+				print "		<button class='btn btn-xs btn-default editSubnet'     data-action='edit'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa-pencil'></i></button>";
+				print "		<button class='btn btn-xs btn-default showSubnetPerm' data-action='show'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa-tasks'></i></button>";
+				print "		<button class='btn btn-xs btn-default editSubnet'     data-action='delete' data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa-times'></i></button>";
 				print "	</div>";
 				print " </td>";
 			}
 			else {
-				print "	<td class='small'>";
+				print "	<td class='actionsl'>";
 				print "	<div class='btn-group'>";
-				print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-pencil'></i></button>";
-				print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-tasks'></i></button>";
-				print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-remove'></i></button>";
+				print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-pencil'></i></button>";
+				print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-tasks'></i></button>";
+				print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-times'></i></button>";
 				print "	</div>";
 				print " </td>";		
 			}

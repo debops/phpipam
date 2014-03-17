@@ -1,3 +1,4 @@
+<div class="content upgrade-db" style="width:600px;margin:auto;background:white;padding:10px;margin-top:10px;border-radius:6px;border:1px solid #eee;">
 <?php
 
 /**
@@ -18,8 +19,8 @@ if(!tableExists("ipaddresses")) { ?>
 				var div = $(this).attr("id");
 				$("table.dbUpgrade tbody.content").not("table.dbUpgrade tbody." + div).hide();	
 				$("table.dbUpgrade tbody." + div).show("fast");	
-				$("table.dbUpgrade i").removeClass("icon-chevron-down").addClass('icon-chevron-right');	
-				$("table.dbUpgrade a#"+div+" i").removeClass("icon-chevron-right").addClass('icon-chevron-down');	
+				$("table.dbUpgrade i").removeClass("fa fa-angle-down").addClass('fa fa-angle-right');	
+				$("table.dbUpgrade a#"+div+" i").removeClass("fa fa-angle-right").addClass('fa fa-angle-down');	
 				
 			return false; 
 			}); 
@@ -40,27 +41,34 @@ if(!tableExists("ipaddresses")) { ?>
 		<!-- title -->
 		<h4>phpIPAM database installation</h4>
 		<hr><br>
+		<div class="info2">Please select installation type:</div>
 		
 
-		<table class="dbUpgrade table table-striped table-top">
+		<table class="dbUpgrade table">
 		
 		<!-- install -->
 		<tr>
-			<th><a href="#" id="upgrade"><i class="icon-gray icon-chevron-down"></i> Install phpipam database</th>
+			<th><a href="#" id="upgrade"><i class="fa fa-angle-right"></i> Automatic database installation</th>
 		</tr>
 		<tr>
 
-		<tbody class="upgrade content">
+		<tbody style="display:none;" class="upgrade content">
 		<tr>
 			<td>
 			<div class="alert alert-info">Clicking on install button will install required database files. Please fill in following database connection details:</div>
 			<form id="install">
-				<input type="text"     style='margin-bottom:5px;' name="mysqlrootuser"  value="root"> MySQL username (user with permissions to create new MySQL database)<br>
-				<input type="password" style='margin-bottom:5px;' name="mysqlrootpass"> MySQL password<br>
-				<input type="text"     style='margin-bottom:5px;' name="mysqllocation" 	value="<?php print $db['host']; ?>" disabled> MySQL database location *<br>
-				<input type="text"     style='margin-bottom:5px;' name="mysqltable" 	value="<?php print $db['name']; ?>" disabled> Database name*<br>
+			<div class="row">
+				MySQL username (user with permissions to create new MySQL database):
+				<input type="text"     class='form-control input-sm input-w-200' style='margin-bottom:5px;' name="mysqlrootuser"  value="root">
+				MySQL password:
+				<input type="password" class='form-control input-sm input-w-200' style='margin-bottom:5px;' name="mysqlrootpass">
+				MySQL database location *
+				<input type="text"     class='form-control input-sm input-w-200' style='margin-bottom:5px;' name="mysqllocation" 	value="<?php print $db['host']; ?>" disabled>
+				Database name*
+				<input type="text"     class='form-control input-sm input-w-200' style='margin-bottom:5px;' name="mysqltable" 	value="<?php print $db['name']; ?>" disabled>
 				<span style="color:gray;"> * Please change database name and location by modifying config.php file!</span><br>
-				<input type="button" class="upgrade btn btn-small" version="0" value="Install phpipam database">
+				<input type="button" class="upgrade btn btn-sm btn-default btn-success" version="0" value="Install phpipam database">
+			</div>
 			</form>
 		
 			<div class="upgradeResult"></div>
@@ -71,7 +79,7 @@ if(!tableExists("ipaddresses")) { ?>
 		
 		<!-- SQL import instructions -->
 		<tr>
-			<th><a href="#" id="sqlUpgrade"><i class="icon-gray icon-chevron-right"></i> MySQL import instructions</a></th>
+			<th><a href="#" id="sqlUpgrade"><i class="fa fa-angle-right"></i> MySQL import instructions</a></th>
 		</tr>	
 
 		<tbody style="display:none;" class="sqlUpgrade content">
@@ -88,7 +96,7 @@ mysql -u root -p my_root_pass < db/SCHEMA.sql</pre>
 	
 		<!-- Manual instructions -->
 		<tr>
-			<th><a href="#" id="manualUpgrade"><i class="icon-gray icon-chevron-right"></i> Manual install instructions</a></th>
+			<th><a href="#" id="manualUpgrade"><i class="fa fa-angle-right"></i> Manual install instructions</a></th>
 		</tr>
 		
 		<tbody style="display:none;" class="manualUpgrade content">
@@ -109,3 +117,4 @@ else {
 	header("Location: /");
 }
 ?>
+</div>

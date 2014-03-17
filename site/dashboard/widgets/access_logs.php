@@ -5,10 +5,15 @@ if(!function_exists('getSubnetStatsDashboard')) {
 require_once( dirname(__FILE__) . '/../../../functions/functions.php' );
 }
 
+/* if direct request that redirect to tools page */
+if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{ 
+	header("Location: ".BASE."administration/logs/");
+}
+
 /* print last 5 access logs */
 $logs = getAllLogs(5, NULL, NULL, NULL, 0, 0,0);
 
-print "<table class='table table-striped table-condensed table-hover table-top'>";
+print "<table class='table table-condensed table-hover table-top'>";
 
 # headers
 print "<tr>";

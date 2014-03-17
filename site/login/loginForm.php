@@ -1,5 +1,5 @@
 <div id="login">
-<form name="login" id="login">  
+<form name="login" id="login" class="form-inline">  
 
 <div class="loginForm">
 <table class="login">
@@ -10,7 +10,7 @@
 		<tr>
 			<th><?php print _('Username'); ?></th>
             <td>
-            	<input type="text" id="username" name="ipamusername" class="login" placeholder="<?php print _('Username'); ?>"></input>
+            	<input type="text" id="username" name="ipamusername" class="login form-control input-sm" placeholder="<?php print _('Username'); ?>" autofocus="autofocus"></input>
             </td>
         </tr>
             
@@ -18,7 +18,7 @@
         <tr>
             <th><?php print _('Password'); ?></th>
             <td>
-                <input type="password" id="password" name="ipampassword" class="login" placeholder="<?php print _('Password'); ?>"></input>
+                <input type="password" id="password" name="ipampassword" class="login form-control input-sm" placeholder="<?php print _('Password'); ?>"></input>
                 <?php
                 // add requested var for redirect
                 if(isset($_SESSION['phpipamredirect'])) {
@@ -31,7 +31,7 @@
         <!-- submit -->
         <tr>
             <td class="submit" colspan="2">
-                <input type="submit" value="<?php print _('Login'); ?>" class="btn btn-small pull-right"></input>
+                <input type="submit" value="<?php print _('Login'); ?>" class="btn btn-sm btn-default pull-right"></input>
             </td>
         </tr>
         
@@ -49,7 +49,7 @@ if($settings['enableIPrequests'] == 1) {
 ?>
 <div class="iprequest">
 	<a href="request_ip/">
-	<i class="icon-plus icon-gray"></i> <?php print _('Request new IP address'); ?>
+	<i class="fa fa-plus fa-pad-right"></i> <?php print _('Request new IP address'); ?>
 	</a>	
 </div>
 <?php

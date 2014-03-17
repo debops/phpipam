@@ -73,9 +73,9 @@ $missing = getUsersInGroup($_POST['g_id']);
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-default hidePopups"><?php print _('Cancel'); ?></button>
 		<?php if(sizeof($missing) > 0) { ?>
-		<button class="btn btn-small btn-success" id="groupRemoveUsersSubmit"><i class="icon-white icon-ok"></i> <?php print _('Remove selected users'); ?></button>
+		<button class="btn btn-sm btn-default btn-success" id="groupRemoveUsersSubmit"><i class="fa fa-minus"></i> <?php print _('Remove selected users'); ?></button>
 		<?php } ?>
 	</div>
 	

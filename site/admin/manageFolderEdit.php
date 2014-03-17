@@ -14,14 +14,14 @@ isUserAuthenticated(false);
 if($_POST['action'] == "add") {
 	$sectionPerm = checkSectionPermission ($_POST['sectionId']);
 	if($sectionPerm != 3) {
-		die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-error'>"._('You do not have permissions to add new folder in this section')."!</div></div><div class='pFooter'><button class='btn btn-small hidePopups'>"._('Close')."</button>");
+		die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-danger'>"._('You do not have permissions to add new folder in this section')."!</div></div><div class='pFooter'><button class='btn btn-sm btn-default hidePopups'>"._('Close')."</button>");
 	}
 }
 /* otherwise check subnet permission */
 else {
 	$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 	if($subnetPerm != 3) {
-		die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-error'>"._('You do not have permissions to add edit/delete this folder')."!</div></div><div class='pFooter'><button class='btn btn-small hidePopups'>"._('Close')."</button>");
+		die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-danger'>"._('You do not have permissions to add edit/delete this folder')."!</div></div><div class='pFooter'><button class='btn btn-sm btn-default hidePopups'>"._('Close')."</button>");
 	}
 }
 
@@ -72,9 +72,9 @@ else															{ $readonly = false; }
     <tr>
         <td class="middle"><?php print _('Name'); ?></td>
         <td>
-            <input type="text" id="field-description" name="description" value="<?php print @$subnetDataOld['description']; ?>">
+            <input type="text" class="form-control input-sm input-w-250" id="field-description" name="description" value="<?php print @$subnetDataOld['description']; ?>">
         </td>
-        <td class="info"><?php print _('Enter folder name'); ?></td>
+        <td class="info2"><?php print _('Enter folder name'); ?></td>
     </tr>  
 
     <?php if($_POST['action'] != "add") { ?>
@@ -82,7 +82,7 @@ else															{ $readonly = false; }
     <tr>
         <td class="middle"><?php print _('Section'); ?></td>
         <td>
-        	<select name="sectionIdNew">
+        	<select name="sectionIdNew" class="form-control input-sm input-w-auto">
             	<?php
            		$sections = fetchSections();
             
@@ -96,7 +96,7 @@ else															{ $readonly = false; }
         	
         	</select>
         </td>
-        <td class="info"><?php print _('Move to different section'); ?></td>
+        <td class="info2"><?php print _('Move to different section'); ?></td>
     </tr>  
     <?php } ?>
     
@@ -106,13 +106,16 @@ else															{ $readonly = false; }
         <td>
         	<?php printDropdownMenuBySectionFolders($_POST['sectionId'], $subnetDataOld['masterSubnetId']); ?>
         </td>
-        <td class="info"><?php print _('Enter master folder if you want to nest it under existing folder, or select root to create root folder'); ?>!</td>
+        <td class="info2"><?php print _('Enter master folder if you want to nest it under existing folder, or select root to create root folder'); ?>!</td>
     </tr>
     
     <!-- hidden values -->
     <input type="hidden" name="sectionId"       value="<?php print $_POST['sectionId'];    ?>">
     <input type="hidden" name="subnetId"        value="<?php print $_POST['subnetId'];     ?>">       
     <input type="hidden" name="action"    		value="<?php print $_POST['action']; ?>">
+	<input type="hidden" name="vlanId" 			value="0">
+	<input type="hidden" name="vrfId" 			value="0">
+
 
     <?php
 	# custom Subnet fields
@@ -129,7 +132,7 @@ else															{ $readonly = false; }
 		    print "<tr>";
 		    print "	<td class='middle'>$field[name]</td>";
 		    print "	<td colspan='2'>";
-		    print "	<input type='text' class='input-xxlarge' id='field-$field[nameNew]' name='$field[nameNew]' value='".$subnetDataOld[$field['name']]."' placeholder='".$subnetDataOld[$field['name']]."'>";
+		    print "	<input type='text' class='form-control input-sm' id='field-$field[nameNew]' name='$field[nameNew]' value='".$subnetDataOld[$field['name']]."' placeholder='".$subnetDataOld[$field['name']]."'>";
 		    print " </td>";
 		    print "</tr>";
 	    }
@@ -147,7 +150,7 @@ else															{ $readonly = false; }
     <?php
     # warning if delete
     if($_POST['action'] == "delete") {
-	    print "<div class='alert alert-warn' style='margin-top:0px;'><strong>"._('Warning')."</strong><br>"._('Removing subnets will delete ALL underlaying subnets and belonging IP addresses')."!</div>";
+	    print "<div class='alert alert-warning' style='margin-top:0px;'><strong>"._('Warning')."</strong><br>"._('Removing subnets will delete ALL underlaying subnets and belonging IP addresses')."!</div>";
     }
     ?>
 
@@ -158,14 +161,14 @@ else															{ $readonly = false; }
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-default hidePopups"><?php print _('Cancel'); ?></button>
 		<?php
 		//if action == edit and location = IPaddresses print also delete form
 		if(($_POST['action'] == "edit") && ($_POST['location'] == "IPaddresses") ) {
-			print "<button class='btn btn-small btn-danger editFolderSubmitDelete' data-action='delete' data-subnetId='$subnetDataOld[id]'><i class='icon-white icon-trash'></i> "._('Delete folder')."</button>";
+			print "<button class='btn btn-sm btn-default btn-danger editFolderSubmitDelete' data-action='delete' data-subnetId='$subnetDataOld[id]'><i class='fa fa-trash-o'></i> "._('Delete folder')."</button>";
 		}
 		?>
-		<button class="btn btn-small editFolderSubmit <?php if($_POST['action']=="delete") print "btn-danger"; else print "btn-success"; ?>"><i class="icon-white <?php if($_POST['action']=="add") { print "icon-plus"; } else if ($_POST['action']=="delete") { print "icon-trash"; } else { print "icon-ok"; } ?>"></i> <?php print ucwords(_($_POST['action'])); ?></button>
+		<button class="btn btn-sm btn-default editFolderSubmit <?php if($_POST['action']=="delete") print "btn-danger"; else print "btn-success"; ?>"><i class="<?php if($_POST['action']=="add") { print "fa fa-plus"; } else if ($_POST['action']=="delete") { print "fa fa-trash-o"; } else { print "fa fa-check"; } ?>"></i> <?php print ucwords(_($_POST['action'])); ?></button>
 	</div>
 	
 	<div class="manageFolderEditResult"></div>

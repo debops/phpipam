@@ -15,7 +15,7 @@ $allVRFs = getAllVRFs ();
 <h4><?php print _('Manage VRF'); ?></h4>
 <hr><br>
 
-<button class='btn btn-small vrfManagement' data-action='add'   data-vrfid=''  style='margin-bottom:10px;'><i class='icon-gray icon-plus'></i> <?php print _('Add VRF'); ?></button>
+<button class='btn btn-sm btn-default vrfManagement' data-action='add'   data-vrfid=''  style='margin-bottom:10px;'><i class='fa fa-plus'></i> <?php print _('Add VRF'); ?></button>
 
 <!-- vrfs -->
 <?php
@@ -48,8 +48,8 @@ else {
 
 	print "	<td class='actions'>";
 	print "	<div class='btn-group'>";
-	print "		<button class='btn btn-small vrfManagement' data-action='edit'   data-vrfid='$vrf[vrfId]'><i class='icon-gray icon-pencil'></i></button>";
-	print "		<button class='btn btn-small vrfManagement' data-action='delete' data-vrfid='$vrf[vrfId]'><i class='icon-gray icon-remove'></i></button>";
+	print "		<button class='btn btn-xs btn-default vrfManagement' data-action='edit'   data-vrfid='$vrf[vrfId]'><i class='fa fa-pencil'></i></button>";
+	print "		<button class='btn btn-xs btn-default vrfManagement' data-action='delete' data-vrfid='$vrf[vrfId]'><i class='fa fa-times'></i></button>";
 	print "	</div>";
 	print "	</td>";	
 	print '</tr>'. "\n";

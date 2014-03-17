@@ -4,7 +4,7 @@
 # miha petkovsek <miha.petkovsek@gmail.com>, 2013.
 #
 
-# "Project-Id-Version: 0.9\n"
+# "Project-Id-Version: 0.99.001\n"
 # "Report-Msgid-Bugs-To: Miha Petkovsek <miha.petkovsek@gmail.com>\n"
 # "POT-Creation-Date: 2013-04-02 14:33+0200\n"
 # "PO-Revision-Date: 2013-06-28 14:33+0200\n"
@@ -4394,3 +4394,287 @@ msgstr "Našel sem sledeče uporabnike"
 
 msgid "Select"
 msgstr "Izberi"
+
+#: functions/functions-common.php
+msgid "Favourite subnets"
+msgstr "Priljubljena omrežja"
+
+msgid "No favourite subnets selected"
+msgstr "Ni priljubljenih omrežij"
+
+msgid "You can add subnets to favourites by clicking star icon in subnet details"
+msgstr "Omrežje lahko dodate v priljubljene s klikom na szvezdivo v podatkih o omrežju"
+
+msgid "Click to remove from favourites"
+msgstr "Kliknite za odstranitev"
+
+msgid "Click to add to favourites"
+msgstr "Kliknite za dodajanje"
+
+#: site/tools/favouriteEdit.php
+msgid "Error editing favourite"
+msgstr "Napaka pri urejanju priljubljenih omrežij"
+
+#: site/sections.php
+msgid "Favourite networks"
+msgstr "Priljubljena omrežja"
+
+#: site/ipaddr/ipDetailsChangelog.php
+msgid "Changelog"
+msgstr "Log sprememb"
+
+msgid "No changelogs available"
+msgstr "Ni zabeleženih sprememb"
+
+msgid "No changelog entries are available for this host"
+msgstr "Za ta IP naslov ni zabeleženih nobenih sprememb"
+
+msgid "No changelog entries are available for this subnet"
+msgstr "Za to omrežje ni zabeleženih nobenih sprememb"
+
+msgid "No changelog entries are available for this section"
+msgstr "Za ta razdelek ni zabeleženih nobenih sprememb"
+
+msgid "No changelog entries are available"
+msgstr "Ni zabeleženih sprememb"
+
+#: site/ipaddr/ipDetails.php
+msgid "Avalibility"
+msgstr "Razpoložljivost"
+
+msgid "Last edited"
+msgstr "Nazadnje urejeno"
+
+msgid "Action"
+msgstr "Dejanje"
+
+msgid "Result"
+msgstr "Rezultat"
+
+msgid "Change"
+msgstr "Sprememba"
+
+#: site/tools/changelogPrint.php
+msgid "Output has been limited to last 50 lines"
+msgstr "Rezultat je bil omejen na zadnjih 50 vrstic"
+
+msgid "Output has been limited to last 100 lines"
+msgstr "Rezultat je bil omejen na zadnjih 100 vrstic"
+
+msgid "Output has been limited to last 250 lines"
+msgstr "Rezultat je bil omejen na zadnjih 250 vrstic"
+
+msgid "Output has been limited to last 500 lines"
+msgstr "Rezultat je bil omejen na zadnjih 500 vrstic"
+
+#: site/admin/settings.php
+msgid "Enable changelog"
+msgstr "Omogoči logiranje sprememb"
+
+#: site/tools/changelog.php
+msgid "Change logging is disabled. You can enable it under administration"
+msgstr "Logiranje sprememb ni omogočeno. To lahko spremenite v nastavitvah sistema"
+
+#: site/admin/settings.php
+msgid "Ping path"
+msgstr "Ping pot"
+
+msgid "Set path for ping executable file (default /bin/ping)"
+msgstr "Pot do ping izvršne datoteke (privzeto /bin/ping/)"
+
+msgid "Max scan threads"
+msgstr "Max hkratnih sej"
+
+msgid "Set maximum nubmer of concurrent ICMP checks (default 128)"
+msgstr "Maksimalno število hkratnih ICMP preverb ob skeniraju (privzeto 128)"
+
+#: functions/functions-common.php
+msgid "Last 5 change log entries"
+msgstr "Zadnjih 5 vnosov sprememb"
+
+#: site/admin/widgets.php
+msgid "You can manage widgets here"
+msgstr "Tukaj lahko upravljate z widgeti"
+
+msgid "Create new widget"
+msgstr "Dodaj nov widget"
+
+msgid "No widgets created yet"
+msgstr "Ni razpoložljivih widgetov"
+
+msgid "Create widget file in directory site/dashboard/widgets/"
+msgstr "Datoteko za widget kreirajte v site/dashboard/widgets/"
+
+#: site/admin/widgetEdit.php
+msgid "Add new widget"
+msgstr "Dodaj nov widget"
+
+msgid "Edit widget"
+msgstr "Uredi widget"
+
+msgid "Delete widget"
+msgstr "Izbriši widget"
+
+#: site/admin/widgetEditResult.php
+msgid "Widget add error"
+msgstr "Napaka pri dodajanju widgets"
+
+msgid "Widget edit error"
+msgstr "Napaka pri urejanju widgeta"
+
+msgid "Widget delete error"
+msgstr "Napaka pri izbrisu widgeta"
+
+msgid "Widget add success"
+msgstr "Widget dodan"
+
+msgid "Widget edit success"
+msgstr "Widget urejen"
+
+msgid "Widget delete success"
+msgstr "Widget izbrisan"
+
+#: site/dashboard/widgets/requests.php
+msgid "Active IP address requests"
+msgstr "Aktivni zahtevki za IP naslov"
+
+#: site/sections.php
+msgid "Click to reorder widgets"
+msgstr "Klikni za prerazporeditev widgetov"
+
+msgid "Click to save widgets order"
+msgstr "Shrani vrstni red widgetov"
+
+#: site/dashboard/widgetPopup.php
+msgid "Add new widget to dashboard"
+msgstr "Dodaj nov widget na dashboard"
+
+msgid "All available widgets are already on dashboard"
+msgstr "Vsi razpoložljivi widgeti so že na dashboardu"
+
+#: site/tools/userMenu.php
+msgid "Save order"
+msgstr "Shrani vrstni red"
+
+#: site/admin/widgets.php
+msgid "File"
+msgstr "Datoteka"
+
+msgid "Admin only"
+msgstr "Samo za administratorje"
+
+msgid "Link to page"
+msgstr "Povezava na stran"
+
+msgid "Widget size"
+msgstr "Velikost"
+
+#: site/ipaddr/scan/subnetScanDiscoveryPing.php
+msgid "No alive host found"
+msgstr "Nisem našel razpoložljivih naprav"
+
+msgid "Errors occured during scan"
+msgstr "Pri skeniranju je prišlo do napake"
+
+msgid "Excluded from check"
+msgstr "Preverjanje izklopljeno"
+
+#: site/login/loginCheck.php
+msgid "Invalid characters in username"
+msgstr "Neveljavni znaki v uporabniškem imenu"
+
+msgid "Invalid characters in password"
+msgstr "Neveljavni znaki v geslu"
+
+#: site/admin/adminMenu.php
+msgid "Mail settings"
+msgstr "Mail nastavitve"
+
+msgid "Mail server settings"
+msgstr "Nastavitve mail strežnika"
+
+msgid "Server type"
+msgstr "Tip strežnika"
+
+msgid "Localhost"
+msgstr "Lokalen strežnik"
+
+msgid "SMTP"
+msgstr "SMTP"
+
+msgid "Select server type for sending mail messages"
+msgstr "Izberite tip strežnika za pošiljanje email sporočil"
+
+msgid "Server authentication"
+msgstr "Avtentikacija"
+
+msgid "Select yes if authentication is required"
+msgstr "Izberite da, če strežnik zahteva avtentikacijo"
+
+msgid "Set username for SMTP authentication"
+msgstr "Vpišite uporabniško ime za SMTP"
+
+msgid "Set password for SMTP authentication"
+msgstr "Vpišite geslo za SMTP"
+
+msgid "Mail sender settings"
+msgstr "Nastavitve pošiljatelja"
+
+msgid "Send test email"
+msgstr "Pošljite testno sporočilo"
+
+msgid "Mail server type"
+msgstr "Tip mail strežnika"
+
+msgid "SMTP settings"
+msgstr "SMTP nastavitve"
+
+msgid "Server address"
+msgstr "Naslov strežnika"
+
+msgid "Sender name"
+msgstr "Ime pošiljatelja"
+
+msgid "Sender mail"
+msgstr "Email pošiljatelja"
+
+#: site/admin.settings.php
+msgid "Set administrator name"
+msgstr "Vpišite ime administratorja"
+
+msgid "Set administrator e-mail"
+msgstr "Vpišite email administratorja"
+
+#: site/admin/verifyDatabase.php
+msgid "Cannot get fix for table"
+msgstr "Ne morem popraviti tabele"
+
+msgid "Fix table"
+msgstr "Popravi tabelo"
+
+msgid "Fix field"
+msgstr "Popravi polje"
+
+#: site/admin/verifyDatabaseFix.php
+msgid "Wrong parameters"
+msgstr "Napačni parametri"
+
+msgid "Table fixed"
+msgstr "Tabela popravljena"
+
+msgid "Field fixed"
+msgstr "Polje popravljeno"
+
+#: site/sections.php
+msgid "Database errors detected"
+msgstr "Zaznane so napake v podatkovni bazi"
+
+#: site/tools/devicesPrint.php
+msgid "Show all hosts"
+msgstr "Prikaži vse IPje"
+
+msgid "No hosts belonging to this device"
+msgstr "Noben IP ne pripada tej napravi"
+
+msgid "Sort by vendor"
+msgstr "Sortiraj po proizvajalcu"

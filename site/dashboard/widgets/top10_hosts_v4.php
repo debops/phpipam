@@ -13,9 +13,31 @@ require_once( dirname(__FILE__) . '/../../../functions/functions.php' );
 # no errors!
 ini_set('display_errors', 0);
 
+# set size parameters
+$height = 200;
+$slimit = 10;
+
+# get widget parameters
+$widget = getWidgetByFile($_REQUEST['subpage']);
+
+# if direct request include plot JS 
+if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{ 
+	# reset size and limit
+	$height = 350;
+	$slimit = 20;
+	# include flot JS
+	print '<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>';
+	print '<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.categories.js"></script>';
+	print '<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/flot/excanvas.min.js"></script><![endif]-->';
+	# and print title
+	print "<div class='container'>";
+	print "<h4 style='margin-top:40px;'>$widget[wtitle]</h4><hr>";
+	print "</div>";
+}
+
 # get subnets statistic
 $type = 'IPv4';
-$subnetHost = getSubnetStatsDashboard($type, 10, false);
+$subnetHost = getSubnetStatsDashboard($type, $slimit, false);
 
 
 /* detect duplicates */
@@ -45,7 +67,7 @@ $(function () {
 	if(sizeof($subnetHost) > 0) {
 		$m=0;
 		foreach ($subnetHost as $subnet) {
-			if($m < 10) {
+			if($m < $slimit) {
 				# verify user access
 				$sp = checkSubnetPermission ($subnet['id']);
 				if($sp != "0") {
@@ -207,6 +229,6 @@ else {
 }
 ?>
 
-<div id="IPv4top10Hosts" class="top10" style="height: 200px; width: 95%; margin-left: 3%; padding: 0px; position: relative; ">
-	<div style="text-align:center;padding-top:50px;"><strong><?php print _('Loading statistics'); ?></strong><br><img src="css/images/loading_dash.gif"></div>
+<div id="IPv4top10Hosts" class="top10" style="height: <?php print $height; ?>px; width: 95%; margin-left: 3%; padding: 0px; position: relative; ">
+	<div style="text-align:center;padding-top:50px;"><strong><?php print _('Loading statistics'); ?></strong><br><i class='fa fa-spinner fa-spin'></i></div>
 </div>

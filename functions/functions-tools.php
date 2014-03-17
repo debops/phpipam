@@ -218,7 +218,7 @@ function updateLogTable ($command, $details = NULL, $severity = 0)
     }
     catch (Exception $e) {
     	$error =  $e->getMessage();
-    	die('<div class="alert alert-error">'._('Error').': '. $error .'</div>');
+    	die('<div class="alert alert-danger">'._('Error').': '. $error .'</div>');
 	}
 	
     return true;
@@ -239,7 +239,7 @@ function getLogByID ($logId)
     try { $logs = $database->getArray($query); }
     catch (Exception $e) {
     	$error =  $e->getMessage();
-    	die('<div class="alert alert-error">'._('Error').': '. $error .'</div>');
+    	die('<div class="alert alert-danger">'._('Error').': '. $error .'</div>');
 	}
 	
     return $logs[0];
@@ -282,7 +282,7 @@ function getAllLogs($logCount, $direction = NULL, $lastId = NULL, $highestId = N
     try { $logs = $database->getArray($query); }
     catch (Exception $e) {
     	$error =  $e->getMessage();
-    	die('<div class="alert alert-error">'._('Error').': '. $error .'</div>');
+    	die('<div class="alert alert-danger">'._('Error').': '. $error .'</div>');
 	}
 
     
@@ -309,7 +309,7 @@ function getAllLogsForExport()
     try { $logs = $database->getArray($query); }
     catch (Exception $e) {
     	$error =  $e->getMessage();
-    	die('<div class="alert alert-error">'._('Error').': '. $error .'</div>');
+    	die('<div class="alert alert-danger">'._('Error').': '. $error .'</div>');
 	}
     /* return vlans */
     return $logs;
@@ -331,7 +331,7 @@ function clearLogs()
     try { $logs = $database->executeQuery($query); }
     catch (Exception $e) {
     	$error =  $e->getMessage();
-    	die('<div class="alert alert-error">'._('Error').': '. $error .'</div>');
+    	die('<div class="alert alert-danger">'._('Error').': '. $error .'</div>');
 	}
 
     /* return result */
@@ -353,7 +353,7 @@ function countAllLogs ()
     try { $logs = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -396,7 +396,7 @@ function getHighestLogId()
     try { $logs = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -482,11 +482,11 @@ function printToolsSubnets( $subnets, $custom )
 				else 												{ $description = $option['value']['description']; }						# description		
 				
 				# requests
-				if($option['value']['allowRequests'] == 1) 			{ $requests = "enabled"; }												# requests enabled
+				if($option['value']['allowRequests'] == 1) 			{ $requests = "<i class='fa fa-gray fa-check'></i>"; }												# requests enabled
 				else 												{ $requests = ""; }														# request disabled				
 
 				# hosts check
-				if($option['value']['pingSubnet'] == 1) 			{ $pCheck = "enabled"; }												# ping check enabled
+				if($option['value']['pingSubnet'] == 1) 			{ $pCheck = "<i class='fa fa-gray fa-check'></i>"; }												# ping check enabled
 				else 												{ $pCheck = ""; }														# ping check disabled
 							
 			
@@ -495,11 +495,24 @@ function printToolsSubnets( $subnets, $custom )
 				$html[] = "<tr>";
 				# folder
 				if($option['value']['isFolder']==1) {
-				$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='icon-gray icon-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'>$description</a></td>";
-				$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span> $description</td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'>$description</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-folder-open'></i> $description</td>";
+				} 
+				else {
+				if($count==1) {
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-folder-open-o'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-folder-open-o'></i> $description</td>";	
 				} else {
-				$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
-				$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span> $description</td>";	
+					# last?
+					if(!empty( $children[$option['value']['id']])) {
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i> $description</td>";	
+					}
+					else {
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-angle-right'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-angle-right'></i> $description</td>";							
+					}
+				}
 				}
 				//vlan
 				$html[] = "	<td>$vlan</td>";
@@ -512,7 +525,7 @@ function printToolsSubnets( $subnets, $custom )
 				else {
 					$master = getSubnetDetailsById ($option['value']['masterSubnetId']);
 					if($master['isFolder'])
-						$html[] = "	<td><i class='icon-gray icon-folder-open'></i> <a href='subnets/".$option['value']['sectionId']."/$master[id]/'>$master[description]</a></td>" . "\n";
+						$html[] = "	<td><i class='fa fa-gray fa-folder-open-o'></i> <a href='subnets/".$option['value']['sectionId']."/$master[id]/'>$master[description]</a></td>" . "\n";
 					else {
 						$html[] = "	<td><a href='subnets/".$option['value']['sectionId']."/$master[id]/'>".transform2long($master['subnet']) .'/'. $master['mask'] .'</a></td>' . "\n";
 					}
@@ -520,26 +533,44 @@ function printToolsSubnets( $subnets, $custom )
 				
 				//used , free				
 				if($option['value']['isFolder']==1) {
-					$html[] =  '<td></td>'. "\n";
+					$html[] =  '<td class="hidden-xs hidden-sm"></td>'. "\n";
 				}
 				elseif( (!$masterSubnet) || (!subnetContainsSlaves($option['value']['id']))) {
 		    		$ipCount = countIpAddressesBySubnetId ($option['value']['id']);
 		    		$calculate = calculateSubnetDetails ( gmp_strval($ipCount), $option['value']['mask'], $option['value']['subnet'] );
 
-		    		$html[] = ' <td class="used">'. reformatNumber($calculate['used']) .'/'. reformatNumber($calculate['maxhosts']) .' ('.reformatNumber($calculate['freehosts_percent']) .' %)</td>';
+		    		$html[] = ' <td class="used hidden-xs hidden-sm">'. reformatNumber($calculate['used']) .'/'. reformatNumber($calculate['maxhosts']) .' ('.reformatNumber($calculate['freehosts_percent']) .' %)</td>';
 		    	}
 		    	else {
-					$html[] =  '<td></td>'. "\n";
+					$html[] =  '<td class="hidden-xs hidden-sm"></td>'. "\n";
 				}			
 				
 				//requests				
-				$html[] = "	<td>$requests</td>";
-				$html[] = "	<td>$pCheck</td>";
+				$html[] = "	<td class='hidden-xs hidden-sm'>$requests</td>";
+				$html[] = "	<td class='hidden-xs hidden-sm'>$pCheck</td>";
 				
 				//custom
 				if(sizeof($custom) > 0) {
 			   		foreach($custom as $field) {
-			    		$html[] =  "	<td>".$option['value'][$field['name']]."</td>"; 
+			   			
+			   			$html[] =  "<td class='hidden-xs hidden-sm hidden-md'>"; 
+			   			
+			   			//booleans
+						if($field['type']=="tinyint(1)")	{
+							if($option['value'][$field['name']] == "0")			{ $html[] = _("No"); }
+							elseif($option['value'][$field['name']] == "1")		{ $html[] = _("Yes"); }
+						} 
+						//text
+						elseif($field['type']=="text") {
+							if(strlen($option['value'][$field['name']])>0)		{ $html[] = "<i class='fa fa-gray fa-comment' rel='tooltip' data-container='body' data-html='true' title='".str_replace("\n", "<br>", $option['value'][$field['name']])."'>"; }
+							else												{ $html[] = ""; }
+						}
+						else {
+							$html[] = $option['value'][$field['name']];
+							
+						}
+			   			
+			   			$html[] =  "</td>"; 
 			    	}
 			    }
 				
@@ -580,7 +611,7 @@ function searchAddresses ($query)
     try { $logs = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     }  
     
@@ -609,8 +640,12 @@ function searchSubnets ($searchterm, $searchTermEdited = "")
 	}
     
     /* set query */    
-	$query[] = 'select * from `subnets` where `description` like "%'. $searchterm .'%" or `subnet` between "'. $searchTermEdited['low'] .'" and "'. $searchTermEdited['high'] .'" '.$custom.';';
-	
+    if($searchTermEdited['low']==0 && $searchTermEdited['high']==0) {
+		$query[] = 'select * from `subnets` where `description` like "%'. $searchterm .'%" '.$custom.';';
+    } else {
+		$query[] = 'select * from `subnets` where `description` like "%'. $searchterm .'%" or `subnet` between "'. $searchTermEdited['low'] .'" and "'. $searchTermEdited['high'] .'" '.$custom.';';	    
+    }
+		
 	/* search inside subnets even if IP does not exist! */
 	if($searchTermEdited['low']==$searchTermEdited['high']) {
 		$allSubnets = fetchAllSubnets ();
@@ -627,6 +662,7 @@ function searchSubnets ($searchterm, $searchTermEdited = "")
 			}
 		}
 	}
+		
     /* execute each query */
     foreach($query as $q) {
 	    try { $search[] = $database->getArray( $q ); }
@@ -640,7 +676,7 @@ function searchSubnets ($searchterm, $searchTermEdited = "")
     
     /* die if errors */
     if(isset($error)) {
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;	    
     }
        
@@ -676,7 +712,7 @@ function searchVLANs ($searchterm)
     try { $search = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -816,7 +852,7 @@ function isIPalreadyRequested($ip)
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -840,7 +876,7 @@ function countRequestedIPaddresses()
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -862,7 +898,7 @@ function getAllActiveIPrequests()
     try { $activeRequests = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -884,7 +920,7 @@ function getAllIPrequests($limit = 20)
     try { $activeRequests = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -907,7 +943,7 @@ function getIPrequestById ($id)
     try { $activeRequests = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -939,7 +975,7 @@ function addNewRequest ($request)
     try { $database->executeQuery( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
     	updateLogTable ('Failed to add new IP request', $log."\n".$error, 2);
         return false;
     } 
@@ -965,7 +1001,7 @@ function rejectIPrequest($id, $comment)
     try { $database->executeQuery( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
     	updateLogTable ('Failed to reject IP address id '. $id, 'Failed to reject IP address id '. $id . " - error:".$error, 2);
         return false;
     } 	
@@ -1016,7 +1052,7 @@ function acceptIPrequest($request)
     try { $database->executeMultipleQuerries( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         updateLogTable ('Failed to accept IP request', $log . "\n".$error, 2);
         return false;
     } 
@@ -1036,26 +1072,27 @@ function acceptIPrequest($request)
 
 
 
-/* @switch functions ------------------- */
+/* @device functions ------------------- */
 
 
 
 /**
  * Get all unique devices
  */
-function getAllUniqueSwitches () 
+function getAllUniqueDevices ($orderby = "hostname", $direction = "asc") 
 {
     global $db;                                                                      # get variables from config file
     $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
     
     /* get all vlans, descriptions and subnets */
-    $query   = 'SELECT `hostname`,`id`,`sections` FROM `switches` order by `hostname` ASC;';
+    $query   = "select * from `devices` as `d`, `deviceTypes` as `t` where `d`.`type` = `t`.`tid` order by `d`.`$orderby` $direction;";
+    $query   = "SELECT * from `devices` LEFT JOIN `deviceTypes` ON `devices`.`type` = `deviceTypes`.`tid` order by `devices`.`$orderby` $direction;";	
 
     /* execute */
     try { $devices = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -1065,53 +1102,103 @@ function getAllUniqueSwitches ()
 
 
 /**
- * Get switch details by hostname
+ * Get all unique devices - filter
  */
-function getSwitchDetailsByHostname($hostname) 
+function getAllUniqueDevicesFilter ($field, $search, $orderby = "hostname", $direction = "asc") 
 {
     global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
     
-    /* get all vlans, descriptions and subnets */
-    $query = 'SELECT * FROM `switches` where `hostname` = "'. $hostname .'" limit 1;';
+    /*query */
+    if($field == "type")	{ $query   = "select * from `devices` as `d`, `deviceTypes` as `t` where `d`.`type` = `t`.`tid` and `t`.`tname` like '%$search%' order by `d`.`$orderby` $direction;"; }
+    else 					{ $query   = "select * from `devices` as `d`, `deviceTypes` as `t` where `d`.`type` = `t`.`tid` and `d`.`$field` like '%$search%' order by `d`.`$orderby` $direction;"; }
 
     /* execute */
-    try { $ip = $database->getArray( $query ); }
+    try { $devices = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
-    /* return details */
-    if($ip) { return $ip[0]; }
-    else 	{ return false; }
+    /* return unique devices */
+    return $devices;
 }
 
 
 /**
- * Get switch details by id
+ * Get device details by id
  */
-function getSwitchDetailsById($id) 
+function getDeviceDetailsById($id) 
 {
     global $db;                                                                      # get variables from config file
     $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
     
     /* get all vlans, descriptions and subnets */
-    $query = 'SELECT * FROM `switches` where `id` = "'. $id .'";';
+    $query = 'SELECT * FROM `devices` where `id` = "'. $id .'";';
 
     /* execute */
-    try { $switch = $database->getArray( $query ); }
+    try { $device = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     }  
     
     /* return details */
-    if($switch) { return $switch[0]; }
+    if($device) { return $device[0]; }
     else 		{ return false; }
 }
+
+
+/**
+ * Get all device types
+ */
+function getAllDeviceTypes () 
+{
+    global $db;                                                                      # get variables from config file
+    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    
+    /* get all vlans, descriptions and subnets */
+    $query   = "select * from `deviceTypes`;";
+
+    /* execute */
+    try { $devices = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    } 
+    
+    /* return unique devices */
+    return $devices;
+}
+
+
+/**
+ * Get type details by id
+ */
+function getTypeDetailsById($id) 
+{
+    global $db;                                                                      # get variables from config file
+    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    
+    /* get all vlans, descriptions and subnets */
+    $query = 'SELECT * FROM `deviceTypes` where `tid` = '. $id .';';
+
+    /* execute */
+    try { $device = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    }  
+    
+    /* return details */
+    if($device) { return $device[0]; }
+    else 		{ return false; }
+}
+
 
 
 
@@ -1140,7 +1227,7 @@ function fetchInstructions ()
     try { $instructions = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -1155,17 +1242,39 @@ function fetchInstructions ()
 function getLatestPHPIPAMversion() 
 {
 	/* fetch page */
-	$handle = fopen("http://phpipam.net/phpipamversion.php", "r");
-	while (!feof($handle)) {
-		$version = fgets($handle);		
+	$handle = @fopen("http://phpipam.net/phpipamversion.php", "r");
+	if($handle) {
+		while (!feof($handle)) {
+			$version = fgets($handle);		
+		}
+		fclose($handle);
 	}
-	fclose($handle);
 	
 	/* return version */
 	if(is_numeric($version)) 	{ return $version; }
 	else 						{ return false; }
 }
 
+
+/**
+ *	update version check time
+ */
+function updatePHPIPAMversionCheckTime()
+{
+    global $db;                                                                      # get variables from config file
+    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
+	$query 		 = "update `settings` set `vcheckDate` = '".date("Y-m-d H:i:s")."';";
+	
+
+    /* execute */
+    try { $database->executeQuery($query); }
+    catch (Exception $e) {
+    	$error =  $e->getMessage();
+	}
+
+    /* return result */
+    return true;
+}
 
 
 

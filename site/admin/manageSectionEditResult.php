@@ -30,8 +30,8 @@ $update['permissions'] = json_encode($perm);
 
 /* get variables */
 $update['action']      		= $_POST['action'];
-$update['name']        		= htmlentities($_POST['name'], ENT_COMPAT | ENT_HTML401, "UTF-8");	//prevent XSS
-$update['description'] 		= htmlentities($_POST['description'], ENT_COMPAT | ENT_HTML401, "UTF-8");	//prevent XSS
+$update['name']        		= $_POST['name'];
+$update['description'] 		= $_POST['description'];
 $update['id']          		= $_POST['id'];
 $update['strictMode']  		= $_POST['strictMode'];
 $update['subnetOrdering']  	= $_POST['subnetOrdering'];

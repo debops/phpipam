@@ -14,7 +14,7 @@ isUserAuthenticated(false);
 $permission = checkSubnetPermission ($_POST['subnetId']);
 
 # die if write not permitted
-if($permission < 2) { die("<div class='alert alert-error'>"._('You cannot write to this subnet')."!</div>"); }
+if($permission < 2) { die("<div class='alert alert alert-danger'>"._('You cannot write to this subnet')."!</div>"); }
 
 /* verify post */
 CheckReferrer();
@@ -48,7 +48,7 @@ CheckReferrer();
 	<br><br>
 	
 	<!-- Download template -->
-	<a class="csvtemplate btn btn-small pull-right" id="csvtemplate">Download template</a>
+	<a class="csvtemplate btn btn-sm btn-default pull-right" id="csvtemplate">Download template</a>
 
 	<!-- Upload file form -->
 	<h4>1.) <?php print _('Upload file'); ?>:</h4>
@@ -58,7 +58,7 @@ CheckReferrer();
 	<div id="drop">
 		<input type="file" name="file" id="csvfile" style="display:none;">
 
-		<?php print _('Select CSV file'); ?>: <a class="btn btn-small">Browse</a>
+		<?php print _('Select CSV file'); ?>: <a class="btn btn-sm btn-default">Browse</a>
 	</div>
 	<span class="fname" style="display:none"></span>
 	
@@ -126,7 +126,7 @@ CheckReferrer();
 	
 	        fail:function(e, data){
 	            // Something has gone wrong!
-	            $('ul.progressUl li.alert').addClass('alert-error');
+	            $('ul.progressUl li.alert').addClass('alert alert-danger');
 	        },
 	        success:function(e, data){
 	            // All good, check for response!
@@ -142,7 +142,7 @@ CheckReferrer();
 	            else {
 	            	//get error message
 					var respErr = resp['error'];	            	
-	            	$('ul.progressUl li.alert').addClass('alert-error');		//add error class	
+	            	$('ul.progressUl li.alert').addClass('alert alert-danger');		//add error class	
 	            	$('li.alert p').append("<br><strong>Error: "+respErr+"</strong>");	            
 	            }
 
@@ -172,7 +172,7 @@ CheckReferrer();
 	<hr>
 
 	<!-- import button -->
-	<input type="button" class="btn btn-small" value="<?php print _('Show uploaded subnets'); ?>" id="csvimportcheck">
+	<input type="button" class="btn btn-sm btn-default" value="<?php print _('Show uploaded subnets'); ?>" id="csvimportcheck">
 
 	<!-- verification holder -->
 	<div class="csvimportverify"></div>
@@ -181,7 +181,7 @@ CheckReferrer();
 
 <!-- footer -->
 <div class="pFooter">
-	<button class="btn btn-small hidePopups"><?php print _('Close window'); ?></button>
+	<button class="btn btn-sm btn-default hidePopups"><?php print _('Close window'); ?></button>
 	<!-- result -->
 	<div class="csvImportResult"></div>
 </div>

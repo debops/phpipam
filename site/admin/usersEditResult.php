@@ -43,10 +43,10 @@ else if ($userModDetails['action'] == "delete") {
 
 	//cannot delete admin user
 	if($userModDetails['username']=="Admin" ) {
-		die('<div class="alert alert-error">'._('Admin user cannot be deleted').'!</div>');
+		die('<div class="alert alert-danger">'._('Admin user cannot be deleted').'!</div>');
 	}	
 	else {
-	    if (!deleteUserById($userModDetails['userId'], $userModDetails['username'])) { print '<div class="alert alert-error">'._('Cannot delete user').' '. $userModDetails['username'] .'!</div>'; }
+	    if (!deleteUserById($userModDetails['userId'], $userModDetails['username'])) { print '<div class="alert alert-danger">'._('Cannot delete user').' '. $userModDetails['username'] .'!</div>'; }
 	    else 																		 { print '<div class="alert alert-success">'._('User deleted successfully').'!</div>'; }
 	    //stop script execution
 	    die();	
@@ -62,6 +62,18 @@ if(sizeof($myFields) > 0) {
 		$myField['nameTest']      = str_replace(" ", "___", $myField['name']);
 		
 		if(isset($_POST[$myField['nameTest']])) { $userModDetails[$myField['name']] = $userModDetails[$myField['nameTest']];}
+
+		//booleans can be only 0 and 1!
+		if($myField['type']=="tinyint(1)") {
+			if($userModDetails[$myField['name']]>1) {
+				$userModDetails[$myField['name']] = "";
+			}
+		}
+				
+		//not null!
+		if($myField['Null']=="NO" && strlen($userModDetails[$myField['name']])==0 && !checkAdmin(false,false)) {
+			die('<div class="alert alert-danger">"'.$myField['name'].'" can not be empty!</div>');
+		}
 	}
 }
 
@@ -87,7 +99,7 @@ else {
  * If no errors are present add / edit user
  */
 if (sizeof($errors) != 0) {
-    print '<div class="alert alert-error">';
+    print '<div class="alert alert-danger">';
     foreach ($errors as $error) {
         print $error .'<br>';
     }

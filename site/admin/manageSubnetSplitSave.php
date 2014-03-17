@@ -9,7 +9,7 @@ require_once('../../functions/functions.php');
 
 /* verify that user has write permissions for subnet */
 $subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
-if($subnetPerm < 3) 	{ die('<div class="alert alert-error">'._('You do not have permissions to resize subnet').'!</div>'); }
+if($subnetPerm < 3) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to resize subnet').'!</div>'); }
 
 
 /* verify post */
@@ -24,13 +24,18 @@ $subnetOld = getSubnetDetailsById ($_POST['subnetId']);
 # get number - this tells us to how many subnets we want to split
 $num = $_POST['number'];
 
-# get new mask
+# get new mask - how much we need to add to old mask?
 switch($num) {
-	case "2":  $maskDiff = 1; break;
-	case "4":  $maskDiff = 2; break;
-	case "8":  $maskDiff = 3; break;
-	case "16": $maskDiff = 4; break;
+	case "2":   $maskDiff = 1; break;
+	case "4":   $maskDiff = 2; break;
+	case "8":   $maskDiff = 3; break;
+	case "16":  $maskDiff = 4; break;
+	case "32":  $maskDiff = 5; break;
+	case "64":  $maskDiff = 6; break;
+	case "128": $maskDiff = 7; break;
+	case "256": $maskDiff = 8; break;
 }
+
 $mask = $subnetOld['mask'] + $maskDiff;
 
 # set number of subnets
@@ -108,7 +113,7 @@ foreach($ipaddresses as $ip) {
 
 # die if errors
 if(isset($errors) || sizeof($errors) > 0) {
-	print "<div class='alert alert-error'>"._('Wrong IP addresses (subnet or broadcast)')."<ul>";
+	print "<div class='alert alert-danger'>"._('Wrong IP addresses (subnet or broadcast)')."<ul>";
 	foreach($errors as $error) {
 		print "<li>$error</li>";
 	}
@@ -144,7 +149,7 @@ foreach($newsubnets as $subnet) {
 
 # if all good remove old subnet, else remove created subnets
 if(isset($errors) || sizeof($errors) > 0) {
-	print "<div class='alert alert-error'>"._('Wrong IP addresses (subnet or broadcast)')."<ul>";
+	print "<div class='alert alert-danger'>"._('Wrong IP addresses (subnet or broadcast)')."<ul>";
 	foreach($errors as $error) {
 		print "<li>$error</li>";
 	}
@@ -158,7 +163,7 @@ else {
 	}
 	else {
 		# no errors, remove old subnet!
-		if(!deleteSubnet ($subnetOld['id']))	{ print "<div class='alert alert-error'>"._('Failed to remove old subnet')."!</div>"; }
+		if(!deleteSubnet ($subnetOld['id']))	{ print "<div class='alert alert-danger'>"._('Failed to remove old subnet')."!</div>"; }
 		else									{ print "<div class='alert alert-success'>"._('Subnet splitted ok')."!</div>"; }
 	}
 }

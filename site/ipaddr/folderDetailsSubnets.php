@@ -37,19 +37,19 @@ if(sizeof($folders)>0)
 {
 	/* print title */
 	$slaveNum = sizeof($folders);
-	print "<h4><strong>$master[description]</strong> "._('has')." $slaveNum "._('directly nested folders').":</h4><hr>";
+	print "<h4>$master[description] "._('has')." $slaveNum "._('directly nested folders').":</h4><hr>";
 	
 	/* print HTML list */
 	print "<ul style='margin-bottom:35px;list-style:none'>";
 	foreach($folders as $f) {
-		print "<li><a href='folder/$section[id]/$f[id]/'><i class='icon-folder-close'></i> $f[description]</a></li>";
+		print "<li><a href='folder/$section[id]/$f[id]/'><i class='fa fa-folder fa-sfolder'></i> $f[description]</a></li>";
 	}
 	print "</ul>";
 }
 /* print title */
 if(sizeof($subnets)>0) {
 	$slaveNum = sizeof($subnets);
-	print "<h4><strong>$master[description]</strong> "._('has')." $slaveNum "._('directly nested subnets').":</h4><hr><br>";
+	print "<h4>$master[description] "._('has')." $slaveNum "._('directly nested subnets').":</h4><hr><br>";
 	
 	/* print HTML table */
 	print '<table class="slaves table table-striped table-condensed table-hover table-full table-top">'. "\n";
@@ -59,10 +59,10 @@ if(sizeof($subnets)>0) {
 	print "	<th class='small'>"._('VLAN')."</th>";
 	print "	<th class='small description'>"._('Subnet description')."</th>";
 	print "	<th>"._('Subnet')."</th>";
-	print "	<th class='small'>"._('Used')."</th>";
-	print "	<th class='small'>% "._('Free')."</th>";
-	print "	<th class='small'>"._('Requests')."</th>";
-	print " <th></th>";
+	print "	<th class='small hidden-xs hidden-sm'>"._('Used')."</th>";
+	print "	<th class='small hidden-xs hidden-sm'>% "._('Free')."</th>";
+	print "	<th class='small hidden-xs hidden-sm'>"._('Requests')."</th>";
+	print " <th class='actions'></th>";
 	print "</tr>";
 	
 	/* print each slave */
@@ -97,8 +97,8 @@ if(sizeof($subnets)>0) {
 	
 	    
 		$calculate = calculateSubnetDetails ( gmp_strval($ipCount), $slave['mask'], $slave['subnet'] );
-	    print ' <td class="small">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
-	    print '	<td class="small">'. $calculate['freehosts_percent'] .'</td>';
+	    print ' <td class="small hidden-xs hidden-sm">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
+	    print '	<td class="small hidden-xs hidden-sm">'. $calculate['freehosts_percent'] .'</td>';
 	    
 	    # add to sum if IPv4
 	    if ( IdentifyAddress( $slave['subnet'] ) == "IPv4") {
@@ -107,26 +107,26 @@ if(sizeof($subnets)>0) {
 	    }
 		
 		# allow requests
-		if($slave['allowRequests'] == 1) 			{ print '<td class="allowRequests small">enabled</td>'; }
-		else 										{ print '<td class="allowRequests small"></td>'; }
+		if($slave['allowRequests'] == 1) 			{ print '<td class="allowRequests small hidden-xs hidden-sm"><i class="fa fa-gray fa-check"></i></td>'; }
+		else 										{ print '<td class="allowRequests small hidden-xs hidden-sm"><i class="fa fa-gray fa-check"></i></td>'; }
 		
 		# edit
 		$subnetPerm = checkSubnetPermission ($slave['id']);
 		if($subnetPerm == 3) {
-			print "	<td class='small'>";
+			print "	<td class='actions'>";
 			print "	<div class='btn-group'>";
-			print "		<button class='btn btn-mini editSubnet'     data-action='edit'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-pencil'></i></button>";
-			print "		<button class='btn btn-mini showSubnetPerm' data-action='show'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-tasks'></i></button>";
-			print "		<button class='btn btn-mini editSubnet'     data-action='delete' data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-remove'></i></button>";
+			print "		<button class='btn btn-xs btn-default editSubnet'     data-action='edit'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa fa-pencil'></i></button>";
+			print "		<button class='btn btn-xs btn-default showSubnetPerm' data-action='show'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa fa-tasks'></i></button>";
+			print "		<button class='btn btn-xs btn-default editSubnet'     data-action='delete' data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa fa-times'></i></button>";
 			print "	</div>";
 			print " </td>";
 		}
 		else {
-			print "	<td class='small'>";
+			print "	<td class='actions'>";
 			print "	<div class='btn-group'>";
-			print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-pencil'></i></button>";
-			print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-tasks'></i></button>";
-			print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-remove'></i></button>";
+			print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa fa-pencil'></i></button>";
+			print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa fa-tasks'></i></button>";
+			print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa fa-times'></i></button>";
 			print "	</div>";
 			print " </td>";		
 		}

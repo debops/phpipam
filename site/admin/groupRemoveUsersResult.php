@@ -18,7 +18,7 @@ foreach($_POST as $k=>$p) {
 } 
 
 /* verify that description is present if action != delete */
-if(strlen($_POST['gid'] == 0))	{ die("<div class='alert alert-error'>"._('Error - no group ID')."</div>"); }
+if(strlen($_POST['gid'] == 0))	{ die("<div class='alert alert alert-danger'>"._('Error - no group ID')."</div>"); }
 
 /* remove each user from group */
 if(sizeof($users)>0) {
@@ -36,7 +36,7 @@ else {
 
 /* print result */
 if(isset($errors)) {
-	print "<div class='alert alert-error'>";
+	print "<div class='alert alert alert-danger'>";
 	print _("Failed to remove users").":<hr>";
 	print "<ul>";
 	foreach($errors as $e) {

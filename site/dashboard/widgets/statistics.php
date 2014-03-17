@@ -25,7 +25,7 @@ $userCount = getNumberOfUsers();
 
 
 <!-- stats table -->
-<table class="table table-striped table-condensed table-hover">
+<table class="table table-condensed table-hover">
 
 	<!-- sections -->
 	<tr>

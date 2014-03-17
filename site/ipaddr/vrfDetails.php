@@ -11,7 +11,7 @@ $vrf = getVRFDetailsById ($_REQUEST['vrfId']);
 
 # not existing
 if(!$vrf) {
-	die("<div class='alert alert-error'>"._('Invalid VRF id')."!</div>");
+	die("<div class='alert alert-danger'>"._('Invalid VRF id')."!</div>");
 }
 
 # get all site settings
@@ -55,8 +55,8 @@ $settings = getAllSettings();
 	
 	# permissions
 	if(checkAdmin (false)) {
-		print "		<button class='btn btn-small vrfManagement' data-action='edit'   data-vrfId='$vrf[vrfId]'><i class='icon-gray icon-pencil'></i></button>";
-		print "		<button class='btn btn-small vrfManagement' data-action='delete' data-vrfId='$vrf[vrfId]'><i class='icon-gray icon-remove'></i></button>";
+		print "		<button class='btn btn-xs btn-default vrfManagement' data-action='edit'   data-vrfId='$vrf[vrfId]'><i class='fa fa-pencil'></i></button>";
+		print "		<button class='btn btn-xs btn-default vrfManagement' data-action='delete' data-vrfId='$vrf[vrfId]'><i class='fa fa-times'></i></button>";
 	}
 		
 	print "	</div>";

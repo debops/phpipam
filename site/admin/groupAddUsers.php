@@ -73,9 +73,9 @@ $missing = getUsersNotInGroup($_POST['g_id']);
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups">Cancel</button>
+		<button class="btn btn-sm btn-default hidePopups">Cancel</button>
 		<?php if(sizeof($missing) > 0) { ?>
-		<button class="btn btn-small btn-success" id="groupAddUsersSubmit"><i class="icon-white icon-ok"></i> Add selected users</button>
+		<button class="btn btn-sm btn-default btn-success" id="groupAddUsersSubmit"><i class="fa fa-plus"></i> Add selected users</button>
 		<?php } ?>
 	</div>
 	

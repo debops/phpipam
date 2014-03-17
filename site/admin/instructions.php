@@ -40,8 +40,8 @@ if($rowcount < 18) { $rowcount = 18; }
 	<!-- preview, submit -->
 	<br>
 	<div style="text-align:right;">
-		<input type="button" class="btn btn-small" id="preview" value="<?php print _('preview'); ?>">
-		<input type="submit" class="btn btn-small" value="<?php print _('Save instructions'); ?>">
+		<input type="button" class="btn btn-sm btn-default" id="preview" value="<?php print _('preview'); ?>">
+		<input type="submit" class="btn btn-sm btn-default" value="<?php print _('Save instructions'); ?>">
 	</div>
 </form>
 

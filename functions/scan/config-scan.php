@@ -7,18 +7,20 @@
  */
 
 //general configs
-$scanMaxHosts 	= 32;				// maximum number of scans per once
-$scanDNSresolve = true;				// try to resolve DNS name
-$scanIPv6 		= false;			// not yet
+$scanDNSresolve = true;							// try to resolve DNS name
+$scanIPv6 		= false;						// not yet
 
 //configs
-$MAX_THREADS = 256;					// set max concurrent threads
+$settings = getAllSettings();
+
+// set max concurrent threads
+$MAX_THREADS = $settings['scanMaxThreads'];	
 
 // ping path
-$pathPing = "/sbin/ping";
+$pathPing = $settings['scanPingPath'];
 
 // nmap path
-$pathNmap = "/usr/local/bin/nmap";
+//$pathNmap = "/usr/local/bin/nmap";
 
 
 ?>

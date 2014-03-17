@@ -46,12 +46,12 @@ foreach ($sections as $section) {
 		print "	<th>"._('Description')."</th>";
 		print "	<th>"._('VLAN')."</th>";	
 		print "	<th>"._('Master Subnet')."</th>";
-		print "	<th>"._('Used')."</th>";
-		print "	<th>"._('Requests')."</th>";
-		print "	<th>"._('Hosts check')."</th>";
+		print "	<th class='hidden-xs hidden-sm'>"._('Used')."</th>";
+		print "	<th class='hidden-xs hidden-sm'>"._('Requests')."</th>";
+		print "	<th class='hidden-xs hidden-sm'>"._('Hosts check')."</th>";
 		if(sizeof($custom) > 0) {
 			foreach($custom as $field) {
-				print "	<th>$field[name]</th>";
+				print "	<th class='hidden-xs hidden-sm hidden-md'>$field[name]</th>";
 			}
 		}
 		print "</tr>";
@@ -61,7 +61,7 @@ foreach ($sections as $section) {
 
 		# no subnets
 		if(sizeof($subnets) == 0) {
-			print "<tr><td colspan='$colSpan'><div class='alert alert-warn'>"._('Section has no subnets')."!</div></td></tr>";
+			print "<tr><td colspan='$colSpan'><div class='alert alert-info'>"._('Section has no subnets')."!</div></td></tr>";
 		}	
 		else {
 			$subnetPrint = printToolsSubnets($subnets, $custom);

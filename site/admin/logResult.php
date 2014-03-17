@@ -1,4 +1,4 @@
-<table id="logs" class="table table-condensed table-hover table-top">
+<table id="logs" class="table table-condensed table-hover table-top" style="margin-top:10px;">
 
 <?php
 
@@ -101,7 +101,7 @@ foreach ($logs as $log)
             print '	<td class="command"><a href="" class="openLogDetail" data-logid="'.$log['id'].'">'. $log['command']  .'</a></td>'. "\n";
             print '	<td class="detailed">';
             /* details */
-            if(!empty($log['details'])) { print '	<i class="icon-comment icon-gray" rel="tooltip" data-html="true" title="<b>'._('Event details').'</b>:<hr>'. $log['details'] .'"></i></td>'. "\n"; }
+            if(!empty($log['details'])) { print '	<i class="fa fa-comment fa-gray" rel="tooltip" data-html="true" data-placement="left" title="<b>'._('Event details').'</b>:<hr>'. $log['details'] .'"></i></td>'. "\n"; }
             print '	</td>'. "\n";
         	print '</tr>'. "\n";
     	}    	

@@ -26,7 +26,7 @@ if ($sectionId == 'Administration')
 {
     /* Print all Admin actions af user is admin :) */
     if (!checkAdmin()) {
-        print '<div class="alert alert-error">'._('Sorry, must be admin').'!</div>';
+        print '<div class="alert alert-danger">'._('Sorry, must be admin').'!</div>';
     }
     else {
         include('admin/adminMenu.php');
@@ -54,7 +54,7 @@ else
 		
 		foreach($subsections as $ss) {
 			print "<tr>";
-			print "	<td><i class='icon-gray icon-folder-close'></i> <a href='subnets/$ss[id]/' rel='tooltip' data-placement='right' title='$ss[description]'>$ss[name]</a></td>";
+			print "	<td><i class='fa fa-gray fa-folder'></i> <a href='subnets/$ss[id]/' rel='tooltip' data-placement='right' title='$ss[description]'>$ss[name]</a></td>";
 			print "</tr>";
 		}
 		
@@ -69,17 +69,17 @@ else
     # verify permissions
 	$sectionPermission = checkSectionPermission ($sectionId);
 		
-	if($sectionPermission == "0") { die("<div class='alert alert-error'>"._('You do not have access to this section')."!</div>"); }
+	if($sectionPermission == "0") { die("<div class='alert alert-danger'>"._('You do not have access to this section')."!</div>"); }
     
     # die if empty!
-    if(sizeof($sectionName) == 0) { die('<div class="alert alert-error">'._('Section does not exist').'!</div>'); }
+    if(sizeof($sectionName) == 0) { die('<div class="alert alert-danger">'._('Section does not exist').'!</div>'); }
 
     # header
     if(isset($_COOKIE['expandfolders'])) {
-	    if($_COOKIE['expandfolders'] == "1")	{ $iconClass='icon-resize-small'; $action = 'open';}
-	    else									{ $iconClass='icon-resize-full';  $action = 'close'; }
+	    if($_COOKIE['expandfolders'] == "1")	{ $iconClass='fa-compress'; $action = 'open';}
+	    else									{ $iconClass='fa-expand';  $action = 'close'; }
     }
-    else 										{ $iconClass='icon-resize-full';  $action = 'close';}
+    else 										{ $iconClass='fa-expand';  $action = 'close';}
     
     # Check if it has parent, and if so print back link
     if($sectionName['masterSection']!="0")	{
@@ -87,11 +87,11 @@ else
     	$mSection = getSectionDetailsById ($sectionName['masterSection']);
     	
 	    print "<div class='subnets' style='padding-top:10px;'>";
-	    print "	<a href='subnets/$mSection[id]/'><i class='icon-gray icon-chevron-left'></i> "._('Back to')." $mSection[name]</a><hr>";
+	    print "	<a href='subnets/$mSection[id]/'><i class='fa fa-gray fa-angle-left fa-pad-left'></i> "._('Back to')." $mSection[name]</a><hr>";
 	    print "</div>";
     }
     
-    print "<h4>"._('Available subnets')." <span class='pull-right' style='margin-right:5px;cursor:pointer;'><i class='icon-gray $iconClass' rel='tooltip' data-placement='bottom' title='"._('Expand/compress all folders')."' id='expandfolders' data-action='$action'></i></span></h4>";	
+    print "<h4>"._('Available subnets')." <span class='pull-right' style='margin-right:5px;cursor:pointer;'><i class='fa fa-gray fa-sm $iconClass' rel='tooltip' data-placement='bottom' title='"._('Expand/compress all folders')."' id='expandfolders' data-action='$action'></i></span></h4>";	
     print "<hr>";
 	
 	/* print subnets table ---------- */
@@ -144,12 +144,12 @@ $sectionPermission = checkSectionPermission ($sectionId);
 if($sectionPermission == 3) {
 	print "<div class='action'>";
 	if(isset($_REQUEST['subnetId'])) {
-	print "	<button class='btn btn-mini pull-left' id='hideSubnets' rel='tooltip' title='"._('Hide subnet list')."' data-placement='right'><i class='icon-gray icon-chevron-left'></i></button>";
+	print "	<button class='btn btn-xs btn-default pull-left' id='hideSubnets' rel='tooltip' title='"._('Hide subnet list')."' data-placement='right'><i class='fa fa-gray fa-sm fa-chevron-left'></i></button>";
 	}
 	print "	<span>"._('Add new');
 	print "	<div class='btn-group'>";
-	print "	 <button id='add_subnet' class='btn btn-small btn-success'  rel='tooltip' data-placement='top' title='"._('Add new subnet to')." $sectionName[name]'  data-subnetId='' data-sectionId='$sectionName[id]' data-action='add'><i class='icon-plus icon-white'></i></button>";
-	print "	 <button id='add_folder' class='btn btn-small btn-success'  rel='tooltip' data-placement='top' title='"._('Add new folder to')." $sectionName[name]'  data-subnetId='' data-sectionId='$sectionName[id]' data-action='add'><i class='icon-folder-close icon-white'></i></button>";
+	print "	 <button id='add_subnet' class='btn btn-xs btn-default btn-success'  rel='tooltip' data-container='body'  data-placement='top' title='"._('Add new subnet to')." $sectionName[name]'  data-subnetId='' data-sectionId='$sectionName[id]' data-action='add'><i class='fa fa-sm fa-plus'></i></button>";
+	print "	 <button id='add_folder' class='btn btn-xs btn-default btn-success'  rel='tooltip' data-container='body'  data-placement='top' title='"._('Add new folder to')." $sectionName[name]'  data-subnetId='' data-sectionId='$sectionName[id]' data-action='add'><i class='fa fa-sm fa-folder'></i></button>";
 	print "	</div>";
 	print "	</span>";
 	print "</div>";

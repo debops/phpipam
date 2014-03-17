@@ -17,13 +17,11 @@ checkAdmin();
 CheckReferrer();
 
 /* create array of ordering */
-foreach($_POST as $key=>$val) {
-	// set 0 to NULL
-	if($val==0)	$val = 'NULL';
-	// remove order-
-	$key = str_replace("order-", "", $key);
-	//create output array
-	$order[$key] = $val;
+$otmp = explode(";", $_POST['position']);
+foreach($otmp as $ot) {
+	$ptmp = explode(":", $ot);
+	
+	$order[$ptmp[0]] = $ptmp[1];
 }
 
 /* do action! */

@@ -25,7 +25,7 @@ else if ($action == "Edit") { $subject	= _('User ipam account updated'); }
 else 						{ $subject	= _('IPAM account details'); }
 
 # send mail
-if(!sendUserAccDetailsEmail($userModDetails, $subject))	{ print '<div class="alert alert-error"><div class="alert alert-error">'._('Sending notification mail for new account failed').'!</div></div>'; }
+if(!sendUserAccDetailsEmail($userModDetails, $subject))	{ print '<div class="alert alert-danger"><div class="alert alert-danger">'._('Sending notification mail for new account failed').'!</div></div>'; }
 else													{ print '<div class="alert alert-success">'._('Notification mail for new account sent').'!</div>'; }
 
 

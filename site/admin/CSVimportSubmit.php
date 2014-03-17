@@ -19,7 +19,7 @@ $filetype = end(explode(".", $filetype));
 /* get $outFile based on provided filetype */
 if ($filetype == "csv") {
 	/* get file to string */
-	$outFile = file_get_contents('csvupload/import.csv') or die ('<div class="alert alert-error">'._('Cannot open csvupload/import.csv').'</div>');
+	$outFile = file_get_contents('csvupload/import.csv') or die ('<div class="alert alert alert-danger">'._('Cannot open csvupload/import.csv').'</div>');
 
 	/* format file */
 	$outFile = str_replace( array("\r\n","\r") , "\n" , $outFile);	//replace windows and Mac line break
@@ -66,6 +66,10 @@ else {
 /* import each value */
 foreach($outFile as $k=>$line) {
 
+	//escape " and '
+	#$line = str_replace("\"", "\\\"", $line);
+	#$line = str_replace("'", "\'", $line);
+
 	// explode it to array for verifications
 	$lineArr = explode(",", $line);
 	
@@ -83,7 +87,7 @@ foreach($outFile as $k=>$line) {
 		else														{ $lineArr[1] = 1; }
 		
 		// reformat device
-		$devices = getAllUniqueSwitches ();
+		$devices = getAllUniqueDevices ();
 		foreach($devices as $d) {
 			if($d['hostname']==$lineArr[6])	{ $lineArr[6] = $d['id']; }
 		}
@@ -99,7 +103,7 @@ foreach($outFile as $k=>$line) {
 
 /* print errors */
 if(isset($errors)) {
-	print '<div class="alert alert-error">'._('Errors occured when importing to database!').'<br>';
+	print '<div class="alert alert alert-danger">'._('Errors occured when importing to database!').'<br>';
 	foreach ($errors as $error) {
 		print $error . "<br>";
 	}

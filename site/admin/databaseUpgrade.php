@@ -12,7 +12,7 @@ require_once('../../functions/functions.php');
 $settings = getAllSettings();
 
 /* display only to admin users */
-if(!checkAdmin(false)) { die('<div class="alert alert-error">Admin user required!</div>'); }
+if(!checkAdmin(false)) { die('<div class="alert alert alert-danger">Admin user required!</div>'); }
 
 /* get version */
 $version = $settings['version'];
@@ -20,7 +20,7 @@ $version = $settings['version'];
 /* try to upgrade database */
 if(upgradeDatabase($version)) {
 	print '<div class="alert alert-success">Database upgraded successfully!</div>';
-	print '<a href="login/"><button class="btn btn-small">Go to login</button></a>';
+	print '<a href="login/"><button class="btn btn-sm btn-default">Go to login</button></a>';
 }
 
 ?>

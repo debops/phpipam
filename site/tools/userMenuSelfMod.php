@@ -18,15 +18,6 @@ $user_old = getActiveUserDetails();
 /* get changed details */
 $modData = $_POST;
 
-
-/* widgets */
-foreach($modData as $k=>$md) {
-	if(substr($k, 0,7)=="widget-") {
-		$modData['widgets'] .= substr($k, 7).";";
-		unset($modData[$k]);
-	}
-}
-
 /* verify email */
 if (!checkEmail($modData['email'])) 											{ $error = _('Email not valid!'); }
 
@@ -43,9 +34,9 @@ if (strlen($modData['password1']) != 0) {
 
 
 /* Print errors if present and die, else update */
-if ($error) { die('<div class="alert alert-error alert-absolute">'._('Please fix the following error').': <strong>'. $error .'<strong></div>'); }
+if ($error) { die('<div class="alert alert-danger alert-absolute">'._('Please fix the following error').': <strong>'. $error .'<strong></div>'); }
 else {
-    if (!selfUpdateUser ($modData)) 		{ die('<div class="alert alert-error alert-absolute">'._('Error updating').'!</div>'); }
+    if (!selfUpdateUser ($modData)) 		{ die('<div class="alert alert-danger alert-absolute">'._('Error updating').'!</div>'); }
     else 									{ print '<div class="alert alert-success alert-absolute">'._('Account updated successfully').'!</div>'; }
     
     # check if language has changed

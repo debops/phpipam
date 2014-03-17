@@ -56,7 +56,7 @@ if (sizeof($missingExt) != 1) {
 	$error  .= '</div>';
 	$error  .= '</div>';
     /* error */
-    $error  .= "<div class='alert alert-error' style='margin:auto;margin-top:20px;width:500px;'><strong>"._('The following required PHP extensions are missing').":</strong><br><hr>";
+    $error  .= "<div class='alert alert-danger' style='margin:auto;margin-top:20px;width:500px;'><strong>"._('The following required PHP extensions are missing').":</strong><br><hr>";
     $error  .= '<ul>' . "\n";
     foreach ($missingExt as $missing) {
         $error .= '<li>'. $missing .'</li>' . "\n";
@@ -81,6 +81,6 @@ $mysqli = @new mysqli($db['host'], $db['user'], $db['pass'], $db['name']);
 /* check connection */
 if ($mysqli->connect_errno) {
 	/* die with error */
-    die('<div class="alert alert-error"><strong>'._('Database connection failed').'!</strong><br><hr>Error: '. mysqli_connect_error() .'</div>');
+    die('<div class="alert alert-danger"><strong>'._('Database connection failed').'!</strong><br><hr>Error: '. mysqli_connect_error() .'</div>');
 }
 ?>

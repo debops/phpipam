@@ -48,25 +48,25 @@ else {
 	<tr>
 	    <td><?php print _('App id'); ?></td> 
 	    <td>
-	    	<input type="text" name="app_id" class="input-xlarge" value="<?php print @$api['app_id']; ?>" <?php if($_POST['action'] == "delete") print "readonly"; ?>>
+	    	<input type="text" name="app_id" class="form-control input-sm" value="<?php print @$api['app_id']; ?>" <?php if($_POST['action'] == "delete") print "readonly"; ?>>
 	        <input type="hidden" name="id" value="<?php print $api['id']; ?>">
     		<input type="hidden" name="action" value="<?php print $_POST['action']; ?>">
 	    </td>
-       	<td class="info"><?php print _('Enter application identifier'); ?></td>
+       	<td class="info2"><?php print _('Enter application identifier'); ?></td>
     </tr>
 
 	<!-- code -->
 	<tr>
 	    <td><?php print _('App code'); ?></td> 
-	    <td><input type="text" id="appcode" name="app_code" class="input-xlarge" value="<?php print @$api['app_code']; ?>"  maxlength='32'></td>
-       	<td class="info"><?php print _('Application code'); ?> <button class="btn btn-small" id="regApiKey"><i class="icon-gray icon-random"></i> <?php print _('Regenerate'); ?></button></td>
+	    <td><input type="text" id="appcode" name="app_code" class="form-control input-sm"  value="<?php print @$api['app_code']; ?>"  maxlength='32' <?php if($_POST['action'] == "delete") print "readonly"; ?>></td>
+       	<td class="info2"><?php print _('Application code'); ?> <button class="btn btn-xs btn-default" id="regApiKey"><i class="fa fa-random"></i> <?php print _('Regenerate'); ?></button></td>
     </tr>
 
 	<!-- permissions -->
 	<tr>
 	    <td><?php print _('App permissions'); ?></td> 
 	    <td>
-	    	<select name="app_permissions">
+	    	<select name="app_permissions" class="form-control input-sm input-w-auto">
 	    	<?php
 	    	$perms = array("0"=>"Disabled","1"=>"Read","2"=>"Read / Write");
 	    	foreach($perms as $k=>$p) {
@@ -75,7 +75,7 @@ else {
 	    	}
 	    	?>
 	    	</select>
-       	<td class="info"><?php print _('Application permissions'); ?></td>
+       	<td class="info2"><?php print _('Application permissions'); ?></td>
     </tr>
 
     <!-- description -->
@@ -85,7 +85,7 @@ else {
     	<td>
     		<input type="text" name="app_description" class="input-xlarge" value="<?php print @$api['app_description']; ?>" <?php if($_POST['action'] == "delete") print "readonly"; ?>>
     	</td>   
-    	<td class="info"><?php print _('Enter description'); ?></td>
+    	<td class="info2"><?php print _('Enter description'); ?></td>
     </tr>
 -->
 
@@ -100,8 +100,8 @@ else {
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups"><?php print _('Cancel'); ?></button>
-		<button class="btn btn-small <?php if($_POST['action']=="delete") { print "btn-danger"; } else { print "btn-success"; } ?>" id="apiEditSubmit"><i class="icon-white <?php if($_POST['action']=="add") { print "icon-plus"; } else if ($_POST['action']=="delete") { print "icon-trash"; } else { print "icon-ok"; } ?>"></i> <?php print ucwords(_($_POST['action'])); ?></button>
+		<button class="btn btn-sm btn-default hidePopups"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-default <?php if($_POST['action']=="delete") { print "btn-danger"; } else { print "btn-success"; } ?>" id="apiEditSubmit"><i class="fa <?php if($_POST['action']=="add") { print "fa-plus"; } else if ($_POST['action']=="delete") { print "fa-trash-o"; } else { print "fa-check"; } ?>"></i> <?php print ucwords(_($_POST['action'])); ?></button>
 	</div>
 	<!-- Result -->
 	<div class="apiEditResult"></div>

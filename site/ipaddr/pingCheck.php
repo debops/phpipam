@@ -7,6 +7,7 @@
 
 /* include required scripts */
 require_once('../../functions/functions.php');
+require_once( dirname(__FILE__) . '/../../functions/scan/config-scan.php');
 
 /* verify that user is logged in */
 isUserAuthenticated(false);
@@ -21,12 +22,11 @@ if($subnetPerm < 2) {
 //get IP address details
 $ip = getIpAddrDetailsById ($_POST['id']);
 
-
 //try to ping it
-$pingRes = pingHostPear($ip['ip_addr'], 1);
+$pingRes = pingHost($ip['ip_addr'], 1, 1);
 
 //update last seen if success
-if($pingRes['code']==0) { @updateLastSeen($_POST['id']); }
+if($pingRes==0) { @updateLastSeen($_POST['id']); }
 ?>
 
 <!-- header -->
@@ -34,18 +34,27 @@ if($pingRes['code']==0) { @updateLastSeen($_POST['id']); }
 
 <!-- content -->
 <div class="pContent">
-	<?php if($pingRes['code']==2) { ?>
-		<div class="alert alert-error"><?php print _("Error").": $pingRes[text]"; ?></div>
-	<?php } elseif($pingRes['code']==0) { ?>
-		<div class="alert alert-success"><?php print _("IP address")." ".$ip['ip_addr']." "._("is alive"); ?><hr><?php print $pingRes['text']; ?></div>
-	<?php } elseif($pingRes['code']==1) { ?>
-		<div class="alert alert-error"><?php print _("IP address")." ".$ip['ip_addr']." "._("is not alive"); ?></div>
-	<?php } elseif($pingRes['code']==3) { ?>
-		<div class="alert alert-error"><?php print _("Error")." $pingRes[text]"; ?></div>
-	<?php } ?>
+
+	<?php
+	# online
+	if($pingRes==0) { 
+		print "<div class='alert alert-success'>"._("IP address")." $ip[ip_addr] "._("is alive")."</div>";
+	}
+	# offline
+	elseif ($pingRes==1 || $pingRes==2) {
+		print "<div class='alert alert-danger'  >"._("IP address")." $ip[ip_addr] "._("is not alive")."</div>";
+	}
+	# error
+	else {
+		//get error code
+		$ecode = explainPingExit($pingRes);
+		print "<div class='alert alert-danger'>"._("Error").": $ecode ($pingRes)</div>";		
+	}
+	
+	?>
 </div>
 
 <!-- footer -->
 <div class="pFooter">
-	<button class="btn btn-small hidePopups"><?php print _('Close window'); ?></button>
+	<button class="btn btn-sm btn-default hidePopups"><?php print _('Close window'); ?></button>
 </div>

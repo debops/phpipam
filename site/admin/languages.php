@@ -17,8 +17,7 @@ $langs = getLanguages ();
 <?php print "<p class='muted'>"._('You can edit different language translations here')."</p>"; ?>
 
 <!-- Add new -->
-<button class="btn bnt-small lang" data-action='add' style="margin-bottom:10px;"><i class="icon-plus"></i></button> <span class="muted"><?php print _("Create new language"); ?></span>
-
+<button class="btn btn-sm btn-default lang" data-action='add' style="margin-bottom:10px;"><i class="fa fa-plus"></i> <?php print _("Create new language"); ?></button>
 <table class="table table-striped table-auto table-top" style="min-width:400px;">
 
 	<!-- Language list -->
@@ -53,7 +52,7 @@ $langs = getLanguages ();
 			}
 			
 			if($valid)  { $vPrint = "<span class='alert alert-success'>"._('Valid')."</span>"; }
-			else		{ $vPrint = "<span class='alert alert-error'>"._('Invalid')."</span>"; }
+			else		{ $vPrint = "<span class='alert alert alert-danger'>"._('Invalid')."</span>"; }
 		
 			print "<tr>";
 			print "	<td>$lang[l_code]</td>";
@@ -62,8 +61,8 @@ $langs = getLanguages ();
 			print "	<td>$tversion</td>";
 			print "	<td>";
 			print "	<div class='btn-group'>";
-			print "		<button class='btn btn-small lang' data-action='edit' data-langid='$lang[l_id]'><i class='icon-pencil'></i></button>";
-			print "		<button class='btn btn-small lang' data-action='delete' data-langid='$lang[l_id]'><i class='icon-remove'></i></button>";
+			print "		<button class='btn btn-sm btn-default lang' data-action='edit' data-langid='$lang[l_id]'><i class='fa fa-pencil'></i></button>";
+			print "		<button class='btn btn-sm btn-default lang' data-action='delete' data-langid='$lang[l_id]'><i class='fa fa-times'></i></button>";
 			print "	</div>";
 			print "	</td>";
 			print "</tr>";

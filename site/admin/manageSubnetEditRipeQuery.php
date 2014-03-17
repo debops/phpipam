@@ -22,25 +22,33 @@ if ($type == "IPv4") 	{ $url = "http://apps.db.ripe.net/whois/lookup/ripe/inetnu
 else 					{ $url = "http://apps.db.ripe.net/whois/lookup/ripe/inet6num/$_REQUEST[subnet].xml"; }
 
 /* querry ripe db and parse result */
-$xml = simplexml_load_file($url);
+$xml = @simplexml_load_file($url);
 
-foreach($xml->objects->object[0]->attributes->children() as $m=>$subtag) {
-    $a = (string) $subtag->attributes()->name;
-    $b = (string) $subtag->attributes()->value;
-    
-    # replace - with _
-    $a = str_replace("-", "_", $a);
-    
-    $out["$a"] .= $b.'\n';
+/* fail */
+if (!$xml) {
+	/* save to json and return */
+	header("Content-type: text/javascript");
+	echo json_encode(array("Error"=>"Subnet not present in RIPE DB<br>Error opening URL $url"));	
 }
-
-# replace last newlines
-foreach($out as $key=>$val) {
-	$out[$key] = rtrim($val, "\\n");
+else {
+	foreach($xml->objects->object[0]->attributes->children() as $m=>$subtag) {
+	    $a = (string) $subtag->attributes()->name;
+	    $b = (string) $subtag->attributes()->value;
+	    
+	    # replace - with _
+	    $a = str_replace("-", "_", $a);
+	    
+	    $out["$a"] .= $b.'\n';
+	}
+	
+	# replace last newlines
+	foreach($out as $key=>$val) {
+		$out[$key] = rtrim($val, "\\n");
+	}
+	
+	/* save to json and return */
+	header("Content-type: text/javascript");
+	echo json_encode($out);	
 }
-
-/* save to json and return */
-header("Content-type: text/javascript");
-echo json_encode($out);
 
 ?>

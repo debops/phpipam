@@ -11,7 +11,7 @@ $vlan = getVLANbyId($_REQUEST['vlanId']);
 
 # not existing
 if(!$vlan) {
-	die("<div class='alert alert-error'>"._('Invalid VLAN id')."!</div>");
+	die("<div class='alert alert-danger'>"._('Invalid VLAN id')."!</div>");
 }
 
 # get all site settings
@@ -71,8 +71,8 @@ $customVLANFields = getCustomFields('vlans');
 	
 	# permissions
 	if(checkAdmin (false)) {
-		print "		<button class='btn btn-small editVLAN' data-action='edit'   data-vlanid='$vlan[vlanId]'><i class='icon-gray icon-pencil'></i></button>";
-		print "		<button class='btn btn-small editVLAN' data-action='delete' data-vlanid='$vlan[vlanId]'><i class='icon-gray icon-remove'></i></button>";
+		print "		<button class='btn btn-xs btn-default editVLAN' data-action='edit'   data-vlanid='$vlan[vlanId]'><i class='fa fa-pencil'></i></button>";
+		print "		<button class='btn btn-xs btn-default editVLAN' data-action='delete' data-vlanid='$vlan[vlanId]'><i class='fa fa-times'></i></button>";
 	}
 		
 	print "	</div>";

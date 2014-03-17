@@ -3,6 +3,8 @@
 // include required scripts
 require_once( dirname(__FILE__) . '/../functions.php' );
 require_once( dirname(__FILE__) . '/Thread.php');
+require_once( dirname(__FILE__) . '/../functions-mail.php');
+require_once( dirname(__FILE__) . '/../scan/config-scan.php');
 
 /*
 set cronjob:
@@ -15,6 +17,7 @@ $email = true;							//set mail with status diff to admins
 $emailText = false;						//format to send mail via text or html
 //$wait = 500;							//time to wait for response in ms
 $count = 1;								//number of pings to send
+$timeout = 1;							//timeut in seconds
 
 // response
 $stateDiff = array();					//Array with differences, can be used to email to admins
@@ -53,7 +56,7 @@ elseif(!$threads) {
 		if($tDiff < $statuses[1])	{ $addresses[$m]['oldStatus'] = 0; }	//old online
 		else						{ $addresses[$m]['oldStatus'] = 2; }	//old offline
 		//get status
-		$code = pingHost (transform2long($ip['ip_addr']), $count, false);
+		$code = pingHost (transform2long($ip['ip_addr']), $count, $timeout, false);
 		//Online
 		if($code == "0") {
 			//update IP status
@@ -99,7 +102,7 @@ else {
 
 				//start new thread
 	            $threads[$z] = new Thread( 'pingHost' );
-	            $threads[$z]->start( Transform2long($addresses[$z]['ip_addr']), $count, true );
+	            $threads[$z]->start( Transform2long($addresses[$z]['ip_addr']), $count, $timeout, true );
 	            $z++;				//next index
 			}
         }
@@ -110,21 +113,22 @@ else {
                 if( ! $thread->isAlive() ) {
                 	//get exit code
                 	$exitCode = $thread->getExitCode();
+                	
                 	//online, check diff
-                	if($exitCode == "0") {
-	                	//update IP status
-						@updateLastSeen($addresses[$index]['id']);
+                	if($exitCode == 0) {
 						//set new seen
 						$addresses[$index]['newSeen'] = date("Y-m-d H:i:s");
 						//if old is offline than check for time diff
 						if($addresses[$index]['oldStatus']==2) {
 							//calculate diff since last alive
-							$tDiff2 = $sTime - strtotime($addresses[$index]['lastSeen']);
+							$tDiff2 = time() - strtotime($addresses[$index]['lastSeen']);
 							//set New status
 							if($tDiff2 >= $statuses[1])	{ 
-								$stateDiff[] = $addresses[$index];	 				//change
+								$stateDiff[] = $addresses[$index];	 				//change to online 
 							}							
-						}	
+						}
+	                	//update IP status
+						@updateLastSeen($addresses[$index]['id']);	
                 	} 
                 	else {
                 		//now offline
@@ -132,10 +136,10 @@ else {
 						//if online before change
 						if($addresses[$index]['oldStatus']==0) {
 							//calculate diff since last alive
-							$tDiff2 = $sTime - strtotime($addresses[$index]['lastSeen']);							
+							$tDiff2 = time() - strtotime($addresses[$index]['lastSeen']);	
 							//set New status
 							if($tDiff2 >= $statuses[1])	{ 
-								$stateDiff[] = $addresses[$index];	 				//change
+								$stateDiff[] = $addresses[$index];	 				//change to offline
 							}	
 						}
 					}
@@ -147,7 +151,6 @@ else {
             }
             usleep(500);
         }
-
 	}
 }
 
@@ -191,12 +194,13 @@ if(sizeof($stateDiff)>0 && $email)
 		//Changes
 		foreach($stateDiff as $change) {
 			//reformat statuses
-			if($change['oldStatus'] == 0)		{ $oldStatus = "Online"; }
+			if($change['oldStatus'] == 0)		{ $oldStatus = "<font style='color:#04B486'>Online</font>"; }
 			elseif($change['oldStatus'] == 1)	{ $oldStatus = "Check failed"; }
-			else								{ $oldStatus = "Offline"; }
-			if($change['newStatus'] == 0)		{ $newStatus = "Online"; }
+			else								{ $oldStatus = "<font style='color:#DF0101'>Offline</font>"; }
+			
+			if($change['newStatus'] == 0)		{ $newStatus = "<font style='color:#04B486'>Online</font>"; }
 			elseif($change['newStatus'] == 1)	{ $oldStatus = "Check failed"; }
-			else								{ $newStatus = "Offline"; }
+			else								{ $newStatus = "<font style='color:#DF0101'>Offline</font>"; }
 			//set subnet
 			$subnet = getSubnetDetails($change['subnetId']);
 			$subnetPrint = Transform2long($subnet['subnet'])."/".$subnet['mask']." - ".$subnet['description'];
@@ -212,10 +216,10 @@ if(sizeof($stateDiff)>0 && $email)
 			}
 			
 			$html[] = "<tr>";
-			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>".Transform2long($change['ip_addr'])."</td>";
+			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]subnets/$section[id]/$subnet[id]/'>".Transform2long($change['ip_addr'])."</a></td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$change[description]</td>";
-			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$subnetPrint</td>";
-			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$sectionPrint</td>";
+			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]subnets/$section[id]/$subnet[id]/'>$subnetPrint</a></td>";
+			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]subnets/$section[id]/'>$sectionPrint</a></td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$ago</td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$oldStatus</td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$newStatus</td>";
@@ -229,11 +233,12 @@ if(sizeof($stateDiff)>0 && $email)
 		$html[] = "</body>";
 		$html[] = "</html>";
 		
-		//save to 
+		//save to array
 		$mail['content'] = implode("\n", $html);
 
-		//send
-		mail($settings['siteAdminMail'], $mail['subject'], $mail['content'], $mail['headers']);
+		//send to all admins
+		sendStatusUpdateMail($mail['content'], $mail['subject']);
+		//mail($settings['siteAdminMail'], $mail['subject'], $mail['content'], $mail['headers']);
 	}
 }
 

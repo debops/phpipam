@@ -139,7 +139,7 @@ if(in_array('state', $setFields)) {
 	$worksheet->write($lineCount, $x, _('hostname') ,$format_title);		$x++;
 # switch
 if(in_array('switch', $setFields)) {
-	$worksheet->write($lineCount, $x, _('switch') ,$format_title);			$x++;
+	$worksheet->write($lineCount, $x, _('device') ,$format_title);			$x++;
 }
 # port
 if(in_array('port', $setFields)) {
@@ -222,6 +222,11 @@ foreach ($result as $ip) {
 	$worksheet->write($lineCount, $x, $ip['dns_name']);						$x++;
 	# switch
 	if(in_array('switch', $setFields)) {
+		if(strlen($ip['switch'])>0 && $ip['switch']!=0) {
+			# get switch
+			$switch = getDeviceDetailsById($ip['switch']);
+			$ip['switch'] = $switch['hostname'];
+		}
 	$worksheet->write($lineCount, $x, $ip['switch']);						$x++;
 	}
 	# port

@@ -14,14 +14,14 @@ isUserAuthenticated(true);
 if($_POST['action'] == "add") {
 	$sectionPerm = checkSectionPermission ($_POST['sectionId']);
 	if($sectionPerm != 3) {
-		die("<div class='alert alert-error'>"._('You do not have permissions to add new subnet in this section')."!</div>");
+		die("<div class='alert alert alert-danger'>"._('You do not have permissions to add new subnet in this section')."!</div>");
 	}
 }
 /* otherwise check subnet permission */
 else {
 	$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 	if($subnetPerm != 3) {
-		die("<div class='alert alert-error'>"._('You do not have permissions to add edit/delete this subnet')."!</div>");
+		die("<div class='alert alert alert-danger'>"._('You do not have permissions to add edit/delete this subnet')."!</div>");
 	}	
 }
 
@@ -49,7 +49,6 @@ if(sizeof($myFields) > 0) {
 /* sanitize description */
 $_POST['description'] = htmlentities($_POST['description'], ENT_COMPAT | ENT_HTML401, "UTF-8");	//prevent XSS
 
-
 /* Set permissions for add! */
 if($_POST['action'] == "add") {
 	# root
@@ -66,7 +65,7 @@ if($_POST['action'] == "add") {
 
 # check for name length - 2 is minimum!
 if(strlen($_POST['description'])<2 && $_POST['action']!="delete") {
-	die("<div class='alert alert-error'>"._('Folder name must have at least 2 characters')."!</div>");
+	die("<div class='alert alert alert-danger'>"._('Folder name must have at least 2 characters')."!</div>");
 }
 
 # set folder flag!
@@ -74,7 +73,7 @@ $_POST['isFolder'] = true;
 
 
 # failed
-if (!modifySubnetDetails ($_POST)) 		{ print '<div class="alert alert-error">'._('Error adding new folder').'!</div>'; }
+if (!modifySubnetDetails ($_POST)) 		{ print '<div class="alert alert alert-danger">'._('Error adding new folder').'!</div>'; }
 # all good
 else {
 	if($_POST['action'] == "delete") 	{ print '<div class="alert alert-success">'._('Folder, IP addresses and all belonging subnets deleted successfully').'!</div>'; } 

@@ -32,9 +32,9 @@ print "<tr>";
 print "	<th class='small'>"._('VLAN')."</th>";
 print "	<th class='small description'>"._('Subnet description')."</th>";
 print "	<th>"._('Subnet')."</th>";
-print "	<th class='small'>"._('Used')."</th>";
-print "	<th class='small'>% "._('Free')."</th>";
-print "	<th class='small'>"._('Requests')."</th>";
+print "	<th class='small hidden-xs hidden-sm hidden-md'>"._('Used')."</th>";
+print "	<th class='small hidden-xs hidden-sm hidden-md'>% "._('Free')."</th>";
+print "	<th class='small hidden-xs hidden-sm hidden-md'>"._('Requests')."</th>";
 print " <th></th>";
 print "</tr>";
 
@@ -57,7 +57,7 @@ foreach ($slaves as $slave) {
 			
 			print "<tr class='success'>";
 			print "	<td></td>";
-			print "	<td class='small description'>"._('Free space')."</td>";
+			print "	<td class='small description'><a href='#' data-sectionId='$section[id]' data-masterSubnetId='$subnetId' class='btn btn-sm btn-default createfromfree' data-cidr='".getFirstPossibleSubnet(transform2long($master['subnet']) , $diff, false)."'><i class='fa fa-plus'></i></a> "._('Free space')."</td>";
 			print "	<td colspan='5'>". transform2long($master['subnet']) ." - ". transform2long(gmp_strval(gmp_add($master['subnet'], gmp_sub($diff,1)))) ." ( ".$diff." )</td>";
 			print "</tr>";
 		}
@@ -85,8 +85,8 @@ foreach ($slaves as $slave) {
 
     
 	$calculate = calculateSubnetDetails ( gmp_strval($ipCount), $slave['mask'], $slave['subnet'] );
-    print ' <td class="small">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
-    print '	<td class="small">'. $calculate['freehosts_percent'] .'</td>';
+    print ' <td class="small hidden-xs hidden-sm hidden-md">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
+    print '	<td class="small hidden-xs hidden-sm hidden-md">'. $calculate['freehosts_percent'] .'</td>';
     
     # add to sum if IPv4
     if ( IdentifyAddress( $slave['subnet'] ) == "IPv4") {
@@ -95,26 +95,26 @@ foreach ($slaves as $slave) {
     }
 	
 	# allow requests
-	if($slave['allowRequests'] == 1) 			{ print '<td class="allowRequests small">enabled</td>'; }
-	else 										{ print '<td class="allowRequests small"></td>'; }
+	if($slave['allowRequests'] == 1) 			{ print '<td class="allowRequests small hidden-xs hidden-sm hidden-md"><i class="fa fa-gray fa-check"></td>'; }
+	else 										{ print '<td class="allowRequests small hidden-xs hidden-sm hidden-md"></td>'; }
 	
 	# edit
 	$subnetPerm = checkSubnetPermission ($slave['id']);
 	if($subnetPerm == 3) {
-		print "	<td class='small'>";
+		print "	<td class='actions'>";
 		print "	<div class='btn-group'>";
-		print "		<button class='btn btn-mini editSubnet'     data-action='edit'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-pencil'></i></button>";
-		print "		<button class='btn btn-mini showSubnetPerm' data-action='show'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-tasks'></i></button>";
-		print "		<button class='btn btn-mini editSubnet'     data-action='delete' data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='icon-gray icon-remove'></i></button>";
+		print "		<button class='btn btn btn-xs btn-default editSubnet'     data-action='edit'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa-pencil'></i></button>";
+		print "		<button class='btn btn btn-xs btn-default showSubnetPerm' data-action='show'   data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa-tasks'></i></button>";
+		print "		<button class='btn btn btn-xs btn-default editSubnet'     data-action='delete' data-subnetid='".$slave['id']."'  data-sectionid='".$slave['sectionId']."'><i class='fa fa-gray fa-times'></i></button>";
 		print "	</div>";
 		print " </td>";
 	}
 	else {
-		print "	<td class='small'>";
+		print "	<td class='actions'>";
 		print "	<div class='btn-group'>";
-		print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-pencil'></i></button>";
-		print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-tasks'></i></button>";
-		print "		<button class='btn btn-mini disabled'><i class='icon-gray icon-remove'></i></button>";
+		print "		<button class='btn btn btn-xs btn-default disabled'><i class='fa fa-gray fa-pencil'></i></button>";
+		print "		<button class='btn btn btn-xs btn-default disabled'><i class='fa fa-gray fa-tasks'></i></button>";
+		print "		<button class='btn btn btn-xs btn-default disabled'><i class='fa fa-gray fa-remove'></i></button>";
 		print "	</div>";
 		print " </td>";		
 	}
@@ -142,7 +142,7 @@ foreach ($slaves as $slave) {
 		if($diff > 0) {
 			print "<tr class='success'>";
 			print "	<td></td>";
-			print "	<td class='small description'>"._('Free space')."</td>";
+			print "	<td class='small description'><a href='#' data-sectionId='$section[id]' data-masterSubnetId='$subnetId' class='btn btn-sm btn-default createfromfree' data-cidr='".getFirstPossibleSubnet(transform2long(gmp_strval(gmp_add($slave['maxip'], $slave['subnet']))) , $diff, false)."'><i class='fa fa-plus'></i></a> "._('Free space')."</td>";
 			print "	<td colspan='5'>". transform2long(gmp_strval(gmp_add($slave['maxip'], $slave['subnet']))) ." - ". transform2long(gmp_strval(gmp_add(gmp_add($slave['maxip'], $slave['subnet']), gmp_sub($diff,1)))) ." ( ".$diff." )</td>";
 			print "</tr>";			
 		}		
@@ -175,7 +175,7 @@ foreach ($slaves as $slave) {
 		if($max_m > $max_s) {			
 			print "<tr class='success'>";
 			print "	<td></td>";
-			print "	<td class='small description'>"._('Free space')."</td>";
+			print "	<td class='small description'><a href='#' data-sectionId='$section[id]' data-masterSubnetId='$subnetId' class='btn btn-sm btn-default createfromfree' data-cidr='".getFirstPossibleSubnet(transform2long(gmp_strval(gmp_sub($max_m, $diff))) , $diff, false)."'><i class='fa fa-plus'></i></a> "._('Free space')."</td>";
 			print "	<td colspan='5'>". transform2long(gmp_strval(gmp_sub($max_m, $diff))) ." - ". transform2long(gmp_strval(gmp_sub($max_m, 1))) ." ( $diff )</td>";
 			print "</tr>";
 		}	

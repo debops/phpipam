@@ -18,7 +18,7 @@ html += "<li><a href='http://www.apple.com/safari/' alt='chrome' target='self'>S
 html += "</ul>";
 
 $('body').css('overflow','hidden');
-$('div.jqueryError').addClass('dieIE').html('<div class="alert alert-error">'+html+'</div>').show();
+$('div.jqueryError').addClass('dieIE').html('<div class="alert alert-danger">'+html+'</div>').show();
 
 return false;
 });

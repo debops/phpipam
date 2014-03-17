@@ -9,7 +9,7 @@ require_once('../../functions/functions.php');
 
 /* verify that user has write permissions for subnet */
 $subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
-if($subnetPerm < 2) 	{ die('<div class="alert alert-error">'._('You do not have permissions to truncate subnet').'!</div>'); }
+if($subnetPerm < 2) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to truncate subnet').'!</div>'); }
 
 
 /* verify post */
@@ -47,7 +47,7 @@ $ip_addr = getIpAddressesBySubnetId ($_POST['subnetId']) ;
     </table>
 
     <!-- warning -->
-    <div class="alert alert-warn">
+    <div class="alert alert-warning">
     <?php print _('Truncating network will remove all IP addresses, that belong to selected subnet!'); ?>
     </div>
 
@@ -57,8 +57,8 @@ $ip_addr = getIpAddressesBySubnetId ($_POST['subnetId']) ;
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopup2"><?php print _('Cancel'); ?></button>
-		<button class="btn btn-small btn-danger" id="subnetTruncateSubmit" data-subnetId='<?php print $_POST['subnetId']; ?>'><i class="icon-white icon-trash"></i> <?php print _('Truncate subnet'); ?></button>
+		<button class="btn btn-sm btn-default hidePopup2"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-default btn-danger" id="subnetTruncateSubmit" data-subnetId='<?php print $_POST['subnetId']; ?>'><i class="fa fa-trash-o"></i> <?php print _('Truncate subnet'); ?></button>
 	</div>
 
 	<div class="subnetTruncateResult"></div>

@@ -34,8 +34,8 @@ $sections = $sectionssorted;
 
 <!-- Add new section -->
 <div class="btn-group" style='margin-bottom:20px;margin-top:10px;'>
-	<button class='btn btn-small editSection' data-action='add'><i class='icon-gray icon-plus'></i> <?php print _('Add section'); ?></button>
-	<button class='btn btn-small sectionOrder' ><i class='icon-gray icon-tasks'></i> <?php print _('Section order'); ?></button>
+	<button class='btn btn-sm btn-default editSection' data-action='add'><i class='fa fa-plus'></i> <?php print _('Add section'); ?></button>
+	<button class='btn btn-sm btn-default sectionOrder' ><i class='fa fa-tasks'></i> <?php print _('Section order'); ?></button>
 </div>
 
 <!-- show sections -->
@@ -111,9 +111,10 @@ foreach ($sections as $section)
 	print "</td>";
     
    	print '	<td class="actions">'. "\n";
-   	print "	<div class='btn-group'>";
-	print "		<button class='btn btn-small editSection' data-action='edit'   data-sectionid='$section[id]'><i class='icon-gray icon-pencil'></i></button>";
-	print "		<button class='btn btn-small editSection' data-action='delete' data-sectionid='$section[id]'><i class='icon-gray icon-remove'></i></button>";
+   	print "	<div class='btn-group btn-group-xs'>";
+	print "		<button class='btn btn-default editSection' data-action='edit'   data-sectionid='$section[id]'><i class='fa fa-pencil'></i></button>";
+	print "		<a class='btn btn-default' href='administration/manageSection/sectionChangelog/$section[id]/'><i class='fa fa-clock-o'></i></a>";
+	print "		<button class='btn btn-default editSection' data-action='delete' data-sectionid='$section[id]'><i class='fa fa-times'></i></button>";
 	print "	</div>";
 	print '	</td>'. "\n";
     

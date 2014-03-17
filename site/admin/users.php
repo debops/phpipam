@@ -28,7 +28,7 @@ $langs = getLanguages ();
 <hr><br>
 
 <!-- Add new -->
-<button class='btn btn-small editUser' style="margin-bottom:10px;" data-action='add'><i class='icon-gray icon-plus'></i> <?php print _('Create user'); ?></button>
+<button class='btn btn-sm btn-default editUser' style="margin-bottom:10px;" data-action='add'><i class='fa fa-plus'></i> <?php print _('Create user'); ?></button>
 
 
 <!-- table -->
@@ -106,15 +106,33 @@ foreach ($users as $user)
 	# custom
 	if(sizeof($custom) > 0) {
 		foreach($custom as $field) {
-			print "<td>".$user[$field['name']]."</td>";
+			print "<td>";
+
+			//booleans
+			if($field['type']=="tinyint(1)")	{
+				if($user[$field['name']] == "0")		{ print _("No"); }
+				elseif($user[$field['name']] == "1")	{ print _("Yes"); }
+			} 
+			//text
+			elseif($field['type']=="text") {
+				if(strlen($user[$field['name']])>0)		{ print "<i class='fa fa-gray fa-comment' rel='tooltip' data-container='body' data-html='true' title='".str_replace("\n", "<br>", $user[$field['name']])."'>"; }
+				else									{ print ""; }
+			}
+			else {
+				print $user[$field['name']];
+				
+			}
+			
+			print "</td>";
+
 		}
 	}
 	
 	# edit, delete
 	print "	<td class='actions'>";
 	print "	<div class='btn-group'>";
-	print "		<button class='btn btn-small editUser' data-userid='$user[id]' data-action='edit'  ><i class='icon-gray icon-pencil'></i></button>";
-	print "		<button class='btn btn-small editUser' data-userid='$user[id]' data-action='delete'><i class='icon-gray icon-remove'></i></button>";
+	print "		<button class='btn btn-xs btn-default editUser' data-userid='$user[id]' data-action='edit'  ><i class='fa fa-pencil'></i></button>";
+	print "		<button class='btn btn-xs btn-default editUser' data-userid='$user[id]' data-action='delete'><i class='fa fa-times'></i></button>";
 	print "	</div>";
 	print "	</td>";
 	

@@ -820,3 +820,335 @@ msgstr ""
 
 msgid "Select"
 msgstr ""
+
+
+
+### 0.91.001 ###
+
+#: functions/functions-common.php
+msgid "Favourite subnets"
+msgstr ""
+
+msgid "No favourite subnets selected"
+msgstr ""
+
+msgid "You can add subnets to favourites by clicking star icon in subnet details"
+msgstr ""
+
+msgid "Click to remove from favourites"
+msgstr ""
+
+msgid "Click to add to favourites"
+msgstr ""
+
+#: site/tools/favouriteEdit.php
+msgid "Error editing favourite"
+msgstr ""
+
+#: site/sections.php
+msgid "Favourite networks"
+msgstr ""
+
+
+### 0.92.001 ###
+
+#: site/ipaddr/ipDetailsChangelog.php
+msgid "Changelog"
+msgstr ""
+
+msgid "No changelogs available"
+msgstr ""
+
+msgid "No changelog entries are available for this host"
+msgstr ""
+
+msgid "No changelog entries are available for this subnet"
+msgstr ""
+
+msgid "No changelog entries are available for this section"
+msgstr ""
+
+msgid "No changelog entries are available"
+msgstr ""
+
+#: site/ipaddr/ipDetails.php
+msgid "Avalibility"
+msgstr ""
+
+msgid "Last edited"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Result"
+msgstr ""
+
+msgid "Change"
+msgstr ""
+
+#: site/tools/changelogPrint.php
+msgid "Output has been limited to last 50 lines"
+msgstr ""
+
+msgid "Output has been limited to last 100 lines"
+msgstr ""
+
+msgid "Output has been limited to last 250 lines"
+msgstr ""
+
+msgid "Output has been limited to last 500 lines"
+msgstr ""
+
+#: site/admin/settings.php
+msgid "Enable changelog"
+msgstr ""
+
+#: site/tools/changelog.php
+msgid "Change logging is disabled. You can enable it under administration"
+msgstr ""
+
+
+
+### 0.94.002 ###
+
+#: site/admin/settings.php
+msgid "Ping path"
+msgstr ""
+
+msgid "Set path for ping executable file (default /bin/ping)"
+msgstr ""
+
+msgid "Max scan threads"
+msgstr ""
+
+msgid "Set maximum nubmer of concurrent ICMP checks (default 128)"
+msgstr ""
+
+#: functions/functions-common.php
+msgid "Last 5 change log entries"
+msgstr ""
+
+
+### 0.95.001 ###
+
+#: site/admin/widgets.php
+msgid "Widgets"
+msgstr ""
+
+msgid "You can manage widgets here"
+msgstr ""
+
+msgid "Create new widget"
+msgstr ""
+
+msgid "No widgets created yet"
+msgstr ""
+
+msgid "Create widget file in directory site/dashboard/widgets/"
+msgstr ""
+
+#: site/admin/widgetEdit.php
+msgid "Add new widget"
+msgstr ""
+
+msgid "Edit widget"
+msgstr ""
+
+msgid "Delete widget"
+msgstr ""
+
+#: site/admin/widgetEditResult.php
+msgid "Widget add error"
+msgstr ""
+
+msgid "Widget edit error"
+msgstr ""
+
+msgid "Widget delete error"
+msgstr ""
+
+msgid "Widget add success"
+msgstr ""
+
+msgid "Widget edit success"
+msgstr ""
+
+msgid "Widget delete success"
+msgstr ""
+
+
+### 0.96.002 ###
+
+#: site/dashboard/widgets/requests.php
+msgid "Active IP address requests"
+msgstr ""
+
+#: site/sections.php
+msgid "Click to reorder widgets"
+msgstr ""
+
+msgid "Click to save widgets order"
+msgstr ""
+
+#: site/dashboard/widgetPopup.php
+msgid "Add new widget to dashboard"
+msgstr ""
+
+msgid "All available widgets are already on dashboard"
+msgstr ""
+
+#: site/tools/userMenu.php
+msgid "Save order"
+msgstr ""
+
+#: site/admin/widgets.php
+msgid "File"
+msgstr ""
+
+msgid "Admin only"
+msgstr ""
+
+msgid "Link to page"
+msgstr ""
+
+msgid "Widget size"
+msgstr ""
+
+
+### 0.96.007 ###
+
+#: site/ipaddr/scan/subnetScanDiscoveryPing.php
+msgid "No alive host found"
+msgstr ""
+
+msgid "Errors occured during scan"
+msgstr ""
+
+msgid "Excluded from check"
+msgstr ""
+
+
+### 0.97.001 ###
+
+#: site/login/loginCheck.php
+msgid "Invalid characters in username"
+msgstr ""
+
+msgid "Invalid characters in password"
+msgstr ""
+
+#: site/admin/adminMenu.php
+msgid "Mail settings"
+msgstr ""
+
+msgid "Mail server settings"
+msgstr ""
+
+msgid "Server type"
+msgstr ""
+
+msgid "Localhost"
+msgstr ""
+
+msgid "SMTP"
+msgstr ""
+
+msgid "Select server type for sending mail messages"
+msgstr ""
+
+msgid "Server authentication"
+msgstr ""
+
+msgid "Select yes if authentication is required"
+msgstr ""
+
+msgid "Set username for SMTP authentication"
+msgstr ""
+
+msgid "Set password for SMTP authentication"
+msgstr ""
+
+msgid "Mail sender settings"
+msgstr ""
+
+msgid "Send test email"
+msgstr ""
+
+msgid "Mail server type"
+msgstr ""
+
+msgid "SMTP settings"
+msgstr ""
+
+msgid "Server address"
+msgstr ""
+
+msgid "Sender name"
+msgstr ""
+
+msgid "Sender mail"
+msgstr ""
+
+#: site/admin.settings.php
+msgid "Set administrator name"
+msgstr ""
+
+msgid "Set administrator email"
+msgstr ""
+
+
+
+### 0.97.003 ###
+
+#: site/ipaddr/scan/subnetScan.php
+msgid "Separate multiple ports with ;"
+msgstr ""
+
+#: site/ipaddr/scan/subnetScanDiscoveryTelnet.php
+msgid "Please enter ports to scan"
+msgstr ""
+
+msgid "Invalid port"
+msgstr ""
+
+
+
+### 0.98.001 ###
+
+#: site/admin/verifyDatabase.php
+msgid "Cannot get fix for table"
+msgstr ""
+
+msgid "Fix table"
+msgstr ""
+
+msgid "Fix field"
+msgstr ""
+
+#: site/admin/verifyDatabaseFix.php
+msgid "Wrong parameters"
+msgstr ""
+
+msgid "Table fixed"
+magstr ""
+
+msgid "Field fixed"
+magstr ""
+
+#: site/sections.php
+msgid "Database errors detected"
+msgstr ""
+
+
+### 0.99.002 ###
+
+#: site/tools/devicesPrint.php
+msgid "Show all hosts"
+msgstr ""
+
+msgid "No hosts belonging to this device"
+msgstr ""
+
+msgid "Sort by vendor"
+msgstr ""

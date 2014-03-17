@@ -6,15 +6,23 @@ isUserAuthenticated ();
 /* get posted search term */
 if($_REQUEST['ip']) { $searchTerm = $_REQUEST['ip']; }
 else				{ $searchTerm = ""; }
+
 ?>
 
 <h4><?php print _('Search IP database');?></h4>
 <hr>
 
 <!-- search form -->
-<form id="search" name="search">
-	<div class="input-append">
-		<input class="span2 search" id="appendedInputButton" name="ip" value="<?php print $searchTerm; ?>" size="16" type="text"><input type="submit" class="btn" value="<?php print _('search');?>">
+<form id="search" name="search" class='form-inline'>
+	<div class='input-group'>
+
+	<div class='form-group'>
+		<input class="search input-sm form-control" name="ip" value="<?php print $searchTerm; ?>" type="text" autofocus="autofocus" style='width:250px;'>
+		<span class="input-group-btn">
+			<button type="submit" class="btn btn-sm btn-default"><?php print _('search');?></button>
+		</span>
+	</div>
+	
 	</div>
 </form>
 

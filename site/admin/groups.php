@@ -21,7 +21,7 @@ $settings = getallSettings();
 <hr><br>
 
 <!-- Add new -->
-<button class='btn btn-small editGroup' style="margin-bottom:10px;" data-action='add'><i class='icon-gray icon-plus'></i> <?php print _('Create group'); ?></button>
+<button class='btn btn-sm btn-default editGroup' style="margin-bottom:10px;" data-action='add'><i class='fa fa-plus'></i> <?php print _('Create group'); ?></button>
 
 
 <!-- table -->
@@ -54,7 +54,7 @@ $settings = getallSettings();
 
 <?php
 /* print existing sections */
-if(sizeof($groups)>0) {
+if($groups) {
 	foreach ($groups as $g)
 	{
 		print '<tr>' . "\n";
@@ -91,16 +91,16 @@ if(sizeof($groups)>0) {
 		# add/remove users
 		print "	<td class='actions'>";
 		print "	<div class='btn-group'>";
-		print "		<button class='btn btn-small addToGroup' 		data-groupid='$g[g_id]' data-action='add'    rel='tooltip' title='"._('add users to this group')."'>   	<i class='icon-gray icon-plus'></i></button>";
-		print "		<button class='btn btn-small removeFromGroup' 	data-groupid='$g[g_id]' data-action='remove' rel='tooltip' title='"._('remove users from this group')."'><i class='icon-gray icon-minus'></i></button>";
+		print "		<button class='btn btn-xs btn-default addToGroup' 		data-groupid='$g[g_id]' data-action='add'    rel='tooltip' data-container='body'  title='"._('add users to this group')."'>   	<i class='fa fa-plus'></i></button>";
+		print "		<button class='btn btn-xs btn-default removeFromGroup' 	data-groupid='$g[g_id]' data-action='remove' rel='tooltip' data-container='body'  title='"._('remove users from this group')."'><i class='fa fa-minus'></i></button>";
 		print "	</div>";
 		print "</td>";
 	
 		# edit, delete	
 		print "<td class='actions'>";	
 		print "	<div class='btn-group'>";
-		print "		<button class='btn btn-small editGroup'  		data-groupid='$g[g_id]' data-action='edit'   rel='tooltip' title='"._('edit group details')."'>	<i class='icon-gray icon-pencil'></i></button>";
-		print "		<button class='btn btn-small editGroup'  		data-groupid='$g[g_id]' data-action='delete' rel='tooltip' title='"._('remove group')."'>		<i class='icon-gray icon-remove'></i></button>";
+		print "		<button class='btn btn-xs btn-default editGroup'  		data-groupid='$g[g_id]' data-action='edit'   rel='tooltip' data-container='body'  title='"._('edit group details')."'>	<i class='fa fa-pencil'></i></button>";
+		print "		<button class='btn btn-xs btn-default editGroup'  		data-groupid='$g[g_id]' data-action='delete' rel='tooltip' data-container='body'  title='"._('remove group')."'>		<i class='fa fa-times'></i></button>";
 		print "	</div>";
 		print "</td>";
 		

@@ -28,11 +28,11 @@ foreach ($recipients_temp as $rec) {
 
 # if no errors send mail
 if (!$errors) {
-	if(!sendIPnotifEmail($_REQUEST['recipients'], $_REQUEST['subject'], $_REQUEST['content']))	{ print '<div class="alert alert-error">'._('Sending mail failed').'!</div>'; }
+	if(!sendIPnotifEmail($_REQUEST['recipients'], $_REQUEST['subject'], $_REQUEST['content']))	{ print '<div class="alert alert-danger">'._('Sending mail failed').'!</div>'; }
 	else																						{ print '<div class="alert alert-success">'._('Sending mail succeeded').'!</div>'; }
 }
 else {
-	print '<div class="alert alert-error">'._('Wrong recipients! (separate multiple with ,)').'</div>';
+	print '<div class="alert alert-danger">'._('Wrong recipients! (separate multiple with ,)').'</div>';
 }
 
 

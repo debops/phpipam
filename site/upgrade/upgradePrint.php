@@ -6,8 +6,8 @@ $(document).ready(function () {
 		var div = $(this).attr("id");
 		$("table.dbUpgrade tbody.content").not("table.dbUpgrade tbody." + div).hide();	
 		$("table.dbUpgrade tbody." + div).show("fast");	
-		$("table.dbUpgrade i").removeClass("icon-chevron-down").addClass('icon-chevron-right');	
-		$("table.dbUpgrade a#"+div+" i").removeClass("icon-chevron-right").addClass('icon-chevron-down');	
+		$("table.dbUpgrade i").removeClass("fa fa-angle-down").addClass('fa fa-angle-right');	
+		$("table.dbUpgrade a#"+div+" i").removeClass("fa fa-angle-right").addClass('fa fa-angle-down');	
 		return false;		
 	});		
 	$(document).on("click", "input.upgrade", function() {	
@@ -37,16 +37,16 @@ $(document).ready(function () {
 	
 	<!-- automatic upgrade -->
 	<tr>	
-		<th><a href="#" id="upgrade"><i class="icon-gray icon-chevron-down"></i> Upgrade phpipam database</th>		
+		<th><a href="#" id="upgrade"><i class="fa fa-angle-down"></i> Upgrade phpipam database</th>		
 	</tr>		
 	<tr>		
 	
 	<tbody class="upgrade content">
 	<tr>		
 		<td>
-			Clicking on upgrade button will update database to newest version.
-			<div class="alert alert-warn alert-nomargin" style='margin:4px;'><strong>Warning!</strong> Backup database first before attempting to upgrade it! You have been warned.</div>
-			<input type="button" class="upgrade btn btn-small" version="<?php print $settings['version']; ?>" value="Upgrade phpipam database">
+			<div class='info2'>Clicking on upgrade button will update database to newest version.</div>
+			<div class="alert alert-warning alert-nomargin" style='margin:4px;'><strong>Warning!</strong> Backup database first before attempting to upgrade it! You have been warned.</div>
+			<input type="button" class="upgrade btn btn-sm btn-default btn-success" style="margin-top:10px;" version="<?php print $settings['version']; ?>" value="Upgrade phpipam database">
 			<div class="upgradeResult"></div>			
 		</td>		
 	</tr>	
@@ -55,7 +55,7 @@ $(document).ready(function () {
 
 	<!-- Manual instructions -->
 	<tr>		
-		<th><a href="#" id="manualUpgrade"><i class="icon-gray icon-chevron-right"></i> Manual upgrade instructions</a></th>		
+		<th><a href="#" id="manualUpgrade"><i class="fa fa-angle-right"></i> Manual upgrade instructions</a></th>		
 	</tr>		
 	
 	<tbody class="manualUpgrade content" style="display:none">

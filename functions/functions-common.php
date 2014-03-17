@@ -35,7 +35,7 @@ function CheckReferrer()
  *
  */
 function isUserAuthenticated($die = true) 
-{
+{	
     /* open session and get username / pass */
 	if (!isset($_SESSION)) {  session_start(); }
     /* redirect if not authenticated */
@@ -43,11 +43,12 @@ function isUserAuthenticated($die = true)
     	# save requested page
     	$_SESSION['phpipamredirect'] = $_SERVER['HTTP_REFERER'];												//here we need referrer
     	
-    	if($_SERVER['SERVER_PORT'] == "443") { $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
-    	else								 { $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
+    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
+    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].BASE; }
+    	else								 	{ $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
     	# die
-    	if($die) { die('<div class="alert alert-error"><a href="'.$url.'login/">'._('Please login first').'!</a></div>'); }
-    	else	 { die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-error'>"._('Please login first')."!</div></div><div class='pFooter'><a class='btn btn-small' href='".$url."login/'>"._('Login')."</a>"); }
+    	if($die) { die('<div class="alert alert-danger"><a href="'.$url.'login/">'._('Please login first').'!</a></div>'); }
+    	else	 { die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-danger'>"._('Please login first')."!</div></div><div class='pFooter'><a class='btn btn-sm btn-default' href='".$url."login/'>"._('Login')."</a>"); }
     }
     /* close session */
     session_write_close();
@@ -68,8 +69,9 @@ function isUserAuthenticatedNoAjax ()
     	# save requested page
     	$_SESSION['phpipamredirect'] = $_SERVER['SCRIPT_URI'];
     	
-    	if($_SERVER['SERVER_PORT'] == "443") { $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
-    	else								 { $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
+    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
+    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].BASE; }
+    	else								 	{ $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
     	# redirect
     	header("Location:".$url."login/");    
     }
@@ -95,8 +97,9 @@ function checkAdmin ($die = true, $startSession = true)
 
     /* Check connection */
     if ($database->connect_error) {
-    	if($_SERVER['SERVER_PORT'] == "443") { $url = "https://".$_SERVER['SERVER_NAME']; }
-    	else								 { $url = "http://".$_SERVER['SERVER_NAME']; }
+    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
+    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].BASE; }
+    	else								 	{ $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
     	# redirect
     	header("Location:".$url."login/");  
 	}
@@ -108,7 +111,7 @@ function checkAdmin ($die = true, $startSession = true)
     try { $role = $database->getRow( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        die ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        die ("<div class='alert alert-danger'>"._('Error').": $error</div>");
     } 
 
     /* close database connection */
@@ -120,7 +123,7 @@ function checkAdmin ($die = true, $startSession = true)
     }
     else {
     	//die
-    	if($die == true) { die('<div class="alert alert-error">'._('Administrator level privileges required').'!</div>'); }
+    	if($die == true) { die('<div class="alert alert-danger">'._('Administrator level privileges required').'!</div>'); }
     	//return false if called
     	else 			{ return false; }
     }
@@ -157,7 +160,7 @@ function getAllUsers ()
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
 	   
@@ -180,7 +183,7 @@ function getNumberOfUsers ()
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     }  
 	   
@@ -203,7 +206,7 @@ function getAllAdminUsers ()
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     }  
 	   
@@ -226,7 +229,7 @@ function getUserDetailsById ($id)
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -249,7 +252,7 @@ function getUserDetailsByName ($username)
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -271,7 +274,7 @@ function getUserLang ($username)
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -294,7 +297,7 @@ function getLanguages ()
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -317,7 +320,7 @@ function getLangById ($id)
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -329,20 +332,210 @@ function getLangById ($id)
 /**
  *	Get all widgets
  */
-function getAllWidgets($admin = false)
+function getAllWidgets($admin = false, $inactive = false)
 {
-	$widgets['statistics'] 		 = "Statistics";
-	$widgets['top10_hosts_v4'] 	 = "Top 10 IPv4 subnets by number of hosts";
-	$widgets['top10_hosts_v6'] 	 = "Top 10 IPv6 subnets by number of hosts";
-	$widgets['top10_percentage'] = "Top 10 IPv4 subnets by usage percentage";
-	
-	if($admin) {
-	$widgets['access_logs'] 	 = "Last 5 informational logs";
-	$widgets['error_logs'] 		 = "Last 5 warning / error logs";
-
+    global $db; 
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    
+	# inactive also - only for administration
+	if($inactive) 	{ $query = "select * from `widgets`; ";
+	} 
+	else {
+		# admin?
+		if($admin) 	{ $query = "select * from `widgets` where `wactive` = 'yes'; "; }	
+		else		{ $query = "select * from `widgets` where `wadminonly` = 'no' and `wactive` = 'yes'; "; }
 	}
 
-	return $widgets;
+    /* execute */
+    try { $widgets = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    }     
+    
+    /* reindex */
+    foreach($widgets as $w) {
+	    $wout[$w['wfile']] = $w;
+    }
+
+    /* return results */
+    return $wout;
+}
+
+
+/**
+ *	Get widget by id
+ */
+function getWidgetById($wid)
+{
+    global $db; 
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+	# query
+	$query = "select * from `widgets` where `wid` = '$wid'; ";
+
+    /* execute */
+    try { $widget = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    }     
+    
+    /* return results */
+    return $widget[0];
+}
+
+
+/**
+ *	Get widget by filename
+ */
+function getWidgetByFile($wfile)
+{
+    global $db; 
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+	# query
+	$query = "select * from `widgets` where `wfile` = '$wfile'; ";
+
+    /* execute */
+    try { $widget = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    }     
+    
+    /* return results */
+    return $widget[0];
+}
+
+
+/**
+ * Verify widget
+ */
+function verifyWidget ($file)
+{
+	//verify that proper files exist
+	if(!file_exists("site/dashboard/widgets/$file.php"))	{ return false; }
+	else													{ return true; }
+}
+
+
+/**
+ * get user favourite subnets
+ */
+function getFavouriteSubnets()
+{
+    # get user details
+    $user = getActiveUserDetails();
+    
+    # none
+    if(strlen($user['favourite_subnets'])==0) {
+	    return false;
+    }
+    # ok
+    else {
+    	//store to array
+    	$favs = explode(";", $user['favourite_subnets']);
+    	$favs = array_filter($favs);
+    	//fetch details
+	    $subnets = getUserFavouriteSubnets($favs);
+	    
+	    return $subnets;
+    }
+
+}
+
+
+/**
+ *	get user favourite subnets
+ */
+function getUserFavouriteSubnets($subnetIds)
+{
+    global $db;                                                                      # get variables from config file
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+
+	# get details for each id
+	foreach($subnetIds as $id) {
+		$query = "select `su`.`id` as `subnetId`,`se`.`id` as `sectionId`, `subnet`, `mask`,`su`.`description`,`se`.`description` as `section`, `vlanId`, `isFolder`
+				  from `subnets` as `su`, `sections` as `se` where `su`.`id` = $id and `su`.`sectionId` = `se`.`id` limit 1;";
+
+	    /* execute */
+	    try { $sdetails = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        return false;
+	    }
+	    
+	    # out array
+	    $subnets[] = $sdetails[0];
+	}
+	
+	//return result
+	return $subnets;
+}
+
+
+/**
+ *	check if subnet is favourited
+ */
+function isSubnetFavourite($subnetId)
+{
+    # get user details
+    $user = getActiveUserDetails();
+    
+    # none
+    if(strlen($user['favourite_subnets'])==0) {
+	    return false;
+    }
+	# check
+	else {
+    	//store to array
+    	$favs = explode(";", $user['favourite_subnets']);
+    	//check
+    	if(in_array($subnetId, $favs)) {
+	    	return true;
+    	} else {
+	    	return false;
+    	}
+	}	
+}
+
+
+/**
+ *	edit favourite
+ */
+function editFavourite($post)
+{
+    global $db;                                                                      # get variables from config file
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+
+    # get user details and favourites
+    $user = getActiveUserDetails();
+	# empty
+	$old = explode(";", $user['favourite_subnets']);
+		
+	# set query
+	if($post['action'] == "remove") {
+		$new = implode(";", array_diff($old, array($post['subnetId'])));
+		$query = "update `users` set `favourite_subnets` = '$new' where `id` = '$user[id]' limit 1;"; 		
+	} elseif($post['action'] == "add") {  
+		if(!is_array($old))	{ $old = array(); }
+		$new = implode(";",array_merge(array($post['subnetId']), $old));
+		$query = "update `users` set `favourite_subnets` = '$new' where `id` = '$user[id]' limit 1;"; 		
+	} else { 
+		return false;
+	}
+		
+	# execute
+    try { $database->executeQuery( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    }
+    return true;
 }
 
 
@@ -386,7 +579,7 @@ function getFullFieldData($table, $field)
     try { $details = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        //print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        //print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
     
@@ -522,64 +715,6 @@ function checkSubnetPermission ($subnetId)
 
 
 
-
-/* @autocomplete functions ---------- */
-
-
-/**
- *	Get all users for autocomplete
- */
-function getUniqueUsers ()
-{
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
-
-	/* execute query */
-    $query    	= 'select distinct owner from ipaddresses;';  
- 
-    /* execute */
-    try { $users = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
-        return false;
-    } 
-    
-    /* return result */
-    return $users;
-}
-
-
-/**
- *	Get unique hostnames for host search
- */
-function getUniqueHosts ()
-{
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
-
-	/* execute query */
-    $query    	= 'select distinct dns_name from `ipaddresses` order by `dns_name` desc;';  
-
-    /* execute */
-    try { $hosts = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
-        return false;
-    }  
-    
-    /* return result */
-    return $hosts;
-}
-
-
-
-
-
-
-
-
 /* @general functions ---------- */
 
 
@@ -598,7 +733,7 @@ function getAllSettings()
     try { $count = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         return false;
     } 
   
@@ -622,12 +757,40 @@ function getAllSettings()
 
 
 /**
- * Get SVN version
+ * Get all mail settings
  */
-function getSVNversion() {
-	$revision = shell_exec('svnversion');
-	if($svnversion == "exported") {$svnversion = "";}
-	return $revision;
+function getAllMailSettings()
+{
+    global $db;                                                                      # get variables from config file
+    $database    = new database($db['host'], $db['user'], $db['pass']); 
+
+    /* first check if table settings exists */
+    $query    = 'SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_schema = "'. $db['name'] .'" AND table_name = "settingsMail";';
+
+    /* execute */
+    try { $count = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    } 
+  
+	/* return true if it exists */
+	if($count[0]['count'] == 1) {
+	
+		/* select database */
+		$database->selectDatabase($db['name']);
+	
+	    /* first update request */
+	    $query    = 'select * from `settingsMail` where id = 1';
+	    $settings = $database->getArray($query); 
+  
+		/* return settings */
+		return($settings[0]);
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -725,19 +888,23 @@ function sec2hms($sec, $padHours = false)
  */
 function getPHPExecutableFromPath() 
 {
+	/*
+	not used anymore as it is not reliable, using PHP_BINDIR instead
+	*/
 	$paths = explode(PATH_SEPARATOR, getenv('PATH'));
 	foreach ($paths as $path) {
 		// we need this for XAMPP (Windows)
 		if (strstr($path, 'php.exe') && isset($_SERVER["WINDIR"]) && file_exists($path) && is_file($path)) {
 			return $path;
-	}
-	else {
-		$php_executable = $path . DIRECTORY_SEPARATOR . "php" . (isset($_SERVER["WINDIR"]) ? ".exe" : "");
-			if (file_exists($php_executable) && is_file($php_executable)) {
-				return $php_executable;
-			}
 		}
 	}
+
+	//unix
+	$php_executable = PHP_BINDIR."/php";
+	if (file_exists($php_executable) && is_file($php_executable)) {
+		return $php_executable;
+	}	
+	
 	return FALSE; // not found
 }
 
@@ -784,18 +951,18 @@ function get_menu_html( $subnets, $rootId = 0 )
 			$count = count( $parent_stack ) + 1;
 
 			# set opened or closed tag for displaying proper folders
-			if(in_array($option['value']['id'], $allParents))			{ $open = "open"; }
-			else														{ $open = "close"; }
+			if(in_array($option['value']['id'], $allParents))			{ $open = "open";	$openf = "-open"; }
+			else														{ $open = "close";	$openf = ""; }
 						
 			# show also child's by default
 			if($option['value']['id']==$_REQUEST['subnetId']) {
-				if(subnetContainsSlaves($_REQUEST['subnetId']))			{ $open = "open"; }
-				else													{ $open = "close"; }
+				if(subnetContainsSlaves($_REQUEST['subnetId']))			{ $open = "open";	$openf = "-open"; }
+				else													{ $open = "close";	$openf = ""; }
 			}			
 			
 			# override if cookie is set
 			if(isset($_COOKIE['expandfolders'])) {
-				if($_COOKIE['expandfolders'] == "1")					{ $open='open'; }
+				if($_COOKIE['expandfolders'] == "1")					{ $open='open';		$openf = "-open"; }
 			}
 			
 			# for active class
@@ -803,7 +970,7 @@ function get_menu_html( $subnets, $rootId = 0 )
 			else 																					{ $active = ""; 		$leafClass="icon-gray" ;}
 			
 			# override folder
-			if($option['value']['isFolder'] == 1 && ($option['value']['id'] == $_REQUEST['subnetId']))	{ $open = "open"; }
+			if($option['value']['isFolder'] == 1 && ($option['value']['id'] == $_REQUEST['subnetId']))	{ $open = "open"; $openf = "-open"; }
 			
 			# check for permissions if id is provided
 			if($option['value']['id'] != "") {
@@ -825,17 +992,17 @@ function get_menu_html( $subnets, $rootId = 0 )
 				if($sp != 0) {	
 					# folder
 					if($option['value']['isFolder'] == 1) {
-						$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="icon-folder-'.$open.'" rel="tooltip" data-placement="right" data-html="true" title="'._('Folder contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
+						$html[] = '<li class="folderF folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-sfolder fa-folder'.$openf.'" rel="tooltip" data-placement="right" data-html="true" title="'._('Folder contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
 						$html[] = '<a href="folder/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/">'.$option['value']['description'].'</a>'; 				
 					}
 					# print name
 					elseif($option['value']['showName'] == 1) {
-						$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="icon-gray icon-folder-'.$open.'" rel="tooltip" data-placement="right" data-html="true" title="'._('Subnet contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
+						$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('Subnet contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
 						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'">'.$option['value']['description'].'</a>'; 				
 					}
 					# print subnet
 					else {
-						$html[] = '<li class="folder folder-'.$open.' '.$active.'""><i class="icon-gray icon-folder-'.$open.'" rel="tooltip" data-placement="right" data-html="true" title="'._('Subnet contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
+						$html[] = '<li class="folder folder-'.$open.' '.$active.'""><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('Subnet contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
 						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.$option['value']['description'].'">'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'</a>'; 										
 					}
 
@@ -852,17 +1019,17 @@ function get_menu_html( $subnets, $rootId = 0 )
 				if($sp != 0) {
 					# folder - opened
 					if($option['value']['isFolder'] == 1) {
-						$html[] = '<li class="leaf '.$active.'"><i class="icon-folder-'.$open.'"></i>';
+						$html[] = '<li class="leaf '.$active.'"><i class="fa fa-gray fa-sfolder fa-folder'.$openf.'"></i>';
 						$html[] = '<a href="folder/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/">'.$option['value']['description'].'</a></li>';
 					}
 					# print name
 					elseif($option['value']['showName'] == 1) {				
-						$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' icon-chevron-right"></i>';
+						$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
 						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'">'.$option['value']['description'].'</a></li>';
 					}
 					# print subnet
 					else {
-						$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' icon-chevron-right"></i>';
+						$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
 						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.$option['value']['description'].'">'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'</a></li>';					
 					}
 				}
@@ -894,21 +1061,21 @@ function get_menu_vlan( $vlans, $sectionId )
 			if($_REQUEST['vlanId'] == $item['vlanId'] && !isset($_REQUEST['subnetId'])) {
 				$open = "open";
 				$active = "active";
-				$leafClass="icon-gray";					
+				$leafClass="fa-gray";					
 			}
 			elseif(isSubnetIdVlan ($_REQUEST['subnetId'], $item['vlanId'])) {
 				$open = "open";
 				$active = "";
-				$leafClass="icon-gray";				
+				$leafClass="fa-gray";				
 			}
 			else {
 				$open = "close";
 				$active = "";
-				$leafClass="icon-gray";		
+				$leafClass="fa-gray";		
 			}
 			
 			# new item
-			$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="icon-gray icon-folder-'.$open.'" rel="tooltip" data-placement="right" data-html="true" title="'._('VLAN contains subnets').'.<br>'._('Click on folder to open/close').'"></i>';
+			$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('VLAN contains subnets').'.<br>'._('Click on folder to open/close').'"></i>';
 			$html[] = '<a href="vlan/'.$sectionId.'/'.$item['vlanId'].'/" rel="tooltip" data-placement="right" title="'.$item['description'].'">'.$item['number'].' ('.$item['name'].')</a>'; 				
 
 			# fetch all subnets in VLAN
@@ -933,11 +1100,11 @@ function get_menu_vlan( $vlans, $sectionId )
 						
 						# check if showName is set
 						if($subnet['showName'] == 1) {
-							$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' icon-chevron-right"></i>';
+							$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
 							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'">'.$subnet['description'].'</a></li>';						
 						}
 						else {
-							$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' icon-chevron-right"></i>';
+							$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
 							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.$subnet['description'].'">'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'</a></li>';												
 						}
 					
@@ -976,21 +1143,21 @@ function get_menu_vrf( $vrfs, $sectionId )
 			if($_REQUEST['vrfId'] == $item['vrfId'] && !isset($_REQUEST['subnetId'])) {
 				$open = "open";
 				$active = "active";
-				$leafClass="icon-gray";					
+				$leafClass="fa-gray";					
 			}
 			elseif(isSubnetIdVrf ($_REQUEST['subnetId'], $item['vrfId'])) {
 				$open = "open";
 				$active = "";
-				$leafClass="icon-gray";				
+				$leafClass="fa-gray";				
 			}
 			else {
 				$open = "close";
 				$active = "";
-				$leafClass="icon-gray";		
+				$leafClass="fa-gray";		
 			}
 			
 			# new item
-			$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="icon-gray icon-folder-'.$open.'" rel="tooltip" data-placement="right" data-html="true" title="'._('VRF contains subnets').'.<br>'._('Click on folder to open/close').'"></i>';
+			$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('VRF contains subnets').'.<br>'._('Click on folder to open/close').'"></i>';
 			$html[] = '<a href="vrf/'.$sectionId.'/'.$item['vrfId'].'/" rel="tooltip" data-placement="right" title="'.$item['description'].'">'.$item['name'].'</a>'; 				
 
 			# fetch all subnets in VLAN
@@ -1015,11 +1182,11 @@ function get_menu_vrf( $vrfs, $sectionId )
 						
 						# check if showName is set
 						if($subnet['showName'] == 1) {
-							$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' icon-chevron-right"></i>';
+							$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
 							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'">'.$subnet['description'].'</a></li>';						
 						}
 						else {
-							$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' icon-chevron-right"></i>';
+							$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
 							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.$subnet['description'].'">'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'</a></li>';												
 						}
 					
@@ -1102,11 +1269,11 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 				else 												{ $description = $option['value']['description']; }						# description		
 				
 				# requests
-				if($option['value']['allowRequests'] == 1) 			{ $requests = _("enabled"); }											# requests enabled
+				if($option['value']['allowRequests'] == 1) 			{ $requests = "<i class='fa fa-gray fa-check'></i>"; }					# requests enabled
 				else 												{ $requests = ""; }														# request disabled				
 
 				# hosts check
-				if($option['value']['pingSubnet'] == 1) 			{ $pCheck = _("enabled"); }												# ping check enabled
+				if($option['value']['pingSubnet'] == 1) 			{ $pCheck = "<i class='fa fa-gray fa-check'></i>"; }					# ping check enabled
 				else 												{ $pCheck = ""; }														# ping check disabled
 
 				#vrf
@@ -1128,35 +1295,69 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 				// print item
 				if($permission != 0) {
 					$html[] = "<tr>";
-					# is folder?
-					if($option['value']['isFolder']==1) {
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='icon-gray icon-folder-open'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'> $description</a></td>";						
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span> $description</td>";						
-
+					# which level?
+					if($count==1) {
+						# is folder?
+						if($option['value']['isFolder']==1) {
+						$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-pad-right-3 fa-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'> $description</a></td>";						
+						$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-pad-right-3 fa-folder-open'></i>  $description</td>";						
+	
+						}
+						else {
+							# last?
+							if(!empty( $children[$option['value']['id']])) {
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> $description</td>";						
+							} else {
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> $description</td>";						
+							}
 					}
-					else {
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span> $description</td>";						
+					} else {
+						# is folder?
+						if($option['value']['isFolder']==1) {
+							# last?
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'> $description</a></td>";						
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open'></i> $description</td>";						
+						}
+						else {
+							# last?
+							if(!empty( $children[$option['value']['id']])) {							
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> $description</td>";						
+							}
+							else {
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> $description</td>";						
+								
+							}
+						}
 					}
 					$html[] = "	<td>$vlan</td>";
 					#vrf
 					if($vrf == "1") {
-					$html[] = "	<td>$vrfText</td>";
+					$html[] = "	<td class='hidden-xs hidden-sm'>$vrfText</td>";
 					}
-					$html[] = "	<td>$requests</td>";
-					$html[] = "	<td>$pCheck</td>";
+					$html[] = "	<td class='hidden-xs hidden-sm'>$requests</td>";
+					$html[] = "	<td class='hidden-xs hidden-sm'>$pCheck</td>";
 					# custom
 					if(sizeof($custom)>0) {
 						foreach($custom as $field) {
-				    		$html[] =  "	<td>".$option['value'][$field['name']]."</td>"; 
+				    		$html[] =  "	<td class='hidden-xs hidden-sm'>".$option['value'][$field['name']]."</td>"; 
 				    	}
 					}
 					if($actions) {
 					$html[] = "	<td class='actions' style='padding:0px;'>";
 					$html[] = "	<div class='btn-group'>";
-					$html[] = "		<button class='btn btn-mini editSubnet'     data-action='edit'   data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='icon-gray icon-pencil'></i></button>";
-					$html[] = "		<button class='btn btn-mini showSubnetPerm' data-action='show'   data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='icon-gray icon-tasks'></i></button>";
-					$html[] = "		<button class='btn btn-mini editSubnet'     data-action='delete' data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='icon-gray icon-remove'></i></button>";
+					if($option['value']['isFolder']==1) {
+						$html[] = "		<button class='btn btn-xs btn-default add_folder'     data-action='edit'   data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='fa fa-gray fa-pencil'></i></button>";
+						$html[] = "		<button class='btn btn-xs btn-default showSubnetPerm' data-action='show'   data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='fa fa-gray fa-tasks'></i></button>";
+						$html[] = "		<button class='btn btn-xs btn-default add_folder'     data-action='delete' data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='fa fa-gray fa-times'></i></button>";
+					} else {
+						$html[] = "		<button class='btn btn-xs btn-default editSubnet'     data-action='edit'   data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='fa fa-gray fa-pencil'></i></button>";
+						$html[] = "		<button class='btn btn-xs btn-default showSubnetPerm' data-action='show'   data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='fa fa-gray fa-tasks'></i></button>";
+						$html[] = "		<button class='btn btn-xs btn-default editSubnet'     data-action='delete' data-subnetid='".$option['value']['id']."'  data-sectionid='".$option['value']['sectionId']."'><i class='fa fa-gray fa-times'></i></button>";						
+					}
 					$html[] = "	</div>";
 					$html[] = "	</td>";
 					}
@@ -1228,7 +1429,7 @@ function getAllSlaves ($subnetId, $multi = false)
 		try { $slaves2 = $database->getArray( $query ); }
 		catch (Exception $e) { 
         	$error =  $e->getMessage(); 
-        	print ("<div class='alert alert-error'>"._('Error').": $error</div>");
+        	print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
         	return false;
         }
 		
@@ -1255,7 +1456,7 @@ function getAllSlaves ($subnetId, $multi = false)
 function printBreadcrumbs ($req)
 {
 	# subnets
-	if($req['page'] == "subnets")	{
+	if(isset($req['ipaddrid']))	{
 		if(isset($req['subnetId'])) {
 			# get all parents
 			$parents = getAllParents ($req['subnetId']);
@@ -1267,11 +1468,47 @@ function printBreadcrumbs ($req)
 			if(is_numeric($req['section']))	{ $section = getSectionDetailsById($req['section']); }					# if id is provided
 			else							{ $section = getSectionDetailsByName($req['section']); }				# if name is provided
 			
-			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'>/</span></li>";	# section name
+			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'></span></li>";	# section name
 			
 			foreach($parents as $parent) {
 			$subnet = getSubnetDetailsById($parent);
-			print "	<li><a href='subnets/$section[id]/$parent/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'>/</span></li>";								# subnets in between
+			if($subnet['isFolder']==1) {
+				print "	<li><a href='subnets/$section[id]/$parent/'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
+			} else {
+				print "	<li><a href='subnets/$section[id]/$parent/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";								# subnets in between				
+			}
+			}
+			# parent subnet
+			$subnet = getSubnetDetailsById($req['subnetId']);
+			print "	<li><a href='subnets/$section[id]/$subnet[id]/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";																# active subnet
+			# ip
+			$ip = getIpAddrDetailsById($req['ipaddrid']);
+			print "	<li class='active'>$ip[ip_addr]</li>";																# IP address
+			print "</ul>";
+		}
+	}
+	# subnets
+	elseif($req['page'] == "subnets")	{
+		if(isset($req['subnetId'])) {
+			# get all parents
+			$parents = getAllParents ($req['subnetId']);
+			print "<ul class='breadcrumb'>";
+			# remove root - 0
+			array_shift($parents);
+			
+			# section details
+			if(is_numeric($req['section']))	{ $section = getSectionDetailsById($req['section']); }					# if id is provided
+			else							{ $section = getSectionDetailsByName($req['section']); }				# if name is provided
+			
+			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'></span></li>";	# section name
+			
+			foreach($parents as $parent) {
+			$subnet = getSubnetDetailsById($parent);
+			if($subnet['isFolder']==1) {
+				print "	<li><a href='subnets/$section[id]/$parent/'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
+			} else {
+				print "	<li><a href='subnets/$section[id]/$parent/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";								# subnets in between				
+			}
 			}
 			$subnet = getSubnetDetailsById($req['subnetId']);
 			print "	<li class='active'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</li>";																# active subnet
@@ -1291,11 +1528,11 @@ function printBreadcrumbs ($req)
 			if(is_numeric($req['section']))	{ $section = getSectionDetailsById($req['section']); }					# if id is provided
 			else							{ $section = getSectionDetailsByName($req['section']); }				# if name is provided
 			
-			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'>/</span></li>";	# section name
+			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'></span></li>";	# section name
 			
 			foreach($parents as $parent) {
 			$subnet = getSubnetDetailsById($parent);
-			print "	<li><a href='subnets/$section[id]/$parent/'>$subnet[description]</a> <span class='divider'>/</span></li>";								# subnets in between
+			print "	<li><a href='subnets/$section[id]/$parent/'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
 			}
 			$subnet = getSubnetDetailsById($req['subnetId']);
 			print "	<li class='active'>$subnet[description]</li>";																# active subnet
@@ -1311,7 +1548,7 @@ function printBreadcrumbs ($req)
 	else if ($req['page'] == "tools") {
 		if(isset($req['tpage'])) {
 			print "<ul class='breadcrumb'>";
-			print "	<li><a href='tools/'>"._('Tools')."</a> <span class='divider'>/</span></li>";
+			print "	<li><a href='tools/'>"._('Tools')."</a> <span class='divider'></span></li>";
 			print "	<li class='active'>$req[tpage]></li>";
 			print "</ul>";
 		}

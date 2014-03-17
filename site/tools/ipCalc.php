@@ -14,10 +14,10 @@ isUserAuthenticated ();
     <tr>
         <td><?php print _('IP address');?> / <?php print _('mask');?></td>
         <td>
-            <input type="text" name="cidr" size="40">
+            <input type="text" class="form-control" name="cidr" size="40" autofocus="autofocus">
         </td>
         <td>
-            <div class="alert alert-warn" style="margin-bottom:0px;"><?php print _('Please enter IP address and mask in CIDR format');?></div>
+            <div class="info2" style="margin-bottom:0px;"><?php print _('Please enter IP address and mask in CIDR format');?></div>
         </td>
     </tr>
 
@@ -26,8 +26,8 @@ isUserAuthenticated ();
         <td></td>
         <td>
         	<div class="btn-group">
-            	<button type="submit" class="btn btn-small"><i class="icon-gray icon-ok"></i> <?php print _('Calculate');?></button>
-				<input type="button" class="btn btn-small reset" value="<?php print _('Reset');?>">
+            	<button type="submit" class="btn btn-sm btn-default"><i class="fa fa-check"></i> <?php print _('Calculate');?></button>
+				<input type="button" class="btn btn-sm btn-default reset" value="<?php print _('Reset');?>">
         	</div>
         </td>
         <td></td>

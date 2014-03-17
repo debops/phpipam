@@ -26,17 +26,17 @@ $subnet['subnet'] = Transform2long ($subnet['subnet']);
 $subnet = $subnet['subnet'] . "/" . $subnet['mask'];
 
 /* verify email */
-if(!checkEmail($request['requester']) ) 						{ die('<div class="alert alert-error alert-nomargin alert-norounded">'._('Please provide valid email address').'! ('._('requester').': <del>'. $request['requester'] .'</del>)</div>');	 }
+if(!checkEmail($request['requester']) ) 						{ die('<div class="alert alert-danger alert-nomargin alert-norounded">'._('Please provide valid email address').'! ('._('requester').': <del>'. $request['requester'] .'</del>)</div>');	 }
 
 if(addNewRequest ($request)) {
 	print '<div class="alert alert-success alert-nomargin alert-norounded">'._('Request submitted successfully').'!</div>';
 
 	# send mail
-	if(!sendIPReqEmail($request))	{ print '<div class="alert alert-error alert-nomargin alert-norounded">'._('Sending mail for new IP request failed').'!</div>'; }
+	if(!sendIPReqEmail($request))	{ print '<div class="alert alert-danger alert-nomargin alert-norounded">'._('Sending mail for new IP request failed').'!</div>'; }
 	else							{ print '<div class="alert alert-success alert-nomargin alert-norounded">'._('Sending mail for IP request succeeded').'!</div>'; }
 }
 else {
-	print '<div class="alert alert-error alert-nomargin alert-norounded">'._('Error submitting new IP address request').'!</div>';
+	print '<div class="alert alert-danger alert-nomargin alert-norounded">'._('Error submitting new IP address request').'!</div>';
 }
 
 ?>

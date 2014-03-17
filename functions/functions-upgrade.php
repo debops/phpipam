@@ -38,7 +38,7 @@ function getAllTables()
     try { $tables = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>Error: $error</div>");
+        print ("<div class='alert alert-danger'>Error: $error</div>");
         return false;
     } 
   
@@ -93,7 +93,7 @@ function fieldExists($table, $fieldName)
     try { $count = $database->getArray( $query ); }
     catch (Exception $e) { 
         $error =  $e->getMessage(); 
-        print ("<div class='alert alert-error'>Error: $error</div>");
+        print ("<div class='alert alert-danger'>Error: $error</div>");
         return false;
     } 
   
@@ -113,7 +113,7 @@ function upgradeDatabase($version)
 
     /* Check connection */
     if ($database->connect_error) {
-    	die('<div class="alert alert-error">Connect Error (' . $database->connect_errno . '): '. $database->connect_error). "</div>";
+    	die('<div class="alert alert-danger">Connect Error (' . $database->connect_errno . '): '. $database->connect_error). "</div>";
 	}
 	
 	/* get all upgrade files */
@@ -139,7 +139,7 @@ function upgradeDatabase($version)
     catch (Exception $e) {
     	$error =  $e->getMessage();
     	updateLogTable ('DB update failed', 'DB updated failed with error: '. $error, 2);
-    	die('<div class="alert alert-error">Update error: '. $error .'</div>');
+    	die('<div class="alert alert-danger">Update error: '. $error .'</div>');
 	}
     
     /* return true if we came to here */

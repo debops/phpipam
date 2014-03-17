@@ -7,6 +7,7 @@ Features and tools:
 - Section / Subnet separation
 - Subnet nesting
 - IPv4/IPv6 support
+- Subnet ICMP/telnet scanning and automatic status updates
 - Displays free range and number of clients
 - Subnet statistics
 - User management
@@ -22,7 +23,6 @@ Features and tools:
 
 What it does not do:
 - Updates DNS server
-- Scan subnet range (for now)
 
 License
 =======
@@ -70,17 +70,6 @@ See misc/Roadmap
 Contact
 =======
 miha.petkovsek@gmail.com
-
-Donors
-======
-Special thanks to following donors:
-	- Dicom Datautveckling AB
-	- Tatung Baby
-	- Suretec Systems Ltd.
-	- Uplifting Host
-	- Alun James
-	- Maxim Kravets
-	- VIBIZNES
 
 special thank also to Hosterdam team (http://www.hosterdam.com) for VPS server 
 that is used for development of phpIPAM and for demo site.

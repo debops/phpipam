@@ -40,25 +40,27 @@ if($_REQUEST['page'] != 'upgrade' && $_REQUEST['page'] != "login" && $_REQUEST['
 /* recreate base */
 if($_SERVER['SERVER_PORT'] == "443") 		{ $url = "https://$_SERVER[SERVER_NAME]".BASE; }
 /* custom port */
-else if($_SERVER['SERVER_PORT'] != "80")  	{ $url = "http://$_SERVER[SERVER_NAME]:$_SERVER[SERVER_PORT]".BASE; }
+elseif($_SERVER['SERVER_PORT'] != "80")  	{ $url = "http://$_SERVER[SERVER_NAME]:$_SERVER[SERVER_PORT]".BASE; }
 /* normal http */
 else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 
 /* site header */
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
 
 <head>
 	<base href="<?php print $url; ?>" />
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 	
 	<meta name="Description" content=""> 
 	<meta name="title" content="<?php print $settings['siteTitle']; ?>"> 
 	<meta name="robots" content="noindex, nofollow"> 
 	<meta http-equiv="X-UA-Compatible" content="IE=9" >
-	<meta name="viewport" content="width=1024, initial-scale=0.85, user-scalable=yes">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=1, user-scalable=no">
 	
 	<!-- chrome frame support -->
 	<meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -69,28 +71,22 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 	<!-- css -->
 	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-custom.css">
+	<link rel="stylesheet" type="text/css" href="css/font-awesome/font-awesome.min.css">
 	<link rel="shortcut icon" href="css/images/favicon.ico">
 		
 	<!-- js -->
 	<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="js/jclock.jquery.js"></script>
-	<script type="text/javascript" src="js/magic.min.js"></script>
 	<script type="text/javascript" src="js/login.js"></script>
-<!-- 	<script type="text/javascript" src="js/magic.js"></script> -->
+	<script type="text/javascript" src="js/magic-1.0.min.js"></script>
+<!-- 	<script type="text/javascript" src="js/magic-1.0.js"></script> -->
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	
-
-	<?php 
-	if ($settings['showTooltips'] == 1) { 
-	?>
+	<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function(){
 	     if ($("[rel=tooltip]").length) { $("[rel=tooltip]").tooltip(); }
 	});
 	</script>
-	<?php
-	} 
-	?>
 	<!--[if lt IE 9]>
 	<script type="text/javascript" src="js/dieIE.js"></script>
 	<![endif]-->
@@ -103,7 +99,11 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 <div class="wrapper">
 
 <!-- jQuery error -->
-<div class="jqueryError">jQuery error!<div class="jqueryErrorText"></div><br><a href="" class="btn btn-small" id="hideError" style="margin-top:10px;">Hide</a></div>
+<div class="jqueryError">
+	<div class='alert alert-danger' style="width:400px;margin:auto">jQuery error!</div>
+	<div class="jqueryErrorText"></div><br>
+	<a href="" class="btn btn-sm btn-default" id="hideError" style="margin-top:0px;">Hide</a>
+</div>
 
 <!-- Popups -->
 <div id="popupOverlay"></div>
@@ -112,24 +112,40 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 <div id="popup" class="popup popup_w700"></div>
 
 <!-- loader -->
-<div class="loading"><?php print _('Loading');?>...<br><img src="css/images/ajax-loader.gif"></div>
-
-<!-- page header -->
-<div id="header">
-<div class="hero-unit">
-	<a href=""><?php print $settings['siteTitle']; if($_REQUEST['page'] == "login") { print " | "._('login'); } if($_REQUEST['page'] == "install") { print " | "._('installation'); } ?></a>
-</div>
-</div>
+<div class="loading"><?php print _('Loading');?>...<br><i class="fa fa-spinner fa-spin"></i></div>
 
 
-<!-- page user menu -->
-<div class="user_menu">
-	<?php if($_REQUEST['page'] != "login" && $_REQUEST['page'] != "logout" && $_REQUEST['page'] != "request_ip" && $_REQUEST['page'] != "upgrade" && $_REQUEST['page'] != "install") include('site/userMenu.php');?>
-</div>
+<!-- helpers -->
+<!--
+<div class="visible-xs">XS</div>
+<div class="visible-sm">SM</div>
+<div class="visible-md">MD</div>
+<div class="visible-lg">LG</div>
+-->
+
+<!-- header -->
+<div class="row" id="header">
+
+	<!-- usermenu -->
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 pull-right" id="user_menu">
+		<?php if($_REQUEST['page'] != "login" && $_REQUEST['page'] != "logout" && $_REQUEST['page'] != "request_ip" && $_REQUEST['page'] != "upgrade" && $_REQUEST['page'] != "install") include('site/userMenu.php');?>
+	</div>
+  
+ 
+	<!-- title -->
+	<div class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-12 col-xs-12">
+		<div class="hero-pusher hidden-xs hidden-sm"></div>
+		<div class="hero-unit">
+			<a href=""><?php print $settings['siteTitle']; if($_REQUEST['page'] == "login") { print " | "._('login'); } if($_REQUEST['page'] == "install") { print " | "._('installation'); } ?></a>
+		</div>
+	</div>
+	
+</div>  
+
 
 <!-- page sections / menu -->
-<div class="sections_overlay">
-<div class="sections">
+<div class="content">
+<div id="sections_overlay">
     <?php if($_REQUEST['page'] != "login" && $_REQUEST['page'] != "logout" && $_REQUEST['page'] != "request_ip" && $_REQUEST['page'] != "upgrade" && $_REQUEST['page'] != "install")  include('site/sections.php');?>
 </div>
 </div>
@@ -137,8 +153,7 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 
 <!-- content -->
 <div class="content_overlay">
-<div class="container-fluid">
-	<div class="row-fluid">
+<div class="container-fluid" id="mainContainer">
 		<?php
 		/* error */
 		if($_REQUEST['page'] == "error") {
@@ -147,30 +162,36 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 			print "</div>";
 		}
 		/* upgrade */
-		else if ($_REQUEST['page'] == "upgrade") {
+		elseif ($_REQUEST['page'] == "upgrade") {
 			print "<div id='dashboard'>";
 			include_once("site/upgrade/index.php");
 			print "</div>";			
 		}
 		/* install */
-		else if ($_REQUEST['page'] == "install") {
+		elseif ($_REQUEST['page'] == "install") {
 			print "<div id='dashboard'>";
 			include_once("site/install/index.php");
 			print "</div>";			
 		}
 		/* login, logout, ipRequest */
-		else if($_REQUEST['page'] == "login" || $_REQUEST['page'] == "logout" || $_REQUEST['page'] == "request_ip") {
+		elseif($_REQUEST['page'] == "login" || $_REQUEST['page'] == "logout" || $_REQUEST['page'] == "request_ip") {
 			print "<div id='dashboard'>";
 			include_once("site/login/index.php");
 			print "</div>";			
 		}
 		/* dashboard */
-		else if(!isset($_REQUEST['page']) || $_REQUEST['page'] == "dashboard") {
+		elseif(!isset($_REQUEST['page']) || $_REQUEST['page'] == "dashboard") {
 			print "<div id='dashboard'>";
 			include_once("site/dashboard/index.php");
 			print "</div>";
 		}
-		# side menus
+		/* widgets */
+		elseif(@$_REQUEST['page']=="widgets") {
+			print "<div id='dashboard'>";
+			include_once("site/dashboard/widgets/".$_REQUEST['subpage'].".php");
+			print "</div>";			
+		}
+		/* side menus */
 		else {
 			print "<table id='subnetsMenu'>";
 			print "<tr>";
@@ -184,11 +205,14 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
 			print "</div>";		
 			print "</td>";
 			
-			print "<td>";
-			print "<div id='content'>";
+			print "<td id='subnetsContent'>";
+			print "<div class='row' id='content'>";
 				if( isset($_REQUEST['toolsId']) && (strlen($_REQUEST['toolsId']) == 0) )	{ unset($_REQUEST['toolsId']); }
+				# subnet changelog
+				if($_REQUEST['page'] == "subnets" && $_REQUEST['sPage'] == "changelog")									{ include_once("site/ipaddr/subnetChangelog.php"); }
 				# subnets
-				if($_REQUEST['page'] == "subnets" && !isset($_REQUEST['subnetId']))										{ include_once("site/ipaddr/sectionAllSubnets.php"); }
+				elseif($_REQUEST['page'] == "subnets" && !isset($_REQUEST['subnetId']))									{ include_once("site/ipaddr/sectionAllSubnets.php"); }
+				# subnets, vrf, vlan, folder
 				else if($_REQUEST['page'] == "subnets" || $_REQUEST['page'] == "vlan" 
 					 || $_REQUEST['page'] == "vrf"	   || $_REQUEST['page'] == "folder")								{ include_once("site/ipaddr/ipAddressSwitch.php"); }
 				# tools		
@@ -205,7 +229,6 @@ else								 		{ $url = "http://$_SERVER[SERVER_NAME]".BASE; }
     	}
     	?>
       	
-    </div>
 </div>
 </div>
 

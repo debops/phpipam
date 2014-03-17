@@ -36,7 +36,7 @@ $ipaddresses   = getIpAddressesBySubnetIdSort ($subnetId, "ip_addr", "asc");
 $SubnetDetails = getSubnetDetailsById     ($subnetId);
 
 /* die if empty! */
-if(sizeof($SubnetDetails) == 0) { die('<div class="alert alert-error">'._('Subnet does not exist').'!</div>');}
+if(sizeof($SubnetDetails) == 0) { die('<div class="alert alert-danger">'._('Subnet does not exist').'!</div>');}
 
 /* get all selected fields */
 $myFields = getCustomFields('ipaddresses');
@@ -66,7 +66,7 @@ foreach($myFields as $field) {
 if(sizeof($ipaddresses) > 0) {
 ?>
 <br><hr>
-<h4><div class="alert alert-warn"><?php print _('Orphaned IP addresses for subnet'); ?> <strong><?php print $SubnetDetails['description'] ?></strong> (<?php print sizeof($ipaddresses); ?>) <i class="icon-gray icon-info-sign" rel="tooltip" data-html="true" title="<?php print _('This happens if subnet had IP addresses<br>when new nested subnet was added'); ?>."></i></div></h4>
+<h4><div class="alert alert-warning"><?php print _('Orphaned IP addresses for subnet'); ?> <strong><?php print $SubnetDetails['description'] ?></strong> (<?php print sizeof($ipaddresses); ?>) <i class="fa fa-gray fa-info" rel="tooltip" data-html="true" title="<?php print _('This happens if subnet had IP addresses<br>when new nested subnet was added'); ?>."></i></div></h4>
 
 <table class="ipaddresses table table-striped table-condensed table-hover table-full table-top">
 
@@ -86,15 +86,15 @@ if(sizeof($ipaddresses) > 0) {
 	# note
 	if(in_array('note', $setFields)) 	{ print "<th></th>"; }	
 	# switch
-	if(in_array('switch', $setFields)) 	{ print "<th>"._('Switch')."</th>"; }	
+	if(in_array('switch', $setFields)) 	{ print "<th class='hidden-xs hidden-sm hidden-md'>"._('Switch')."</th>"; }	
 	# port
-	if(in_array('port', $setFields)) 	{ print "<th>"._('Port')."</th>"; }
+	if(in_array('port', $setFields)) 	{ print "<th class='hidden-xs hidden-sm hidden-md'>"._('Port')."</th>"; }
 	# owner
-	if(in_array('owner', $setFields)) 	{ print "<th>"._('Owner')."</th>"; }
+	if(in_array('owner', $setFields)) 	{ print "<th class='hidden-xs hidden-sm hidden-md'>"._('Owner')."</th>"; }
 	
 	# custom fields
 	if(sizeof($myFields) > 0) {
-		foreach($myFields as $myField) 	{ print "<th>$myField[name]</th>"; }
+		foreach($myFields as $myField) 	{ print "<th class='hidden-xs hidden-sm'>$myField[name]</th>"; }
 	}
 ?>
 
@@ -133,8 +133,8 @@ foreach($ipaddresses as $ipaddress)
 
 			# Print mac address icon!
 			if(in_array('mac', $setFields)) {
-				if(!empty($ipaddress['mac'])) 					{ print "<td class='mac'><img class='info mac' src='/css/images/lan.png' rel='tooltip' title='"._('MAC').": ".$ipaddress['mac']."'></td>"; }
-				else 												{ print "<td class='mac'></td>"; }
+				if(!empty($ipaddress['mac'])) 					{ print "<td class='mac'><i class='info fa fa-gray fa-sitemap' rel='tooltip' title='"._('MAC').": ".$ipaddress['mac']."'></i></td>"; }
+				else 											{ print "<td class='mac'></td>"; }
 			}
 		
 			# print description - mandatory
@@ -142,34 +142,34 @@ foreach($ipaddresses as $ipaddress)
 		
        		# print info button for hover
        		if(in_array('note', $setFields)) {
-        		if(!empty($ipaddress['note'])) 					{ print "<td><i class='icon-gray icon-comment' rel='tooltip' title='".str_replace("\n", "<br>",$ipaddress['note'])."'></td>"; }
+        		if(!empty($ipaddress['note'])) 					{ print "<td><i class='fa fa-gray fa-comment-o' rel='tooltip' title='".str_replace("\n", "<br>",$ipaddress['note'])."'></td>"; }
         		else 											{ print "<td></td>"; }
         	}
 	
         	# print switch
         	if(in_array('switch', $setFields)) 					{ 
 	        	# get switch details
-	        	$switch = getSwitchById ($ipaddress['switch']);
-																  print "<td>".$switch['hostname']."</td>";
+	        	$switch = getDeviceById ($ipaddress['switch']);
+																  print "<td class='hidden-xs hidden-sm hidden-md'>".$switch['hostname']."</td>";
 																}
 		
 			# print port
-			if(in_array('port', $setFields)) 					{ print "<td>".$ipaddress['port']."</td>"; }
+			if(in_array('port', $setFields)) 					{ print "<td class='hidden-xs hidden-sm hidden-md'>".$ipaddress['port']."</td>"; }
 		
 			# print owner
-			if(in_array('owner', $setFields)) 					{ print "<td>".$ipaddress['owner']."</td>"; }
+			if(in_array('owner', $setFields)) 					{ print "<td class='hidden-xs hidden-sm hidden-md'>".$ipaddress['owner']."</td>"; }
 		
 			# print custom fields 
 			if(sizeof($myFields) > 0) {
-				foreach($myFields as $myField) 					{ print "<td class='customField'>".$ipaddress[$myField['name']]."</td>"; }
+				foreach($myFields as $myField) 					{ print "<td class='customField hidden-xs hidden-sm'>".$ipaddress[$myField['name']]."</td>"; }
 			}
 		
 			# print action links if user can edit 
 			print "<td class='btn-actions'>";
 			print "	<div class='btn-toolbar'>";
 			print "	<div class='btn-group'>";
-			print "		<a class='move_ipaddress   btn btn-mini moveIPaddr' data-action='move'   data-subnetId='$SubnetDetails[id]' data-id='".$ipaddress['id']."' href='#' rel='tooltip' title='"._('Move to different subnet')."'>		<i class='icon-gray icon-edit'>  </i></a>";
-			print "		<a class='delete_ipaddress btn btn-mini modIPaddr'  data-action='delete' data-subnetId='$SubnetDetails[id]' data-id='".$ipaddress['id']."' href='#' rel='tooltip' title='"._('Delete IP address')."'>				<i class='icon-gray icon-remove'>  </i></a>";
+			print "		<a class='move_ipaddress   btn btn-xs btn-default moveIPaddr' data-action='move'   data-subnetId='$SubnetDetails[id]' data-id='".$ipaddress['id']."' href='#' rel='tooltip' title='"._('Move to different subnet')."'>		<i class='fa fa-gray fa-pencil'>  </i></a>";
+			print "		<a class='delete_ipaddress btn btn-xs btn-default modIPaddr'  data-action='delete' data-subnetId='$SubnetDetails[id]' data-id='".$ipaddress['id']."' href='#' rel='tooltip' title='"._('Delete IP address')."'>				<i class='fa fa-gray fa-times'>  </i></a>";
 			print "	</div>";
 			print "	</div>";
 			print "</td>";		

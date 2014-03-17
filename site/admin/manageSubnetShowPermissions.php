@@ -55,6 +55,7 @@ $subnet = getSubnetDetailsById($_POST['subnetId']);
 	}
 
 	# print each group
+	if($groups) {
 	foreach($groups as $g) {
 		print "<tr>";
 		print "	<td>$g[g_name]</td>";
@@ -77,6 +78,11 @@ $subnet = getSubnetDetailsById($_POST['subnetId']);
 		print "	</td>";
 		print "</tr>";
 	}
+	} else {
+		print "<tr>";
+		print "	<td colspan='2'><span class='alert alert-info'>"._('No groups available')."</span></td>";
+		print "</tr>";		
+	}
 	?>
      
     </table>
@@ -93,8 +99,8 @@ $subnet = getSubnetDetailsById($_POST['subnetId']);
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups"><?php print _('Cancel'); ?></button>
-		<button class="btn btn-small btn-success editSubnetPermissionsSubmit"><i class="icon-white icon-ok"></i> <?php print _('Set permissions'); ?></button>
+		<button class="btn btn-sm btn-default hidePopups"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-default btn-success editSubnetPermissionsSubmit"><i class="fa fa-check"></i> <?php print _('Set permissions'); ?></button>
 	</div>
 
 	<div class="editSubnetPermissionsResult"></div>

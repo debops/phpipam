@@ -9,7 +9,7 @@ require_once('../../functions/functions.php');
 
 /* verify that user has write permissions for subnet */
 $subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
-if($subnetPerm < 3) 	{ die('<div class="alert alert-error">'._('You do not have permissions to resize subnet').'!</div>'); }
+if($subnetPerm < 3) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to resize subnet').'!</div>'); }
 
 
 /* verify post */
@@ -46,7 +46,7 @@ $subnet = getSubnetDetailsById ($_POST['subnetId']);
     <tr>
         <td class="middle"><?php print _('New mask'); ?></td>
         <td style="vertical-align:middle">
-	        / <input type="text" class="input-mini" name="newMask">
+	        <span class="pull-left" style='margin-right:5px;'> / </span> <input type="text" class="form-control input-sm input-w-100" name="newMask">
 	        <input type="hidden" name="subnetId" value="<?php print $_POST['subnetId']; ?>">
         </td>
     </tr>
@@ -55,7 +55,7 @@ $subnet = getSubnetDetailsById ($_POST['subnetId']);
     </form> 
 
     <!-- warning -->
-    <div class="alert alert-warn">
+    <div class="alert alert-warning">
     <?php print _('You can change subnet size by specifying new mask (bigger or smaller). Please note'); ?>:
     <ul>
     	<li><?php print _('If subnet has hosts outside of resized subnet resizing will not be possible'); ?></li>
@@ -69,8 +69,8 @@ $subnet = getSubnetDetailsById ($_POST['subnetId']);
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopup2"><?php print _('Cancel'); ?></button>
-		<button class="btn btn-small btn-success" id="subnetResizeSubmit"><i class="icon-white icon-ok"></i> <?php print _('Resize subnet'); ?></button>
+		<button class="btn btn-sm btn-default hidePopup2"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-default btn-success" id="subnetResizeSubmit"><i class="fa fa-check"></i> <?php print _('Resize subnet'); ?></button>
 	</div>
 
 	<div class="subnetResizeResult"></div>

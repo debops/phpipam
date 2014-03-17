@@ -24,7 +24,7 @@ if($_POST['action']!="delete") {
 
 # die if errors
 if(sizeof($error) > 0) {
-	print "<div class='alert alert-error'>";
+	print "<div class='alert alert alert-danger'>";
 	print _('Error');
 	print "<ul>";
 	foreach($error as $err) {
@@ -35,7 +35,7 @@ if(sizeof($error) > 0) {
 }
 else {
 	/* try to execute */
-	if(!modifyAPI($_POST)) 	{ print "<div class='alert alert-error'  >"._("API $_POST[action] error")."!</div>"; }
+	if(!modifyAPI($_POST)) 	{ print "<div class='alert alert alert-danger'>"._("API $_POST[action] error")."!</div>"; }
 	else 					{ print "<div class='alert alert-success'>"._("API $_POST[action] success")."!</div>"; }	
 }
 

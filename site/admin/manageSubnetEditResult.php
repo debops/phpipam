@@ -14,14 +14,14 @@ isUserAuthenticated(true);
 if($_POST['action'] == "add") {
 	$sectionPerm = checkSectionPermission ($_POST['sectionId']);
 	if($sectionPerm != 3) {
-		die("<div class='alert alert-error'>"._('You do not have permissions to add new subnet in this section')."!</div>");
+		die("<div class='alert alert-danger'>"._('You do not have permissions to add new subnet in this section')."!</div>");
 	}
 }
 /* otherwise check subnet permission */
 else {
 	$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 	if($subnetPerm != 3) {
-		die("<div class='alert alert-error'>"._('You do not have permissions to add edit/delete this subnet')."!</div>");
+		die("<div class='alert alert-danger'>"._('You do not have permissions to add edit/delete this subnet')."!</div>");
 	}	
 }
 
@@ -141,6 +141,13 @@ if(sizeof($myFields) > 0) {
 		
 		if(isset($_POST[$myField['nameTest']])) { $_POST[$myField['name']] = $_POST[$myField['nameTest']];}
 		
+		//booleans can be only 0 and 1!
+		if($myField['type']=="tinyint(1)") {
+			if($_POST[$myField['name']]>1) {
+				$_POST[$myField['name']] = "";
+			}
+		}
+		
 		//not empty
 		if($myField['Null']=="NO" && strlen($_POST[$myField['name']])==0 && !checkAdmin(false)) {
 			$errors[] = "Field \"$myField[name]\" cannot be empty!";
@@ -171,7 +178,7 @@ if($_POST['action'] == "add") {
 /* If no errors are present execute request */
 if (sizeof($errors) != 0) 
 {
-    print '<div class="alert alert-error"><strong>'._('Please fix following problems').'</strong>:';
+    print '<div class="alert alert-danger"><strong>'._('Please fix following problems').'</strong>:';
     foreach ($errors as $error) { print "<br>".$error; }
     print '</div>';
     die();
@@ -179,7 +186,7 @@ if (sizeof($errors) != 0)
 else
 {
 	# failed
-    if (!modifySubnetDetails ($_POST)) 		{ print '<div class="alert alert-error">'._('Error adding new subnet').'!</div>'; }
+    if (!modifySubnetDetails ($_POST)) 		{ print '<div class="alert alert-danger">'._('Error adding new subnet').'!</div>'; }
     # all good
     else {
     	if($_POST['action'] == "delete") 	{ print '<div class="alert alert-success">'._('Subnet, IP addresses and all belonging subnets deleted successfully').'!</div>'; } 

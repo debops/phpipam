@@ -41,7 +41,7 @@ $fieldval = getFullFieldData($_POST['table'], $_POST['fieldName']);
 	<tr>
 		<td><?php print _('Name'); ?></td>
 		<td>	
-			<input type="text" name="name" value="<?php print $_POST['fieldName']; ?>" placeholder="<?php print _('Select field name'); ?>" <?php if($_POST['action'] == "delete") { print 'readonly'; } ?>>
+			<input type="text" name="name" class="form-control input-sm" value="<?php print $_POST['fieldName']; ?>" placeholder="<?php print _('Select field name'); ?>" <?php if($_POST['action'] == "delete") { print 'readonly'; } ?>>
 			
 			<input type="hidden" name="oldname" value="<?php print $_POST['oldname']; ?>">
 			<input type="hidden" name="action" value="<?php print $_POST['action']; ?>">
@@ -53,7 +53,50 @@ $fieldval = getFullFieldData($_POST['table'], $_POST['fieldName']);
 	<tr>
 		<td><?php print _('Description'); ?></td>
 		<td>	
-			<input type="text" name="Comment" value="<?php print @$fieldval['Comment']; ?>" placeholder="<?php print _('Enter comment for users'); ?>" <?php if($_POST['action'] == "delete") { print 'readonly'; } ?>>
+			<input type="text" name="Comment" class="form-control input-sm" value="<?php print @$fieldval['Comment']; ?>" placeholder="<?php print _('Enter comment for users'); ?>" <?php if($_POST['action'] == "delete") { print 'readonly'; } ?>>
+		</td>
+	</tr>
+	
+	<!-- type -->
+	<tr>
+		<td><?php print _('Type'); ?></td>
+		<?php  
+		// define supported types
+		$mTypes = array("varchar"=>"varchar", "integer"=>"int", "boolean"=>"bool", "text"=>"text", "date"=>"date", "datetime"=>"datetime", "set"=>"set");
+		//reformat old type
+		$oldMType = strstr($fieldval['Type'], "(", true);
+		$oldMSize = str_replace(array("(",")"), "",strstr($fieldval['Type'], "(", false));
+		
+		//exceptions
+		if($fieldval['Type']=="text" || $fieldval['Type']=="date" || $fieldval['Type']=="datetime" || $fieldval['Type']=="set")	{ $oldMType = $fieldval['Type']; }
+		
+		?>
+		<td>
+			<select name="fieldType" class="input-sm input-w-auto form-control">
+			<?php
+			foreach($mTypes as $name=>$type) {
+				if($type==$oldMType)							{ print "<option value='$type' selected='selected'>$name</option>"; }
+				elseif($type=="bool" && $oldMType=="tinyint")	{ print "<option value='$type' selected='selected'>$name</option>"; }
+				else											{ print "<option value='$type'>$name</option>"; }
+			}
+			?>
+			</select>
+		</td>
+	</tr>
+	
+	<!-- size -->
+	<tr>
+		<td><?php print _('Size / Length'); ?></td>
+		<td>
+			<input type="text" name="fieldSize" class="form-control input-sm input-w-100" value="<?php print @$oldMSize; ?>" placeholder="<?php print _('Enter field length'); ?>" <?php if($_POST['action'] == "delete") { print 'readonly'; } ?>>
+		</td>
+	</tr>
+
+	<!-- Default -->
+	<tr>
+		<td><?php print _('Default value'); ?></td>
+		<td>
+			<input type="text" name="fieldDefault" class="form-control input-sm" value="<?php print @$fieldval['Default']; ?>" placeholder="<?php print _('Enter default value'); ?>" <?php if($_POST['action'] == "delete") { print 'readonly'; } ?>>
 		</td>
 	</tr>
 	
@@ -73,8 +116,8 @@ $fieldval = getFullFieldData($_POST['table'], $_POST['fieldName']);
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups"><?php print _('Close'); ?></button>
-		<button class="btn btn-small <?php if($_POST['action']=="delete") { print "btn-danger"; } else { print "btn-success";} ?>" id="editcustomSubmit"><i class="icon-white <?php if($_POST['action']=="add") { print "icon-plus"; } else if ($_POST['action']=="delete") { print "icon-trash"; } else { print "icon-ok"; } ?>"></i> <?php print ucwords(_($_POST['action'])); ?></button>
+		<button class="btn btn-sm btn-default hidePopups"><?php print _('Close'); ?></button>
+		<button class="btn btn-sm btn-default <?php if($_POST['action']=="delete") { print "btn-danger"; } else { print "btn-success";} ?>" id="editcustomSubmit"><i class="fa <?php if($_POST['action']=="add") { print "fa-plus"; } else if ($_POST['action']=="delete") { print "fa-trash-o"; } else { print "fa-check"; } ?>"></i> <?php print ucwords(_($_POST['action'])); ?></button>
 	</div>
 	<!-- result -->
 	<div class="customEditResult"></div>

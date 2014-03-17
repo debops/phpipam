@@ -18,7 +18,7 @@
 			# get subnet details
 			$subnet = getSubnetDetailsById($_POST['subnetId']);
 			?>
-			<input type="text" name="ip_addr" class="ip_addr" size="30" value="<?php print $first; ?>">
+			<input type="text" name="ip_addr" class="ip_addr form-control" size="30" value="<?php print $first; ?>">
 			
 			<input type="hidden" name="subnetId" value="<?php print $subnet['id']; ?>">
 		</td>
@@ -27,13 +27,13 @@
 	<!-- description -->
 	<tr>
 		<td><?php print _('Description');?></td>
-		<td><input type="text" name="description" size="30" placeholder="<?php print _('Enter description');?>"></td>
+		<td><input class="form-control" type="text" name="description" size="30" placeholder="<?php print _('Enter description');?>"></td>
 	</tr>
 
 	<!-- DNS name -->
 	<tr>
 		<td><?php print _('DNS name');?></td>
-		<td><input type="text" name="dns_name" size="30" placeholder="<?php print _('hostname');?>"></td>
+		<td><input type="text" class="form-control" name="dns_name" size="30" placeholder="<?php print _('hostname');?>"></td>
 	</tr>
 
 	<!-- owner -->
@@ -41,14 +41,14 @@
 		<td><?php print _('Owner');?></td>
 		<td>	
 		<!-- autocomplete -->
-		<input type="text" name="owner" id="owner" size="30" placeholder="<?php print _('Owner of IP address');?>"></td>
+		<input type="text" class="form-control" name="owner" id="owner" size="30" placeholder="<?php print _('Owner of IP address');?>"></td>
 	</tr>
 
 	<!-- requester -->
 	<tr>
 		<td><?php print _('Requester');?> *</td>
 		<td>
-			<input type="text" name="requester" size="30" placeholder="<?php print _('your email address');?>"></textarea>
+			<input type="text" class="form-control" name="requester" size="30" placeholder="<?php print _('your email address');?>"></textarea>
 		</td>
 	</tr>
 
@@ -56,7 +56,7 @@
 	<tr>
 		<td><?php print _('Additional comment');?></td>
 		<td style="padding-right:20px;">
-			<textarea name="comment" rows="2" style="width:100%;" placeholder="<?php print _('Enter additional details for request if they are needed');?>"></textarea>
+			<textarea name="comment" class="form-control" rows="2" style="width:100%;" placeholder="<?php print _('Enter additional details for request if they are needed');?>"></textarea>
 		</td>
 	</tr>
 
@@ -68,8 +68,8 @@
 
 <!-- footer -->
 <div class="pFooter">
-	<button class="btn btn-small hidePopups"><?php print _('Cancel');?></button>
-	<button class="btn btn-small" id="requestIPAddressSubmit"><?php print _('Request IP');?></button>
+	<button class="btn btn-sm btn-default hidePopups"><?php print _('Cancel');?></button>
+	<button class="btn btn-sm btn-default" id="requestIPAddressSubmit"><?php print _('Request IP');?></button>
 	<!-- result  -->
 	<div id="requestIPresult"></div>
 </div>

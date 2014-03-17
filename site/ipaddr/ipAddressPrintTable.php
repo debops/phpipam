@@ -44,9 +44,9 @@ else {
 isUserAuthenticated ();
 
 /* get all selected fields for IP print */
-$setFieldsTemp = getSelectedIPaddrFields();
+$setFields = getSelectedIPaddrFields();
 /* format them to array! */
-$setFields = explode(";", $setFieldsTemp);
+$setFields = explode(";", $setFields);
 
 /**
  * Get all ip addresses in subnet and subnet details!
@@ -57,20 +57,31 @@ else					 { $ipaddresses   = getIpAddressesBySubnetIdSlavesSort ($subnetId, $sor
 $SubnetDetails = getSubnetDetailsById     ($subnetId);
 
 /* die if empty! */
-if(sizeof($SubnetDetails) == 0) { die('<div class="alert alert-error">'._('Subnet does not exist').'!</div>');}
+if(sizeof($SubnetDetails) == 0) { die('<div class="alert alert-danger">'._('Subnet does not exist').'!</div>');}
 
 /* get all selected fields */
 $myFields = getCustomFields('ipaddresses');
 $myFieldsSize = sizeof($myFields);
-	
+
+/* set size of selected fields */
+$selFieldsSize = sizeof($setFields);
+if(in_array('state', $setFields)) 	{ $selFieldsSize--; }
+
+/* fix for 0 */
+if($selFieldsSize==1 && strlen($setFields[0])==0) {
+	$selFieldsSize = 0;
+}
+
 /* set colspan */
-$colspan['unused'] = sizeof($setFields) + $myFieldsSize;
-$colspan['ipaddr'] = sizeof($setFields) + $myFieldsSize + 4;
-$colspan['dhcp']   = sizeof($setFields) + $myFieldsSize - 3;
+$colspan['empty']  = $selFieldsSize + $myFieldsSize +4;
+$colspan['unused'] = $selFieldsSize + $myFieldsSize +3;
+$colspan['dhcp']   = $selFieldsSize + $myFieldsSize;
 
 /* 
 if result not empty use first IP address in subnet to identify type 
 else use subnet
+
+we must count if we have some custom fields, if not remove from colspan!
 */
 $type = IdentifyAddress( $SubnetDetails['subnet'] );
 
@@ -86,9 +97,10 @@ foreach($myFields as $field) {
 	# unset if value == 0
 	if($sizeMyFields[$field['name']] == 0) {
 		unset($myFields[$field['name']]);
-		
-		$colspan['dhcp']--;							//dhcp span -1
+
+		$colspan['empty']--;
 		$colspan['unused']--;						//unused  span -1
+		$colspan['dhcp']--;							//dhcp span -1
 	}
 }
 
@@ -98,7 +110,6 @@ if($settings['dhcpCompress']==1) {
 	// compress DHCP ranges
 	$ipaddresses = compressDHCPranges ($ipaddresses);
 }
-
 
 /* For page repeats */
 $m = 1;
@@ -114,26 +125,26 @@ $repeats   = ceil($sizeIP / $pageLimit); 		// times to repeat body
 
 # set page number from post
 $maxPages = round($sizeIP/$pageLimit,0);																								// set max number of pages
-if($_REQUEST['sPage']>$maxPages || !isset($_REQUEST['sPage']))	{ $_REQUEST['sPage'] = 1; }												// reset to 1 if number too big
+if($_REQUEST['sPage']>$repeats || !isset($_REQUEST['sPage']))	{ $_REQUEST['sPage'] = 1; }												// reset to 1 if number too big
 elseif(!is_numeric($_REQUEST['sPage']))							{ $_REQUEST['sPage'] = str_replace("page", "", $_REQUEST['sPage']); }	// remove p from page
 
 ?>
 <br>
+
 <h4><?php print $title; ?>
 <?php if($sizeIP  > $pageLimit) { print " (<span class='stran'>"._('Page')." $_REQUEST[sPage]/$repeats</span>)"; }  ?>
 <?php
 # next / previous
-$colspanStran['unused'] = $colspan['unused']+1;
 if($sizeIP  > $pageLimit) { ?>
 <div class='btn-toolbar pull-right'>
 	<div class="btn-group">
 		<?php
 		//prev page
-		if($_REQUEST['sPage']==1) 			{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-mini disabled'><i class='icon-gray icon-chevron-left'></i></a>"; }
-		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-mini' rel='tooltip' title='". _('Previous page')."'><i class='icon-gray icon-chevron-left'></i></a>"; }
+		if($_REQUEST['sPage']==1) 			{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-chevron-left'></i></a>"; }
+		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-xs btn-default' rel='tooltip' data-container='body' title='". _('Previous page')."'><i class='fa fa-gray fa-chevron-left'></i></a>"; }
 		//next page
-		if($_REQUEST['sPage']==$maxPages) 	{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-mini disabled'><i class='icon-gray icon-chevron-right'></i></a>"; }
-		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-mini' rel='tooltip' title='". _('Next page')."'><i class='icon-gray icon-chevron-right'></i></a>"; }
+		if($_REQUEST['sPage']==$repeats) 	{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-chevron-right'></i></a>"; }
+		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-xs btn-default' rel='tooltip' data-container='body' title='". _('Next page')."'><i class='fa fa-gray fa-chevron-right'></i></a>"; }
 	
 		?>
 	</div>
@@ -144,8 +155,8 @@ if($sizeIP  > $pageLimit) { ?>
 # jump to page
 if($sizeIP  > $pageLimit) { 
 	print "<div class='pull-right'>";
-	print "<select name='jumptoPage' class='jumptoPage' style='width:auto;'>";
-	for($m=1; $m<=$maxPages; $m++) {
+	print "<select name='jumptoPage' class='jumptoPage form-control input-sm' style='width:auto;'>";
+	for($m=1; $m<=$repeats; $m++) {
 		if($m==$_REQUEST['sPage'])		{ print "<option value='page$m' data-sectionId='$_REQUEST[section]' data-subnetId='$_REQUEST[subnetId]' selected='selected'>"._('Page')." $m</option>"; }
 		else 							{ print "<option value='page$m' data-sectionId='$_REQUEST[section]' data-subnetId='$_REQUEST[subnetId]'>"._('Page')." $m</option>"; }
 	}
@@ -163,34 +174,34 @@ if($sizeIP  > $pageLimit) {
 
 	<?php
 	# set sort icon!
-	if($sort['direction'] == 'asc') 	{ $icon = "<i class='icon-gray icon-chevron-down'></i> "; }
-	else								{ $icon = "<i class='icon-gray icon-chevron-up'></i> "; }
+	if($sort['direction'] == 'asc') 	{ $icon = "<i class='fa fa-angle-down'></i> "; }
+	else								{ $icon = "<i class='fa fa-angle-up'></i> "; }
 
 	# IP address - mandatory
-										  print "<th class='s_ipaddr'><a href='' data-id='ip_addr|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' title='"._('Sort by IP address')."'>"._('IP address')." "; if($sort['field'] == "ip_addr") 	print $icon;  print "</a></th>";
+										  print "<th class='s_ipaddr'><a href='' data-id='ip_addr|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body' title='"._('Sort by IP address')."'>"._('IP address')." "; if($sort['field'] == "ip_addr") 	print $icon;  print "</a></th>";
 	# hostname - mandatory
-										  print "<th><a href='' data-id='dns_name|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip'  title='"._('Sort by hostname')."'				>"._('Hostname')." "; 	if($sort['field'] == "dns_name") 	print $icon;  print "</a></th>";
+										  print "<th><a href='' data-id='dns_name|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body'  title='"._('Sort by hostname')."'				>"._('Hostname')." "; 	if($sort['field'] == "dns_name") 	print $icon;  print "</a></th>";
+	# Description - mandatory
+										  print "<th><a href='' data-id='description|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body'  title='"._('Sort by description')."'			>"._('Description')." "; if($sort['field'] == "description") print $icon;  print "</a></th>";
 	# MAC address	
 	if(in_array('mac', $setFields)) 	{ print "<th></th>"; }
-	# Description - mandatory
-										  print "<th><a href='' data-id='description|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip'  title='"._('Sort by description')."'			>"._('Description')." "; if($sort['field'] == "description") print $icon;  print "</a></th>";
 	# note
 	if(in_array('note', $setFields)) 	{ print "<th></th>"; }	
 	# switch
-	if(in_array('switch', $setFields)) 	{ print "<th><a href='' data-id='switch|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip'  title='"._('Sort by device')."'					>"._('Device')." "; 	if($sort['field'] == "switch") 		print $icon;  print "</a></th>"; }	
+	if(in_array('switch', $setFields)) 	{ print "<th class='hidden-xs hidden-sm hidden-md'><a href='' data-id='switch|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body'  title='"._('Sort by device')."'					>"._('Device')." "; 	if($sort['field'] == "switch") 		print $icon;  print "</a></th>"; }	
 	# port
-	if(in_array('port', $setFields)) 	{ print "<th><a href='' data-id='port|$sort[directionNext]'   class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip'  title='"._('Sort by port')."'  					>"._('Port')." "; 		if($sort['field'] == "port") 		print $icon;  print "</a></th>"; }
+	if(in_array('port', $setFields)) 	{ print "<th class='hidden-xs hidden-sm hidden-md'><a href='' data-id='port|$sort[directionNext]'   class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body'  title='"._('Sort by port')."'  					>"._('Port')." "; 		if($sort['field'] == "port") 		print $icon;  print "</a></th>"; }
 	# owner
-	if(in_array('owner', $setFields)) 	{ print "<th><a href='' data-id='owner|$sort[directionNext]'  class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip'  title='"._('Sort by owner')."' 					>"._('Owner')." "; 		if($sort['field'] == "owner") 		print $icon;  print "</a></th>"; }
+	if(in_array('owner', $setFields)) 	{ print "<th class='hidden-xs hidden-sm'><a href='' data-id='owner|$sort[directionNext]'  class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body'  title='"._('Sort by owner')."' 					>"._('Owner')." "; 		if($sort['field'] == "owner") 		print $icon;  print "</a></th>"; }
 	
 	# custom fields
 	if(sizeof($myFields) > 0) {
-		foreach($myFields as $myField) 	{ print "<th><a href='' data-id='$myField[name]|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' title='"._('Sort by')." $myField[name]'	>$myField[name] ";  if($sort['field'] == $myField['name']) print $icon;  print "</a></th>"; }
+		foreach($myFields as $myField) 	{ print "<th class='hidden-xs hidden-sm hidden-md'><a href='' data-id='$myField[name]|$sort[directionNext]' class='sort' data-subnetId='$SubnetDetails[id]' rel='tooltip' data-container='body' title='"._('Sort by')." $myField[name]'	>$myField[name] ";  if($sort['field'] == $myField['name']) print $icon;  print "</a></th>"; }
 	}
 	?>
 
 	<!-- actions -->
-	<th class="actions" width="10px"></th>
+	<th class="actions"></th>
 
 </tr>
 </tbody>
@@ -207,7 +218,7 @@ $statuses = explode(";", $settings['pingStatus']);
 # if no IP is configured only display free subnet!
 if (sizeof($ipaddresses) == 0) {
     $unused = FindUnusedIpAddresses ( Transform2decimal($SubnetParsed['network']), Transform2decimal($SubnetParsed['broadcast']), $type, 1, "networkempty", $SubnetDetails['mask'] );
-    print '<tr class="th"><td></td><td colspan="'. $colspan['unused'] .'" class="unused">'. $unused['ip'] . ' (' . reformatNumber ($unused['hosts']) .')</td><td colspan=2></td></tr>'. "\n";
+    print '<tr class="th"><td colspan="'. $colspan['empty'] .'" class="unused">'. $unused['ip'] . ' (' . reformatNumber ($unused['hosts']) .')</td></tr>'. "\n";
 }
 # print IP address
 else {
@@ -248,7 +259,7 @@ else {
 			    if ( $unused && ($sort['field'] == 'ip_addr') && $sort['direction'] == "asc" ) { 
 	        		print "<tr class='th'>";
 	        		print "	<td></td>";
-	        		print "	<td colspan='$colspan[ipaddr]' class='unused'>$unused[ip] ($unused[hosts])</td>";
+	        		print "	<td colspan='$colspan[unused]' class='unused'>$unused[ip] ($unused[hosts])</td>";
 	        		print "</tr>"; 
 	        	}
 	
@@ -269,9 +280,9 @@ else {
 				    print 		Transform2long( $ipaddress[$n]['ip_addr']).' - '.Transform2long( $ipaddress[$n]['stopIP'])." (".$ipaddress[$n]['numHosts'].")";
 				    print 		reformatIPState($ipaddress[$n]['state']);
 				    print "	</td>";
-	        		print "	<td>"._("DHCP range")."</td>";
-	        		print "	<td></td>";
+					print "	<td>"._("DHCP range")."</td>";
 	        		print "	<td>".$ipaddress[$n]['description']."</td>";
+	        		if($colspan['dhcp']!=0) 
 	        		print "	<td colspan='$colspan[dhcp]' class='unused'></td>";
 				    // tr ends after!
 
@@ -294,18 +305,18 @@ else {
 					    //calculate
 					    $tDiff = time() - strtotime($ipaddress[$n]['lastSeen']);
 					    if($ipaddress[$n]['excludePing']=="1" ) { $hStatus = "padded"; $hTooltip = ""; }
-					    elseif($tDiff < $statuses[0])	{ $hStatus = "success";	$hTooltip = "rel='tooltip' data-html='true' data-placement='left' title='"._("Device is alive")."<hr>"._("Last seen").": ".$ipaddress[$n]['lastSeen']."'"; }
-					    elseif($tDiff < $statuses[1])	{ $hStatus = "warning"; $hTooltip = "rel='tooltip' data-html='true' data-placement='left' title='"._("Device warning")."<hr>"._("Last seen").": ".$ipaddress[$n]['lastSeen']."'"; }
-					    elseif($tDiff < 2592000)		{ $hStatus = "error"; 	$hTooltip = "rel='tooltip' data-html='true' data-placement='left' title='"._("Device is offline")."<hr>"._("Last seen").": ".$ipaddress[$n]['lastSeen']."'";}
-					    elseif($ipaddress[$n]['lastSeen'] == "0000-00-00 00:00:00") { $hStatus = "neutral"; 	$hTooltip = "rel='tooltip' data-html='true' data-placement='left' title='"._("Device is offline")."<hr>"._("Last seen").": "._("Never")."'";}
-					    else							{ $hStatus = "neutral"; $hTooltip = "rel='tooltip' data-html='true' data-placement='left' title='"._("Device status unknown")."'";}		    
+					    elseif($tDiff < $statuses[0])	{ $hStatus = "success";	$hTooltip = "rel='tooltip' data-container='body' data-html='true' data-placement='left' title='"._("Device is alive")."<hr>"._("Last seen").": ".$ipaddress[$n]['lastSeen']."'"; }
+					    elseif($tDiff < $statuses[1])	{ $hStatus = "warning"; $hTooltip = "rel='tooltip' data-container='body' data-html='true' data-placement='left' title='"._("Device warning")."<hr>"._("Last seen").": ".$ipaddress[$n]['lastSeen']."'"; }
+					    elseif($tDiff < 2592000)		{ $hStatus = "error"; 	$hTooltip = "rel='tooltip' data-container='body' data-html='true' data-placement='left' title='"._("Device is offline")."<hr>"._("Last seen").": ".$ipaddress[$n]['lastSeen']."'";}
+					    elseif($ipaddress[$n]['lastSeen'] == "0000-00-00 00:00:00") { $hStatus = "neutral"; 	$hTooltip = "rel='tooltip' data-container='body' data-html='true' data-placement='left' title='"._("Device is offline")."<hr>"._("Last seen").": "._("Never")."'";}
+					    else							{ $hStatus = "neutral"; $hTooltip = "rel='tooltip' data-container='body' data-html='true' data-placement='left' title='"._("Device status unknown")."'";}		    
 				    }
 				    else {
 					    $hStatus = "hidden";
 					    $hTooltip = "";
 				    }   
-			    
-				    print "	<td class='ipaddress'><span class='status status-$hStatus' $hTooltip></span>".Transform2long( $ipaddress[$n]['ip_addr']);
+				    			    
+				    print "	<td class='ipaddress'><span class='status status-$hStatus' $hTooltip></span><a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/ipdetails/".$ipaddress[$n]['id']."/'>".Transform2long( $ipaddress[$n]['ip_addr']);
 				    if(in_array('state', $setFields)) 				{ print reformatIPState($ipaddress[$n]['state']); }	
 				    print "</td>";
 		
@@ -317,84 +328,102 @@ else {
 						$dnsResolved['class'] = "";
 						$dnsResolved['name']  = $ipaddress[$n]['dns_name'];
 					}														  print "<td class='$dnsResolved[class] hostname'>$dnsResolved[name]</td>";  		
-		
-					# Print mac address icon!
-					if(in_array('mac', $setFields)) {
-						if(!empty($ipaddress[$n]['mac'])) 					{ print "<td class='mac'><img class='info mac' src='css/images/lan.png' rel='tooltip' title='"._('MAC').": ".$ipaddress[$n]['mac']."'></td>"; }
-						else 												{ print "<td class='mac'></td>"; }
-					}
 				
 					# print description - mandatory
 		        													  		  print "<td class='description'>".$ipaddress[$n]['description']."</td>";	
 				
+		
+					# Print mac address icon!
+					if(in_array('mac', $setFields)) {
+						if(!empty($ipaddress[$n]['mac'])) 					{ print "<td class='narrow'><i class='info fa fa-gray fa-sitemap' rel='tooltip' data-container='body' title='"._('MAC').": ".$ipaddress[$n]['mac']."'></i></td>"; }
+						else 												{ print "<td class='narrow'></td>"; }
+					}
+
+
 		       		# print info button for hover
 		       		if(in_array('note', $setFields)) {
-		        		if(!empty($ipaddress[$n]['note'])) 					{ print "<td><i class='icon-gray icon-comment' rel='tooltip' data-html='true' title='".str_replace("\n", "<br>",$ipaddress[$n]['note'])."'></td>"; }
-		        		else 												{ print "<td></td>"; }
+		        		if(!empty($ipaddress[$n]['note'])) 					{ print "<td class='narrow'><i class='fa fa-gray fa-comment-o' rel='tooltip' data-container='body' data-html='true' title='".str_replace("\n", "<br>",$ipaddress[$n]['note'])."'></td>"; }
+		        		else 												{ print "<td class='narrow'></td>"; }
 		        	}
 			
 		        	# print switch
 		        	if(in_array('switch', $setFields)) 					{ 
 			        	# get switch details
-			        	$switch = getSwitchById ($ipaddress[$n]['switch']);
-																		  print "<td>".$switch['hostname']."</td>";
+			        	$switch = getDeviceById ($ipaddress[$n]['switch']);
+																		  print "<td class='hidden-xs hidden-sm hidden-md'>".$switch['hostname']."</td>";
 																		}
 				
 					# print port
-					if(in_array('port', $setFields)) 					{ print "<td>".$ipaddress[$n]['port']."</td>"; }
+					if(in_array('port', $setFields)) 					{ print "<td class='hidden-xs hidden-sm hidden-md'>".$ipaddress[$n]['port']."</td>"; }
 				
 					# print owner
-					if(in_array('owner', $setFields)) 					{ print "<td>".$ipaddress[$n]['owner']."</td>"; }
+					if(in_array('owner', $setFields)) 					{ print "<td class='hidden-xs hidden-sm'>".$ipaddress[$n]['owner']."</td>"; }
 				
 					# print custom fields 
 					if(sizeof($myFields) > 0) {
-						foreach($myFields as $myField) 					{ print "<td class='customField'>".$ipaddress[$n][$myField['name']]."</td>"; }
+						foreach($myFields as $myField) 					{ 
+							print "<td class='customField hidden-xs hidden-sm hidden-md'>";
+						
+							//booleans
+							if($myField['type']=="tinyint(1)")	{
+								if($ipaddress[$n][$myField['name']] == "0")		{ print _("No"); }
+								elseif($ipaddress[$n][$myField['name']] == "1")	{ print _("Yes"); }
+							} 
+							//text
+							elseif($myField['type']=="text") {
+								if(strlen($ipaddress[$n][$myField['name']])>0)	{ print "<i class='fa fa-gray fa-comment' rel='tooltip' data-container='body' data-html='true' title='".str_replace("\n", "<br>", $ipaddress[$n][$myField['name']])."'>"; }
+								else											{ print ""; }
+							}
+							else {
+								print $ipaddress[$n][$myField['name']];
+								
+							}
+							print "</td>"; 
+						}
 					}				    
 			    }
 			    
 				# print action links if user can edit 	
 				print "<td class='btn-actions'>";
-				print "	<div class='btn-toolbar'>";
 				print "	<div class='btn-group'>";
 				# write permitted
 				if( $permission > 1) {
 					if($ipaddress[$n]['class']=="range-dhcp") 
 					{
-						print "		<a class='edit_ipaddress   btn btn-mini modIPaddr' data-action='edit'   data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' data-stopIP='".$ipaddress[$n]['stopIP']."' href='#' 		   rel='tooltip' title='"._('Edit IP address details')."'>						<i class='icon-gray icon-pencil'>  </i></a>";
-						print "		<a class='				   btn btn-mini disabled' href='#'>																<i class='icon-gray icon-retweet'> </i></a>"; 
-						print "		<a class='				   btn btn-mini disabled' href='#'>																<i class='icon-gray icon-search'></i></a>";
-						print "		<a class='				   btn btn-mini disabled' href='#'>																<i class='icon-gray icon-envelope'></i></a>";
-						print "		<a class='delete_ipaddress btn btn-mini modIPaddr' data-action='delete' data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' id2='".Transform2long($ipaddress[$n]['ip_addr'])."' rel='tooltip' title='"._('Delete IP address')."'>					<i class='icon-gray icon-remove'>  </i></a>";											
+						print "<a class='edit_ipaddress   btn btn-xs btn-default modIPaddr' data-action='edit'   data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' data-stopIP='".$ipaddress[$n]['stopIP']."' href='#'>				<i class='fa fa-gray fa-pencil'></i></a>";
+						print "<a class='				   btn btn-xs btn-default disabled' href='#'>																																									<i class='fa fa-gray fa-cogs'></i></a>"; 
+						print "<a class='				   btn btn-xs btn-default disabled' href='#'>																																									<i class='fa fa-gray fa-search'></i></a>";
+						print "<a class='				   btn btn-xs btn-default disabled' href='#'>																																									<i class='fa fa-gray fa-envelope-o'></i></a>";
+						print "<a class='delete_ipaddress btn btn-xs btn-default modIPaddr' data-action='delete' data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' data-stopIP='".$ipaddress[$n]['stopIP']."' href='#' id2='".Transform2long($ipaddress[$n]['ip_addr'])."'>		<i class='fa fa-gray fa-times'></i></a>";											
 					} 
 					else 
 					{
-						print "		<a class='edit_ipaddress   btn btn-mini modIPaddr' data-action='edit'   data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' 											   rel='tooltip' title='"._('Edit IP address details')."'>						<i class='icon-gray icon-pencil'>  </i></a>";
-						print "		<a class='ping_ipaddress   btn btn-mini' data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' 						   													rel='tooltip' title='"._('Check avalibility')."'>							<i class='icon-gray icon-retweet'>  </i></a>"; 
-						print "		<a class='search_ipaddress btn btn-mini         "; if(strlen($dnsResolved['name']) == 0) { print "disabled"; } print "' href='tools/search/$dnsResolved[name]' "; if(strlen($dnsResolved['name']) != 0)   { print "rel='tooltip' title='"._('Search same hostnames in db')."'"; } print ">	<i class='icon-gray icon-search'></i></a>";
-						print "		<a class='mail_ipaddress   btn btn-mini          ' href='#' data-id='".$ipaddress[$n]['id']."' rel='tooltip' title='"._('Send mail notification')."'>																																		<i class='icon-gray icon-envelope'></i></a>";
-						print "		<a class='delete_ipaddress btn btn-mini modIPaddr' data-action='delete' data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' id2='".Transform2long($ipaddress[$n]['ip_addr'])."' rel='tooltip' title='"._('Delete IP address')."'>					<i class='icon-gray icon-remove'>  </i></a>";											
+						print "<a class='edit_ipaddress   btn btn-xs btn-default modIPaddr' data-action='edit'   data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' >															<i class='fa fa-gray fa-pencil'></i></a>";
+						print "<a class='ping_ipaddress   btn btn-xs btn-default' data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' rel='tooltip' data-container='body' title='"._('Check avalibility')."'>					<i class='fa fa-gray fa-cogs'></i></a>"; 
+						print "<a class='search_ipaddress btn btn-xs btn-default         "; if(strlen($dnsResolved['name']) == 0) { print "disabled"; } print "' href='tools/search/$dnsResolved[name]' "; if(strlen($dnsResolved['name']) != 0)   { print "rel='tooltip' data-container='body' title='"._('Search same hostnames in db')."'"; } print ">	<i class='fa fa-gray fa-search'></i></a>";
+						print "<a class='mail_ipaddress   btn btn-xs btn-default          ' href='#' data-id='".$ipaddress[$n]['id']."' rel='tooltip' data-container='body' title='"._('Send mail notification')."'>																																		<i class='fa fa-gray fa-envelope-o'></i></a>";
+						print "<a class='delete_ipaddress btn btn-xs btn-default modIPaddr' data-action='delete' data-subnetId='".$ipaddress[$n]['subnetId']."' data-id='".$ipaddress[$n]['id']."' href='#' id2='".Transform2long($ipaddress[$n]['ip_addr'])."'>		<i class='fa fa-gray fa-times'>  </i></a>";											
 					}
 				}
 				# write not permitted
 				else {
 					if($ipaddress[$n]['class']=="range-dhcp") 
 					{
-						print "		<a class='edit_ipaddress   btn btn-mini disabled' rel='tooltip' title='"._('Edit IP address details (disabled)')."'>	<i class='icon-gray icon-pencil'>  </i></a>";
-						print "		<a class='				   btn btn-mini disabled' href='#'>																<i class='icon-gray icon-retweet'> </i></a>"; 
-						print "		<a class='				   btn btn-mini disabled' href='#'>																<i class='icon-gray icon-search'></i></a>";
-						print "		<a class='				   btn btn-mini disabled' href='#'>																<i class='icon-gray icon-envelope'></i></a>";
-						print "		<a class='delete_ipaddress btn btn-mini disabled' rel='tooltip' title='"._('Delete IP address (disabled)')."'>			<i class='icon-gray icon-remove'>  </i></a>";				
+						print "<a class='edit_ipaddress   btn btn-xs btn-default disabled' rel='tooltip' data-container='body' title='"._('Edit IP address details (disabled)')."'>	<i class='fa fa-gray fa-pencil'></i></a>";
+						print "<a class='				   btn btn-xs btn-default disabled' href='#'>																					<i class='fa fa-gray fa-cogs'></i></a>"; 
+						print "<a class='				   btn btn-xs btn-default disabled' href='#'>																					<i class='fa fa-gray fa-search'></i></a>";
+						print "<a class='				   btn btn-xs btn-default disabled' href='#'>																					<i class='fa fa-gray fa-envelope-o'></i></a>";
+						print "<a class='delete_ipaddress btn btn-xs btn-default disabled' rel='tooltip' data-container='body' title='"._('Delete IP address (disabled)')."'>			<i class='fa fa-gray fa-times'></i></a>";				
 					}
 					else 
 					{
-						print "		<a class='edit_ipaddress   btn btn-mini disabled' rel='tooltip' title='"._('Edit IP address details (disabled)')."'>							<i class='icon-gray icon-pencil'>  </i></a>";
-						print "		<a class='				   btn btn-mini disabled'  data-id='".$ipaddress[$n]['id']."' href='#' rel='tooltip' title='"._('Check avalibility')."'>		<i class='icon-gray icon-retweet'>  </i></a>";
-						print "		<a class='search_ipaddress btn btn-mini         "; if(strlen($dnsResolved['name']) == 0) { print "disabled"; } print "' href='tools/search/$dnsResolved[name]' "; if(strlen($dnsResolved['name']) != 0) { print "rel='tooltip' title='"._('Search same hostnames in db')."'"; } print ">	<i class='icon-gray icon-search'></i></a>";
-						print "		<a class='mail_ipaddress   btn btn-mini          ' href='#' data-id='".$ipaddress[$n]['id']."' rel='tooltip' title='"._('Send mail notification')."'>		<i class='icon-gray icon-envelope'></i></a>";
-						print "		<a class='delete_ipaddress btn btn-mini disabled' rel='tooltip' title='"._('Delete IP address (disabled)')."'>				<i class='icon-gray icon-remove'>  </i></a>";				
+						print "<a class='edit_ipaddress   btn btn-xs btn-default disabled' rel='tooltip' data-container='body' title='"._('Edit IP address details (disabled)')."'>													<i class='fa fa-gray fa-pencil'></i></a>";
+						print "<a class='				   btn btn-xs btn-default disabled'  data-id='".$ipaddress[$n]['id']."' href='#' rel='tooltip' data-container='body' title='"._('Check avalibility')."'>					<i class='fa fa-gray fa-cogs'></i></a>";
+						print "<a class='search_ipaddress btn btn-xs btn-default         "; if(strlen($dnsResolved['name']) == 0) { print "disabled"; } print "' href='tools/search/$dnsResolved[name]' "; if(strlen($dnsResolved['name']) != 0) { print "rel='tooltip' data-container='body' title='"._('Search same hostnames in db')."'"; } print ">	<i class='fa fa-gray fa-search'></i></a>";
+						print "<a class='mail_ipaddress   btn btn-xs btn-default          ' href='#' data-id='".$ipaddress[$n]['id']."' rel='tooltip' data-container='body' title='"._('Send mail notification')."'>				<i class='fa fa-gray fa-envelope-o'></i></a>";
+						print "<a class='delete_ipaddress btn btn-xs btn-default disabled' rel='tooltip' data-container='body' title='"._('Delete IP address (disabled)')."'>														<i class='fa fa-gray fa-times'></i></a>";				
 					}
 				}
-				print "	</div>";
 				print "	</div>";
 				print "</td>";		
 			
@@ -424,18 +453,17 @@ else {
 
 <?php
 # next / previous
-$colspanStran['unused'] = $colspan['unused']+1;
 if($sizeIP  > $pageLimit) { ?>
 <hr>
 <div class='btn-toolbar pull-right'>
 	<div class="btn-group">
 		<?php
 		//prev page
-		if($_REQUEST['sPage']==1) 			{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-mini disabled'><i class='icon-gray icon-chevron-left'></i></a>"; }
-		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-mini' rel='tooltip' title='". _('Previous page')."'><i class='icon-gray icon-chevron-left'></i></a>"; }
+		if($_REQUEST['sPage']==1) 			{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-chevron-left'></i></a>"; }
+		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']-1)."/' class='btn btn-xs btn-default' rel='tooltip' data-container='body' title='". _('Previous page')."'><i class='fa fa-gray fa-chevron-left'></i></a>"; }
 		//next page
-		if($_REQUEST['sPage']==$maxPages) 	{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-mini disabled'><i class='icon-gray icon-chevron-right'></i></a>"; }
-		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-mini' rel='tooltip' title='". _('Next page')."'><i class='icon-gray icon-chevron-right'></i></a>"; }
+		if($_REQUEST['sPage']==$repeats) 	{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-chevron-right'></i></a>"; }
+		else								{ print "<a href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/page".($_REQUEST['sPage']+1)."/' class='btn btn-xs btn-default' rel='tooltip' data-container='body' title='". _('Next page')."'><i class='fa fa-gray fa-chevron-right'></i></a>"; }
 	
 		?>
 	</div>

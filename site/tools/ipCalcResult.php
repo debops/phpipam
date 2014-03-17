@@ -19,7 +19,7 @@ $cidr = $_POST['cidr'];
 $errors = verifyCidr ($cidr,0);
 
 # die on errors
-if (sizeof($errors) != 0) { die('<div class="alert alert-error alert-absolute">'._('Invalid input').': '.  $errors[0] .'</div>'); }
+if (sizeof($errors) != 0) { die('<div class="alert alert-danger alert-absolute">'._('Invalid input').': '.  $errors[0] .'</div>'); }
 
 /* calculate results */
 $ipCalcResults = calculateIpCalcResult ($cidr);
@@ -50,7 +50,7 @@ $ipCalcResults = calculateIpCalcResult ($cidr);
     <tr>
     	<td></td>
     	<td style="padding-top:10px">
-    		<button id="createSubnetFromCalc" class="btn btn-small"><i class="icon-plus"></i> <?php print _('Create subnet from result');?></button>
+    		<button id="createSubnetFromCalc" class="btn btn-sm btn-default"><i class="fa fa-check"></i> <?php print _('Create subnet from result');?></button>
     	</td>
     </tr>
     
@@ -59,7 +59,7 @@ $ipCalcResults = calculateIpCalcResult ($cidr);
 		<td style="text-align:right"><?php print _('Select Section');?>:</td>
 		<td>
 		
-		<select name="selectSectionfromIPCalc" id="selectSectionfromIPCalc">
+		<select name="selectSectionfromIPCalc" id="selectSectionfromIPCalc" class="form-control" style="width:auto;">
 			<option value=""><?php print _('Please select');?>:</option>
 		<?php
 			//get all sections

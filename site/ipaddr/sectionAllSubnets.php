@@ -28,7 +28,7 @@ if($permission != "0") {
 		if($settings['enableVRF'] == 1)		{ $colCount = 8; }
 		else								{ $colCount = 7; }
 		
-		# get all subnets in section
+		# get Available subnets in section
 		$subnets = fetchSubnets($_REQUEST['section']);
 		
 		# remove custom fields if all empty! */
@@ -58,13 +58,13 @@ if($permission != "0") {
 		print "	<th>"._('Description')."</th>";
 		print "	<th>"._('VLAN')."</th>";
 		if($settings['enableVRF'] == 1) {
-		print "	<th>"._('VRF')."</th>";
+		print "	<th class='hidden-xs hidden-sm'>"._('VRF')."</th>";
 		}
-		print "	<th>"._('Requests')."</th>";
-		print "	<th>"._('Hosts check')."</th>";
+		print "	<th class='hidden-xs hidden-sm'>"._('Requests')."</th>";
+		print "	<th class='hidden-xs hidden-sm'>"._('Hosts check')."</th>";
 		if(sizeof($custom) > 0) {
 			foreach($custom as $field) {
-				print "	<th>$field[name]</th>";
+				print "	<th class='hidden-xs hidden-sm'>$field[name]</th>";
 			}
 		}
 		print "	<th class='actions' style='width:140px;white-space:nowrap;'></th>";
@@ -72,13 +72,51 @@ if($permission != "0") {
 	
 		# no subnets
 		if(sizeof($subnets) == 0) {
-			print "<tr><td colspan='$colCount'><div class='alert alert-warn'>"._('Section has no subnets')."!</div></td></tr>";
+			print "<tr><td colspan='$colCount'><div class='alert alert-info'>"._('Section has no subnets')."!</div></td></tr>";
+				
+			# check Available subnets for subsection
+			$subsections = getAllSubSections($_REQUEST['section']);
+			
+			$colspan = 6 + sizeof($custom);
+			if($settings['enableVRF'] == 1) { $colspan++; }
 		}	
 		else {
 			# subnets
 			$subnets2 = printSubnets($subnets, true, $settings['enableVRF'], $custom);
 			print $subnets2;				
 		}
+
+		# subsection subnets
+		if(sizeof($subsections)>0) {
+
+			$colspan = 6 + sizeof($custom);
+			if($settings['enableVRF'] == 1) { $colspan++; }
+			
+			# subnets
+			foreach($subsections as $ss) {
+				$slavesubnets = fetchSubnets($ss['id']);
+				if(sizeof($slavesubnets)>0) {
+					# headers
+					print "<tr>";
+					print "	<th colspan='$colspan'>"._('Available subnets in subsection')." $ss[name]:</th>";
+					print "</tr>";
+					
+					# subnets
+					$subnets3 = printSubnets($slavesubnets, true, $settings['enableVRF'], $custom);
+					print $subnets3;
+				}
+				else {
+					print "<tr>";
+					print "	<th colspan='$colspan'>"._('Available subnets in subsection')." $ss[name]:</th>";
+					print "</tr>";	
+					
+					print "<tr>";
+					print "	<td colspan='$colspan'><div class='alert alert-info'>"._('Section has no subnets')."!</div></td>";
+					print "</tr>";			
+				}
+			}				
+		} 
+
 		print "</tbody>";
 		$m++;
 	
@@ -86,6 +124,6 @@ if($permission != "0") {
 	print "</table>";
 }
 else {
-	print "<div class='alert alert-error'>"._("You do not have permission to access this network")."!</div>";
+	print "<div class='alert alert-danger'>"._("You do not have permission to access this network")."!</div>";
 }
 ?>

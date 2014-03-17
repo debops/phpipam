@@ -17,7 +17,7 @@ $setFieldsTemp = getSelectedIPaddrFields();
 $setFields = explode(";", $setFieldsTemp);
 
 /* unset mandatory fields -> id,subnetid,ip_addr */
-unset($fields['id'], $fields['subnetId'], $fields['ip_addr'], $fields['description'], $fields['dns_name'], $fields['lastSeen'], $fields['excludePing']);
+unset($fields['id'], $fields['subnetId'], $fields['ip_addr'], $fields['description'], $fields['dns_name'], $fields['lastSeen'], $fields['excludePing'], $fields['editDate']);
 
 /* unset custom! */
 $custom = getCustomFields('ipaddresses');
@@ -36,7 +36,7 @@ if(sizeof($custom) > 0) {
 <div class="alert alert-info alert-absolute"><?php print _('You can select which fields are actually being used for IP management, so you dont show any overhead if not used. IP, hostname and description are mandatory'); ?>.</div>
 
 
-<form id="filterIP" style="margin-top:50px;">
+<form id="filterIP" style="margin-top:50px;clear:both;">
 <table class="filterIP table table-auto table-striped table-top">
 
 <!-- headers -->
@@ -67,7 +67,7 @@ foreach($fields as $field)
 <tr>
 	<td></td>
 	<td>
-		<button class="btn btn-small" id="filterIPSave"><i class="icon-gray icon-ok"></i> <?php print _('Save'); ?></button>
+		<button class="btn btn-sm btn-default" id="filterIPSave"><i class="fa fa-check"></i> <?php print _('Save'); ?></button>
 	</td>
 </tr>
 

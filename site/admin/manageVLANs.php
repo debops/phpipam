@@ -18,7 +18,7 @@ $custom = getCustomFields('vlans');
 <hr><br>
 
 <!-- add new -->
-<button class="btn btn-small editVLAN" data-action="add" data-vlanid="" style="margin-bottom:10px;"><i class="icon-gray icon-plus"></i> <?php print _('Add VLAN'); ?></button>
+<button class="btn btn-sm btn-default editVLAN" data-action="add" data-vlanid="" style="margin-bottom:10px;"><i class="fa fa-plus"></i> <?php print _('Add VLAN'); ?></button>
 
 <?php
 /* first check if they exist! */
@@ -37,7 +37,7 @@ else {
 		<?php
 		if(sizeof($custom) > 0) {
 			foreach($custom as $field) {
-				print "<th>$field[name]</th>";
+				print "<th class='customField hidden-xs hidden-sm'>$field[name]</th>";
 			}
 		}
 		?>
@@ -57,18 +57,36 @@ else {
 	
 	if(sizeof($custom) > 0) {
 		foreach($custom as $field) {
-			print "<td>".$vlan[$field['name']]."</td>";
+
+			print "<td class='customField hidden-xs hidden-sm'>";
+					
+			//booleans
+			if($field['type']=="tinyint(1)")	{
+				if($vlan[$field['name']] == "0")		{ print _("No"); }
+				elseif($vlan[$field['name']] == "1")	{ print _("Yes"); }
+			} 
+			//text
+			elseif($field['type']=="text") {
+				if(strlen($vlan[$field['name']])>0)	{ print "<i class='fa fa-gray fa-comment' rel='tooltip' data-container='body' data-html='true' title='".str_replace("\n", "<br>", $vlan[$field['name']])."'>"; }
+				else											{ print ""; }
+			}
+			else {
+				print $vlan[$field['name']];
+				
+			}
+			print "</td>"; 
+
 		}
 	}
 	
 	print "	<td class='actions'>";
 	print "	<div class='btn-group'>";
-	print "		<button class='btn btn-small editVLAN' data-action='edit'   data-vlanid='$vlan[vlanId]'><i class='icon-gray icon-pencil'></i></button>";
-	print "		<button class='btn btn-small editVLAN' data-action='delete' data-vlanid='$vlan[vlanId]'><i class='icon-gray icon-remove'></i></button>";
+	print "		<button class='btn btn-xs btn-default editVLAN' data-action='edit'   data-vlanid='$vlan[vlanId]'><i class='fa fa-pencil'></i></button>";
+	print "		<button class='btn btn-xs btn-default editVLAN' data-action='delete' data-vlanid='$vlan[vlanId]'><i class='fa fa-times'></i></button>";
 	print "	</div>";
 	print "	</td>";	
 	print '</tr>'. "\n";
-
+	
 	}
 }
 ?>

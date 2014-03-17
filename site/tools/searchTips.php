@@ -8,7 +8,7 @@
 <h4><?php print _('Some search tips');?></h4>
 <hr>
 
-<div class="alert alert-block alert-warn">
+<div class="alert alert-block alert-info">
 <ul>
 
 	<!-- text -->

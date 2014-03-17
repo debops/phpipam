@@ -12,7 +12,7 @@ isUserAuthenticated(true);
 
 /* verify that user has write permissions for subnet */
 $subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
-if($subnetPerm < 2) 		{ die('<div class="alert alert-error">'._('You do not have permissions to modify hosts in this subnet').'!</div>'); }
+if($subnetPerm < 2) 		{ die('<div class="alert alert-danger">'._('You do not have permissions to modify hosts in this subnet').'!</div>'); }
 
 # verify post
 CheckReferrer();
@@ -25,6 +25,13 @@ foreach($_REQUEST as $key=>$line) {
 	if(substr($key, 0,11)=="description") 	{ $res[substr($key, 11)]['description'] = $line; }
 	// dns name 
 	if(substr($key, 0,8)=="dns_name") 		{ $res[substr($key, 8)]['dns_name']  	= $line; }
+
+	//verify that it is not already in table!
+	if(substr($key, 0,2)=="ip") {
+		if(checkDuplicate ($line, $_REQUEST['subnetId']) == true) {
+			die ("<div class='alert alert-danger'>IP address $line already exists!</div>");
+		}
+	}
 }
 
 # insert entries
@@ -35,6 +42,6 @@ if(sizeof($res)>0) {
 }
 # error
 else {
-	print "<div class='alert alert-error'>"._("Error")."</div>";
+	print "<div class='alert alert-danger'>"._("Error")."</div>";
 }
 ?>

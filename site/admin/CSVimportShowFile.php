@@ -13,7 +13,7 @@ $filetype = end(explode(".", $filetype));
 /* get $outFile based on provided filetype */
 if ($filetype == "csv") {
 	/* get file to string */
-	$outFile = file_get_contents('csvupload/import.csv') or die (_('<div class="alert alert-error">Cannot open csvupload/import.csv</div>'));
+	$outFile = file_get_contents('csvupload/import.csv') or die (_('<div class="alert alert alert-danger">Cannot open csvupload/import.csv</div>'));
 
 	/* format file */
 	$outFile = str_replace( array("\r\n","\r") , "\n" , $outFile);	//replace windows and Mac line break
@@ -87,7 +87,7 @@ foreach($outFile as $line) {
 	$field = explode(",", $line);
 
 	//verify IP address
-	if(!filter_var($field[0], FILTER_VALIDATE_IP)) 	{ $class = "error";	$errors++; }
+	if(!filter_var($field[0], FILTER_VALIDATE_IP)) 	{ $class = "danger";	$errors++; }
 	else											{ $class = ""; }
 
 	//print
@@ -108,13 +108,13 @@ print '</table>';
 <?php
 // errors?
 if($errors>0) {
-	print "<div class='alert alert-error'>"._("Errors marked with red will be ignored from importing")."!</div>";
+	print "<div class='alert alert alert-danger'>"._("Errors marked with red will be ignored from importing")."!</div>";
 }
 ?>
 <br><?php print _('Should I import values to database'); ?>?
 
 <!-- YES / NO -->
 <div class="btn-group" style="margin-bottom:10px;">
-	<input type="button" value="<?php print _('Yes'); ?>" class="btn btn-small btn-success" id="csvImportYes">
-	<input type="button" value="<?php print _('No'); ?>"  class="btn btn-small" id="csvImportNo">
+	<input type="button" value="<?php print _('Yes'); ?>" class="btn btn-sm btn-default btn-success" id="csvImportYes">
+	<input type="button" value="<?php print _('No'); ?>"  class="btn btn-sm btn-default" id="csvImportNo">
 </div>	

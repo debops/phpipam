@@ -26,7 +26,7 @@ if(sizeof($myFields) > 0) {
 /* if action is reject set processed and accepted to 1 and 0 */
 if($request['action'] == "reject") {
 	if(!rejectIPrequest($request['requestId'], $request['adminComment'])) {
-		print '<div class="alert alert-error">'._('Cannot update request').'!</div>';
+		print '<div class="alert alert alert-danger">'._('Cannot update request').'!</div>';
 		updateLogTable ('Cannot reject IP request', 'Cannot reject IP request for request id '. $request['requestId'] .'!', 2);
 	}
 	else {
@@ -47,15 +47,15 @@ else {
 	/* verify IP address and subnet */
 	$validIP = VerifyIpAddress ($request['ip_addr'], $subnet);
 	if(!empty($validIP)) {
-		die('<div class="alert alert-error">'. $validIP .'</div>');
+		die('<div class="alert alert alert-danger">'. $validIP .'</div>');
 	}
 	/* verify that it is not yet used */
 	if(checkDuplicate ($request['ip_addr'], $subnet)) {
-		die('<div class="alert alert-error">'._('IP address').' '. $request['ip_addr'] .' '._('already in use').'!<br>* '._('First available IP address is').' <b>'. Transform2long(getFirstAvailableIPAddress ($request['subnet'])) .'</a>!</div>');
+		die('<div class="alert alert alert-danger">'._('IP address').' '. $request['ip_addr'] .' '._('already in use').'!<br>* '._('First available IP address is').' <b>'. Transform2long(getFirstAvailableIPAddress ($request['subnet'])) .'</a>!</div>');
 	}
 	/* verify that it is not yet used */
 	if(checkDuplicate ($request['ip_addr'], $request['subnetId'])) {
-	die('<div class="alert alert-error">'._('IP address').' '. $request['ip_addr'] .' '._('already in use').'!<br>* '._('First available IP address is').' <b>'. Transform2long(getFirstAvailableIPAddress ($request['subnetId'])) .'</a>!</div>');
+	die('<div class="alert alert alert-danger">'._('IP address').' '. $request['ip_addr'] .' '._('already in use').'!<br>* '._('First available IP address is').' <b>'. Transform2long(getFirstAvailableIPAddress ($request['subnetId'])) .'</a>!</div>');
 	}
 	
 	/* transform IP address */
@@ -63,7 +63,7 @@ else {
 
 	
 	if(!acceptIPrequest($request)) {
-		die('<div class="alert alert-error">'._('Cannot confirm IP address').'!</div>');
+		die('<div class="alert alert alert-danger">'._('Cannot confirm IP address').'!</div>');
 		updateLogTable ('Cannot confirm IP address!', 'Cannot accept IP request for request id '. Transform2long($request['requestId']) .'!', 2);
 	}
 	else {

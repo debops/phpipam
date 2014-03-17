@@ -123,7 +123,7 @@ foreach ($sections as $section)
 				}
 				
 				//change switch ID to name
-				$devices = getAllUniqueSwitches ();
+				$devices = getAllUniqueDevices ();
 				foreach($devices as $d) {
 					if($d['id']==$ip['switch'])	{ $ip['switch']=$d['hostname']; }
 				}

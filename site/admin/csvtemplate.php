@@ -64,7 +64,7 @@ $lineCount++;
 
 
 // write options for devices
-$devices = getAllUniqueSwitches ();
+$devices = getAllUniqueDevices ();
 $worksheet->write($lineCount, 0, "Available devices:");
 foreach($devices as $k=>$d) {
 	$worksheet->write($lineCount, 1, $d['hostname']);

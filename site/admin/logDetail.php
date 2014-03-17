@@ -85,7 +85,7 @@ $user = getUserDetailsByName($log['username']);
 
 <!-- footer -->
 <div class="pFooter">
-	<button class="btn btn-small hidePopups"><?php print _('Close window'); ?></button>
+	<button class="btn btn-sm btn-default hidePopups"><?php print _('Close window'); ?></button>
 
 	<!-- result holder -->
 	<div class="sectionEditResult"></div>

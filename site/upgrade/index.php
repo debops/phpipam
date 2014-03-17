@@ -1,3 +1,4 @@
+<div class="content upgrade-db" style="width:600px;margin:auto;background:white;padding:10px;margin-top:10px;border-radius:6px;border:1px solid #eee;">
 <?php
 
 /**
@@ -27,7 +28,7 @@ elseif (!checkAdmin(false)) {
 	//upgrade needed
 	else {
 		print '<h4>phpIPAM upgrade script</h4><hr>';
-		print '<div class="alert alert-error">Database needs upgrade. Please contact site administrator (<a href="mailto:'. $settings['siteAdminMail'] .'">'. $settings['siteAdminName'] .'</a>)!</div>';
+		print '<div class="alert alert-danger">Database needs upgrade. Please contact site administrator (<a href="mailto:'. $settings['siteAdminMail'] .'">'. $settings['siteAdminName'] .'</a>)!</div>';
 	}
 }
 // admins
@@ -36,11 +37,11 @@ elseif(checkAdmin(false)) {
 	if ($settings['version'] == VERSION) {
 		print "<h4>Database upgrade script</h4><hr>";
 		print "<div class='alert alert-success'>Database seems up to date and doesn't need to be upgraded!</div>";
-		print '<a href=""><button class="btn btn-small">Go to dashboard</button></a>';		
+		print '<a href=""><button class="btn btn-sm btn-default">Go to dashboard</button></a>';		
 	}
 	//version too old
 	elseif ($settings['version'] < LAST_POSSIBLE) {
-		die("<div class='alert alert-error'>Your phpIPAM version is too old to be upgraded, at least version ".LAST_POSSIBLE." is required for upgrade.</div>");
+		die("<div class='alert alert-danger'>Your phpIPAM version is too old to be upgraded, at least version ".LAST_POSSIBLE." is required for upgrade.</div>");
 	}
 	//upgrade needed
 	elseif ($settings['version'] < VERSION) {
@@ -56,3 +57,6 @@ elseif(checkAdmin(false)) {
 else {
 	header("Location: login/");		
 }
+
+?>
+</div>

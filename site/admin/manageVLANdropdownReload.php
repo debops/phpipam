@@ -12,7 +12,7 @@ checkAdmin();
 
 ?>
 
-<select name="vlanId">
+<select name="vlanId" class="form-control input-sm input-w-auto">
 	<option disabled="disabled"><?php print _('Select VLAN'); ?>:</option>
     <?php
     $vlans = getAllVLANs();

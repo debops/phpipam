@@ -26,20 +26,20 @@ checkAdmin();
 /* Available extensions */
 $availableExt = get_loaded_extensions();
 /* check if ldap exists */
-if (!in_array("ldap", $availableExt)) { print '<div class="alert alert-error"><strong>'._('Warning').':</strong> '._('ldap extension not enabled in php').'!</div>'; }
+if (!in_array("ldap", $availableExt)) { print '<div class="alert alert alert-danger"><strong>'._('Warning').':</strong> '._('ldap extension not enabled in php').'!</div>'; }
 
 ?>
 
 <form id="ad">
-<table id="ad" class="table table-striped table-top">
+<table id="ad" class="table table-top">
 
 <!-- DC -->
 <tr>
 	<td><?php print _('OpenLDAP servers'); ?></td>
 	<td>
-		<input type="text" name="domain_controllers" value="<?php print $adSettings['domain_controllers']; ?>">
+		<input type="text" name="domain_controllers" class="form-control input-sm" value="<?php print $adSettings['domain_controllers']; ?>">
 	</td>
-	<td class="info"><?php print _('Enter domain controllers, separated by ; (default: dc1.domain.local;cd2.domain.local)'); ?>
+	<td class="info2"><?php print _('Enter domain controllers, separated by ; (default: dc1.domain.local;cd2.domain.local)'); ?>
 	</td>
 </tr>
 
@@ -47,10 +47,10 @@ if (!in_array("ldap", $availableExt)) { print '<div class="alert alert-error"><s
 <tr>
 	<td><?php print _('Base DN'); ?></td>
 	<td>
-		<input type="text" name="base_dn" value="<?php print $adSettings['base_dn']; ?>">	
+		<input type="text" name="base_dn" class="form-control input-sm" value="<?php print $adSettings['base_dn']; ?>">	
 		<input type="hidden" name="type" value="2">
 	</td>
-	<td class="base_dn info"> 
+	<td class="base_dn info2"> 
 		<?php print _('Enter base DN for LDAP (default: CN=Users,CN=Company,DC=domain,DC=local)'); ?>
 	</td>
 </tr>
@@ -60,12 +60,12 @@ if (!in_array("ldap", $availableExt)) { print '<div class="alert alert-error"><s
 <tr>
 	<td><?php print _('Use SSL'); ?></td>
 	<td>
-		<select name="use_ssl">
-			<option value="0" <?php if($adSettings['use_ssl'] == 0) { print 'selected'; } ?>>false'); ?></option>
-			<option value="1" <?php if($adSettings['use_ssl'] == 1) { print 'selected'; } ?>>true'); ?></option>
+		<select name="use_ssl" class="form-control input-sm input-w-auto">
+			<option value="0" <?php if($adSettings['use_ssl'] == 0) { print 'selected'; } ?>><?php print _('false'); ?></option>
+			<option value="1" <?php if($adSettings['use_ssl'] == 1) { print 'selected'; } ?>><?php print _('true'); ?></option>
 		</select>
 	</td>
-	<td class="info">
+	<td class="info2">
 		<?php print _('Use SSL (LDAPS), your server needs to be setup (default: false), please see'); ?><bR>
     	<a href="http://adldap.sourceforge.net/wiki/doku.php?id=ldap_over_ssl">http://adldap.sourceforge.net/wiki/doku.php?id=ldap_over_ssl</a>
 	</td>
@@ -75,12 +75,12 @@ if (!in_array("ldap", $availableExt)) { print '<div class="alert alert-error"><s
 <tr>
 	<td><?php print _('Use TLS'); ?></td>
 	<td>
-		<select name="use_tls">
+		<select name="use_tls" class="form-control input-sm input-w-auto">
 			<option value="0" <?php if($adSettings['use_tls'] == 0) { print 'selected'; } ?>><?php print _('false'); ?></option>
 			<option value="1" <?php if($adSettings['use_tls'] == 1) { print 'selected'; } ?>><?php print _('true'); ?></option>
 		</select>
 	</td>
-	<td class="info">
+	<td class="info2">
 		<?php print _('If you wish to use TLS you should ensure that useSSL is set to false and vice-versa (default: false)'); ?>
 	</td>
 </tr>
@@ -90,9 +90,9 @@ if (!in_array("ldap", $availableExt)) { print '<div class="alert alert-error"><s
 <tr>
 	<td><?php print _('Server port'); ?></td>
 	<td>
-		<input type="text" name="ad_port" value="<?php print $adSettings['ad_port']; ?>">	
+		<input type="text" name="ad_port" class="form-control input-w-100 input-sm" value="<?php print $adSettings['ad_port']; ?>">	
 	</td>
-	<td class="port info">
+	<td class="port info2">
 		<?php print _('The default port for LDAP non-SSL connections (default: 389)'); ?>
 	</td>
 </tr>
@@ -101,8 +101,10 @@ if (!in_array("ldap", $availableExt)) { print '<div class="alert alert-error"><s
 <tr class="th">
 	<td></td>
 	<td>
-		<input type="button" class="btn btn-small" id="checkAD" value="<?php print _('Test settings'); ?>">
-		<input type="submit" class="btn btn-small" value="<?php print _('Save settings'); ?>">
+	<div class="btn-group">
+		<input type="button" class="btn btn-sm btn-default" id="checkAD" value="<?php print _('Test settings'); ?>">
+		<input type="submit" class="btn btn-sm btn-default" value="<?php print _('Save settings'); ?>">
+	</div>
 	</td>
 	<td></td>
 </tr>

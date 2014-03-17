@@ -18,12 +18,12 @@ checkAdmin();
 
 
 <form id="searchReplace">
-<table class="table table-striped" style="width:auto">
+<table class="table" style="width:auto">
 
 <tr>
 	<td><?php print _('Select field to replace'); ?>:</td>
 	<td>
-	<select name="field">
+	<select name="field" class="form-control input-sm input-w-auto">
 		<option value="description"><?php print _('Description'); ?></option>
 		<option value="dns_name"><?php print _('Hostname'); ?></option>
 		<option value="owner"><?php print _('Owner'); ?></option>
@@ -48,21 +48,21 @@ checkAdmin();
 <tr>
 	<td><?php print _('Select search string'); ?></td>
 	<td>
-		<input type="text" name="search" placeholder="<?php print _('search string'); ?>">
+		<input type="text" name="search" class="form-control input-sm" placeholder="<?php print _('search string'); ?>">
 	</td>
 </tr>
 
 <tr>
 	<td><?php print _('Select replace string'); ?></td>
 	<td>
-		<input type="text" name="replace" placeholder="<?php print _('replace string'); ?>">
+		<input type="text" name="replace" class="form-control input-sm" placeholder="<?php print _('replace string'); ?>">
 	</td>
 </tr>
 
 <tr class="th">
 	<td></td>
 	<td>
-		<button class="btn btn-small" id="searchReplaceSave"><i class="icon-gray icon-ok"></i> <?php print _('Replace'); ?></button>
+		<button class="btn btn-sm btn-default" id="searchReplaceSave"><i class="fa fa-check"></i> <?php print _('Replace'); ?></button>
 	</td>
 </tr>
 

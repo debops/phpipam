@@ -25,7 +25,7 @@ $settings = getAllSettings();
 # permissions
 $permission = checkSubnetPermission ($_POST['subnetId']);
 
-if($permission < 1) { die("<div class='alert alert-error'>"._('You cannot access this subnet')."!</div>"); }
+if($permission < 1) { die("<div class='alert alert-danger'>"._('You cannot access this subnet')."!</div>"); }
 		
 # print 
 print '<form id="selectExportFields">';
@@ -98,11 +98,11 @@ if(sizeof($myFields) > 0) {
 	foreach($myFields as $myField) {
 		
 		//change spaces to ___
-		$myField['name'] = str_replace(" ", "___", $myField['name']);
+		$myField['nameTemp'] = str_replace(" ", "___", $myField['name']);
 
 		print "	<tr>";
 		print "	<td>$myField[name]</td>";
-		print "	<td><input type='checkbox' name='$myField[name]' checked> </td>";
+		print "	<td><input type='checkbox' name='$myField[nameTemp]' checked> </td>";
 		print "	</tr>";	
 	}
 }
@@ -117,7 +117,7 @@ print '</form>';
 <!-- footer -->
 <div class="pFooter">
 	<div class="btn-group">
-		<button class="btn btn-small hidePopups"><?php print _('Cancel'); ?></button>
-		<button class="btn btn-small btn-success" id="exportSubnet"><i class="icon-white icon-download"></i> <?php print _('Export'); ?></button>
+		<button class="btn btn-sm btn-default hidePopups"><?php print _('Cancel'); ?></button>
+		<button class="btn btn-sm btn-success" id="exportSubnet"><i class="fa fa-download"></i> <?php print _('Export'); ?></button>
 	</div>
 </div>

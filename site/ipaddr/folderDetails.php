@@ -21,7 +21,7 @@ $ipaddresses   = getIpAddressesBySubnetId ($subnetId); 	# for stats only
 $SubnetDetails = getSubnetDetailsById     ($subnetId);
 
 # die if empty!
-if(sizeof($SubnetDetails) == 0) { die('<div class="alert alert-error">'._('Folder does not exist').'!</div>'); }
+if(sizeof($SubnetDetails) == 0) { die('<div class="alert alert-danger">'._('Folder does not exist').'!</div>'); }
 
 # reset VLAN number!
 $SubnetDetails['VLAN'] = subnetGetVLANdetailsById($SubnetDetails['vlanId']);
@@ -46,7 +46,7 @@ $permission = checkSubnetPermission ($subnetId);
 $permissionsSection = checkSectionPermission ($SubnetDetails['sectionId']);
 
 # if 0 die
-if($permission == "0")	{ die("<div class='alert alert-error'>"._('You do not have permission to access this folder')."!</div>"); }
+if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not have permission to access this folder')."!</div>"); }
 ?>
 
 <!-- content print! -->
@@ -95,51 +95,72 @@ if($permission == "0")	{ die("<div class='alert alert-error'>"._('You do not hav
 	print "	<td class='actions'>";
 
 	print "	<div class='btn-toolbar'>";
-	print "	<div class='btn-group'>";
-	
-	# admin and operator
-	if($permission == "1") {
-		print "<button class='btn btn-small btn-inverse disabled' 	href='' rel='tooltip' title='"._('You do not have permissions to edit folder')."'>	<i class='icon-lock icon-white'></i></button> ";	# lock info
-		print "<a class='disabled btn btn-small'  					href=''>																			<i class='icon-pencil'></i></a>";					# edit subnet
-		if($permissionsSection == 3) {
-		print "<a class='edit_subnet btn btn-small '				href='' rel='tooltip' title='"._('Add new nested subnet')."' 	data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> 	<i class='icon-plus-sign'></i></a> ";		# add new child subnet
-		print "<a class='add_folder btn btn-small '					href='' rel='tooltip' title='"._('Add new nested folder')."' 	data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> 	<i class='icon-folder-close'></i></a> ";		# add new child subnet
-		}
-		else {
-		print "<a class='btn btn-small disabled' 					href='' rel='tooltip' title='"._('Add new nested subnet')."'> 						<i class='icon-plus-sign'></i></a> ";			# add new child subnet
-		print "<a class='btn btn-small disabled'					href='' rel='tooltip' title='"._('Add new nested folder')."'>						<i class='icon-folder-close'></i></a> ";		# add new child folder
-		}
-	}
-	else if ($permission == 2) {
-		print "<a class='btn btn-small disabled' 					href='' rel='tooltip' title='"._('Edit folder')."'		>							<i class='icon-pencil'></i></a>";		# edit subnet
-		if($permissionsSection == 3) {
-		print "<a class='edit_subnet btn btn-small '				href='' rel='tooltip' title='"._('Add new nested subnet')."' 	data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> <i class='icon-plus-sign'></i></a> ";		# add new child subnet
-		print "<a class='add_folder btn btn-small '					href='' rel='tooltip' title='"._('Add new nested folder')."' 	data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> 	<i class='icon-folder-close'></i></a> ";		# add new child subnet
-		}
-		else {
-		print "<a class='btn btn-small disabled' 					href='' rel='tooltip' title='"._('Add new nested subnet')."'		> 			<i class='icon-plus-sign'></i></a> ";			# add new child subnet
-		print "<a class='btn btn-small disabled'					href='' rel='tooltip' title='"._('Add new nested folder')."'>					<i class='icon-folder-close'></i></a> ";		# add new child folder
 
-		}	
+	/* set values for permissions */
+	if($permission == 1) {
+		$sp['editsubnet']= false;		//edit subnet
+		$sp['editperm']  = false;		//edit permissions
+		$sp['changelog'] = false;		//changelog view
+	}
+	else if ($permission == 2) { 
+		$sp['editsubnet']= false;		//edit subnet
+		$sp['editperm']  = false;		//edit permissions			
+		$sp['changelog'] = true;		//changelog view
 	}
 	else if ($permission == 3) {
-		print "<a class='add_folder btn btn-small' 					href='' rel='tooltip' title='"._('Edit folder')."'					data-action='edit' data-subnetId='$SubnetDetails[id]' data-sectionId='$SubnetDetails[sectionId]'>			<i class='icon-pencil'></i></a>";		# edit subnet
-		if(checkAdmin (false, false)) {
-		print "<a class='showSubnetPerm btn btn-small' 				href='' rel='tooltip' title='"._('Manage folder permissions')."'	data-subnetId='$SubnetDetails[id]' data-sectionId='$SubnetDetails[sectionId]' data-action='show'>			<i class='icon-tasks'></i></a>";			# edit subnet
-		}
-		if($permissionsSection == 3) {
-		print "<a class='edit_subnet btn btn-small '				href='' rel='tooltip' title='"._('Add new nested subnet')."' 		data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> <i class='icon-plus-sign'></i></a> ";		# add new child subnet
-		print "<a class='add_folder btn btn-small '					href='' rel='tooltip' title='"._('Add new nested folder')."' 		data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> 	<i class='icon-folder-close'></i></a> ";		# add new child subnet
-		}
-		else {
-		print "<a class='btn btn-small disabled' 					href='' rel='tooltip' title='"._('Add new nested subnet')."'> 			<i class='icon-plus-sign'></i></a> ";			# add new child subnet
-		print "<a class='btn btn-small disabled'					href='' rel='tooltip' title='"._('Add new nested folder')."'>			<i class='icon-folder-close'></i></a> ";		# add new child folder
-		}	
+		$sp['editsubnet']= true;		//edit subnet
+		$sp['editperm']  = true;		//edit permissions
+		$sp['changelog'] = true;		//changelog view
 	}
-	
+
+
+	# edit / permissions / nested / favourites / changelog
+	print "<div class='btn-group'>";
+
+		//warning
+		if($permission == 1) 
+		print "<button class='btn btn-xs btn-default btn-danger' 	data-container='body' rel='tooltip' title='"._('You do not have permissions to edit subnet or IP addresses')."'>																	<i class='fa fa-lock'></i></button> ";
+
+		// edit subnet
+		if($sp['editsubnet'])
+		print "<a class='add_folder btn btn-xs btn-default' 		href='' rel='tooltip' data-container='body' title='"._('Edit folder')."' 		data-action='edit' data-subnetId='$SubnetDetails[id]' data-sectionId='$SubnetDetails[sectionId]'>	<i class='fa fa-pencil'></i></a>";		# edit subnet
+		else
+		print "<a class='btn btn-xs btn-default disabled' 			href='' rel='tooltip' data-container='body' title='"._('Edit folder')."' >																											<i class='fa fa-pencil'></i></a>";		# edit subnet
+
+		//permissions
+		if($sp['editperm']) 
+		print "<a class='showSubnetPerm btn btn-xs btn-default' href='' rel='tooltip' data-container='body' title='"._('Manage folder permissions')."'	data-subnetId='$SubnetDetails[id]' data-sectionId='$SubnetDetails[sectionId]' data-action='show'>	<i class='fa fa-tasks'></i></a>";			# edit subnet
+		else 
+		print "<a class='btn btn-xs btn-default disabled' 		href='' rel='tooltip' data-container='body' title='"._('Manage folder permissions')."'>																										<i class='fa fa-tasks'></i></a>";			# edit subnet
+
+		// add nested subnet
+		if($permissionsSection == 3) {
+		print "<a class='edit_subnet btn btn-xs btn-default '	href='' data-container='body' rel='tooltip' title='"._('Add new nested subnet')."' 		data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> <i class='fa fa-plus-circle'></i></a> ";
+		print "<a class='add_folder btn btn-xs btn-default '	href='' rel='tooltip' data-container='body' title='"._('Add new nested folder')."' 		data-subnetId='$SubnetDetails[id]' data-action='add' data-id='' data-sectionId='$SubnetDetails[sectionId]'> <i class='fa fa-folder-close-o'></i></a> ";		# add new child subnet
+		} else {
+		print "<a class='btn btn-xs btn-default disabled' 		href=''> 																																															<i class='fa fa-plus-circle'></i></a> ";			
+		print "<a class='btn btn-xs btn-default disabled'		href=''> 																																															<i class='fa fa-folder-close-o'></i></a> ";		# add new child subnet
+		}	
+	print "</div>";
+
+	print "<div class='btn-group'>";
+		//favourite
+		if(isSubnetFavourite($SubnetDetails['id'])) 
+		print "<a class='btn btn-xs btn-default btn-info editFavourite favourite-$SubnetDetails[id]' href='' data-container='body' rel='tooltip' title='"._('Click to remove from favourites')."' data-subnetId='$SubnetDetails[id]' data-action='remove'>				<i class='fa fa-star'></i></a> ";	
+		else 
+		print "<a class='btn btn-xs btn-default editFavourite favourite-$SubnetDetails[id]' 		 href='' data-container='body' rel='tooltip' title='"._('Click to add to favourites')."' data-subnetId='$SubnetDetails[id]' data-action='add'>						<i class='fa fa-star fa-star-o' ></i></a> ";				
+		// changelog
+		if($settings['enableChangelog']==1) {
+		if($sp['changelog']) 
+		print "<a class='sChangelog btn btn-xs btn-default'     									 href='subnets/$SubnetDetails[sectionId]/$SubnetDetails[id]/changelog/' data-container='body' rel='tooltip' title='"._('Changelog')."'>								<i class='fa fa-clock-o'></i></a>";				
+		else 
+		print "<a class='btn btn-xs btn-default disabled'     									 	 href='' 																data-container='body' rel='tooltip' title='"._('Changelog')."'>								<i class='fa fa-clock-o'></i></a>";									
+		}
+	print "</div>";		
+
+
 	print "	</div>";
-	print "	</div>";
-	
+		
 	print "	</td>";
 	print "</tr>";
 	

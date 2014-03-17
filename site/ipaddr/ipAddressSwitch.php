@@ -7,9 +7,24 @@
  */
 
 
-# subnets, vlans or vrfs
+# ip address details, subnets, vlans or vrfs
 
-if($_REQUEST['page'] == "subnets") {
+# ip address details
+if($_REQUEST['page'] == "subnets" && isset($_REQUEST['ipaddrid'])) {
+		# print ip address details
+		print "<div class='subnetDetails'>";
+		include_once("ipDetails.php");
+		print "</div>";
+		
+		if($settings['enableChangelog'] == 1) {
+			# Changelog
+			print '<div class="ipaddresses_overlay">';
+			include_once('ipDetailsChangelog.php');
+			print '</div>';
+		}
+}
+# subnets
+elseif($_REQUEST['page'] == "subnets") {
 	# fetch subnet details
 	$slaves = getAllSlaveSubnetsBySubnetId ($_REQUEST['subnetId']);
 	

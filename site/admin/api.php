@@ -23,7 +23,7 @@ $settings = getallSettings();
 <!-- only IF aPI enabled -->
 <?php if($settings['api']==1) { ?>
 	<!-- Add new -->
-	<button class='btn btn-small editAPI' style="margin-bottom:10px;" data-action='add'><i class='icon-gray icon-plus'></i> <?php print _('Create API key'); ?></button>
+	<button class='btn btn-sm btn-default editAPI' style="margin-bottom:10px;" data-action='add'><i class='fa fa-plus'></i> <?php print _('Create API key'); ?></button>
 	
 	
 	<!-- table -->
@@ -58,8 +58,8 @@ $settings = getallSettings();
 			# add/remove APIs
 			print "	<td class='actions'>";
 			print "	<div class='btn-group'>";
-			print "		<button class='btn btn-small editAPI'  		data-appid='$a[id]' data-action='edit'   rel='tooltip' title='"._('edit app details')."'>	<i class='icon-gray icon-pencil'></i></button>";
-			print "		<button class='btn btn-small editAPI'  		data-appid='$a[id]' data-action='delete' rel='tooltip' title='"._('remove app')."'>		<i class='icon-gray icon-remove'></i></button>";
+			print "		<button class='btn btn-sm btn-default editAPI'  data-container='body' data-appid='$a[id]' data-action='edit'   rel='tooltip' title='"._('edit app details')."'>	<i class='fa fa-pencil'></i></button>";
+			print "		<button class='btn btn-sm btn-default editAPI'  data-container='body' data-appid='$a[id]' data-action='delete' rel='tooltip' title='"._('remove app')."'>		<i class='fa fa-times'></i></button>";
 			print "	</div>";
 			print "</td>";
 			
@@ -67,7 +67,7 @@ $settings = getallSettings();
 		}
 	}
 	else {
-		print "<tr><td colspan='4'><div class='alert alert-warning alert-nomargin'>"._("No Apps available")."!</div></td></tr>";
+		print "<tr><td colspan='4'><div class='alert alert-info alert-nomargin'>"._("No Apps available")."!</div></td></tr>";
 	}
 	
 	?>
@@ -86,7 +86,7 @@ $settings = getallSettings();
 	}
 	# print warning if missing
 	if (sizeof($missingExt) > 0) {
-	    print "<div class='alert alert-error'><strong>"._('The following PHP extensions for API server are missing').":</strong><br><hr>";
+	    print "<div class='alert alert alert-danger'><strong>"._('The following PHP extensions for API server are missing').":</strong><br><hr>";
 	    print '<ul>' . "\n";
 	    foreach ($missingExt as $missing) {
 	        print '<li>'. $missing .'</li>' . "\n";
@@ -102,5 +102,5 @@ $settings = getallSettings();
 	<pre><?php print file_get_contents(dirname(__FILE__) . '/../../api/README'); ?></pre>
 
 <?php } else { ?>
-<div class="alert alert-warning"><?php print _('Please enable API module under server management'); ?></div>
+<div class="alert alert-info"><?php print _('Please enable API module under server management'); ?></div>
 <?php } ?>

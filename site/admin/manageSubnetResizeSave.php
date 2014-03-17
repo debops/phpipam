@@ -9,7 +9,7 @@ require_once('../../functions/functions.php');
 
 /* verify that user has write permissions for subnet */
 $subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
-if($subnetPerm < 3) 	{ die('<div class="alert alert-error">'._('You do not have permissions to resize subnet').'!</div>'); }
+if($subnetPerm < 3) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to resize subnet').'!</div>'); }
 
 
 /* verify post */
@@ -40,7 +40,7 @@ foreach($ipaddresses as $ip) {
 }
 
 /* ask must be > 8 */
-if($_POST['newMask'] < 8) { die('<div class="alert alert-error">'._('New mask must be at least /8').'!</div>'); }
+if($_POST['newMask'] < 8) { die('<div class="alert alert-danger">'._('New mask must be at least /8').'!</div>'); }
 
 /* 
  * if strict mode is enabled check that is is still inside master subnet!
@@ -72,7 +72,7 @@ if($section['strictMode'] == 1) {
 
 /* if no errors edit! */
 if(sizeof($errors) > 0) {
-	print "<div class='alert alert-error'><ul>";
+	print "<div class='alert alert-danger'><ul>";
 	foreach($errors as $error) {
 		print "<li>$error</li>";
 	}
@@ -81,7 +81,7 @@ if(sizeof($errors) > 0) {
 # all good, edit subnet!
 else {
 	# failed
-    if (!modifySubnetMask ($_POST['subnetId'], $_POST['newMask'])) 	{ print '<div class="alert alert-error">'._('Error resizing subnet').'!</div>'; }
+    if (!modifySubnetMask ($_POST['subnetId'], $_POST['newMask'])) 	{ print '<div class="alert alert-danger">'._('Error resizing subnet').'!</div>'; }
     # all good
     else 															{ print '<div class="alert alert-success">'._('Subnet resized successfully').'!</div>'; } 
 }
