@@ -12,6 +12,18 @@ require_once( dirname(__FILE__) . '/../../../functions/functions.php' );
 /* verify that user is authenticated! */
 isUserAuthenticated ();
 
+# change parameters - search string provided
+if(isset($_GET['sPage'])) {
+	$_REQUEST['cfilter']  = $_REQUEST['subnetId'];
+	$_REQUEST['climit']  = $_REQUEST['sPage'];
+}
+elseif(isset($_GET['subnetId'])) {
+	$_REQUEST['climit']  = $_REQUEST['subnetId'];
+}
+else {
+	$_REQUEST['climit']  = 50;
+}
+
 # get clog entries
 if(!isset($_REQUEST['cfilter'])) 	{ $clogs = getAllChangelogs(false, "", $_REQUEST['climit']); }
 else								{ $clogs = getAllChangelogs(true, $_REQUEST['cfilter'], $_REQUEST['climit']); }
@@ -71,13 +83,13 @@ else {
 			
 			# subnet, section or ip address
 			if($l['ctype']=="IP address")	{
-				print "	<td><a href='subnets/$l[sectionId]/$l[subnetId]/ipdetails/$l[tid]/'>".transform2long($l['ip_addr'])."</a></td>";			
+				print "	<td><a href='".create_link("subnets",$l['sectionId'],$l['subnetId'],"ipdetails",$l['tid'])."'>".transform2long($l['ip_addr'])."</a></td>";			
 			} 
 			elseif($l['ctype']=="Subnet")   {
-				print "	<td><a href='subnets/$l[sectionId]/$l[tid]/'>".transform2long($l['ip_addr'])."/$l[mask]</a></td>";							
+				print "	<td><a href='".create_link("subnets",$l['sectionId'],$l['tid'])."'>".transform2long($l['ip_addr'])."/$l[mask]</a></td>";							
 			}
 			elseif($l['ctype']=="Folder")   {
-				print "	<td><a href='folder/$l[sectionId]/$l[tid]/'>$l[sDescription]</a></td>";						
+				print "	<td><a href='".create_link("folder",$l['sectionId'],$l['tid'])."'>$l[sDescription]</a></td>";						
 			}
 			
 			print "	<td>"._("$l[caction]")."</td>";

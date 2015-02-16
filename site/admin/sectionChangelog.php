@@ -8,7 +8,7 @@
 isUserAuthenticated ();
 
 # get clog entries
-$clogs = getChangelogEntries("section", $_REQUEST['sectionId']);
+$clogs = getChangelogEntries("section", $_GET['sPage']);
 
 /* verify that user is admin */
 if (!checkAdmin()) die('');
@@ -17,7 +17,7 @@ if (!checkAdmin()) die('');
 print "<h4>"._('Section')." - "._('Changelog')."</h4><hr>";
 
 # back
-print "<a class='btn btn-sm btn-default' href='administration/manageSection/'><i class='fa fa-angle-left'></i> "._('Back to section')."</a>";
+print "<a class='btn btn-sm btn-default' href='".create_link("administration","manageSection")."'><i class='fa fa-angle-left'></i> "._('Back to section')."</a>";
 
 
 # empty

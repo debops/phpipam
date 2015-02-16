@@ -11,8 +11,13 @@ require_once( dirname(__FILE__) . '/../../../functions/scan/config-scan.php');
 /* verify that user is logged in */
 isUserAuthenticated(true);
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+/* subnet Id must be a integer */
+if(!is_numeric($_POST['subnetId']))	{ die("<div class='alert alert-danger'>Invalid subnetId!</div>"); }
+
 /* verify that user has write permissions for subnet */
-$subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
+$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 if($subnetPerm < 2) 		{ die('<div class="alert alert-danger">'._('You do not have permissions to modify hosts in this subnet').'!</div>'); }
 
 # verify post */
@@ -20,6 +25,9 @@ CheckReferrer();
 
 # get subnet details
 $subnet = getSubnetDetailsById ($_POST['subnetId']);
+
+# get settings
+$settings = getAllSettings();
 
 # get php exec path
 if(!$phpPath = getPHPExecutableFromPath()) {
@@ -55,7 +63,7 @@ $serr  = @$result['error'];
 $error = @$result['errors'];
 
 #verify that pign path is correct
-if(!file_exists($pathPing)) { $pingError = true; }
+if(!file_exists($settings['scanPingPath'])) { $pingError = true; }
 
 ?>
 
@@ -82,7 +90,7 @@ elseif(sizeof($alive)==0) {
 }
 # found alive
 else {
-	print "<form name='".$_REQUEST['pingType']."Form' class='".$_REQUEST['pingType']."Form'>";
+	print "<form name='".$_POST['pingType']."Form' class='".$_POST['pingType']."Form'>";
 	print "<table class='table table-striped table-top table-condensed'>";
 	
 	// titles
@@ -134,7 +142,7 @@ else {
 	//submit
 	print "<tr>";
 	print "	<td colspan='4'>";
-	print "		<a href='' class='btn btn-sm btn-success pull-right' id='saveScanResults' data-script='".$_REQUEST['pingType']."' data-subnetId='".$_REQUEST['subnetId']."'><i class='fa fa-plus'></i> "._("Add discovered hosts")."</a>";
+	print "		<a href='' class='btn btn-sm btn-success pull-right' id='saveScanResults' data-script='".$_POST['pingType']."' data-subnetId='".$_POST['subnetId']."'><i class='fa fa-plus'></i> "._("Add discovered hosts")."</a>";
 	print "	</td>";
 	print "</tr>";
 	

@@ -5,7 +5,7 @@
  ***************************************************************************************/
 
 /* get all slaves */
-$slaves = getAllSubnetsInSectionVRF ($_REQUEST['vrfId'], $_REQUEST['section']);
+$slaves = getAllSubnetsInSectionVRF ($_GET['subnetId'], $_GET['section']);
 
 
 /* if none */
@@ -48,8 +48,8 @@ else {
 		if($permission > 0) {
 		
 			print "<tr>";
-		    print "	<td class='small description'><a href='subnets/$_REQUEST[section]/$slave[id]/'>$slave[description]</a></td>";
-		    print "	<td><a href='subnets/$_REQUEST[section]/$slave[id]/'>".transform2long($slave['subnet'])."/$slave[mask]</a></td>";
+		    print "	<td class='small description'><a href='".create_link("subnets",$_GET['section'],$slave['id'])."'>$slave[description]</a></td>";
+		    print "	<td><a href='".create_link("subnets",$_GET['section'],$slave['id'])."'>".transform2long($slave['subnet'])."/$slave[mask]</a></td>";
 
 			# host check
 			if($slave['pingSubnet'] == 1) 				{ print '<td class="allowRequests small hidden-xs hidden-sm">'._('enabled').'</td>'; }

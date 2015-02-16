@@ -10,6 +10,9 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
 # get AS
 $as = $_POST['as'];
 

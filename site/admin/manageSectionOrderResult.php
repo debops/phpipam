@@ -7,8 +7,8 @@
 /* required functions */
 require_once('../../functions/functions.php'); 
 
-/* verify that user is admin */
-if (!checkAdmin()) die('');
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
 
 /* verify that user is admin */
 checkAdmin();

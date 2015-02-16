@@ -9,8 +9,16 @@ require_once('../../functions/functions.php');
 
 /* verify that user is admin */
 checkAdmin();
- 
- 
+
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
+
+/* must be numeric */
+if($_POST['action']=="edit"||$_POST['action']=="delete") {
+	if(!is_numeric($_POST['userId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+}
+
 /**
  * First get posted variables
  */
@@ -22,8 +30,8 @@ $userModDetails['plainpass'] = $userModDetails['password1'];
  * Hash passwords if changed
  */
 if (strlen($userModDetails['password1']) != 0) {
-	$userModDetails['password1'] = md5($userModDetails['password1']);
-	$userModDetails['password2'] = md5($userModDetails['password2']);
+	$userModDetails['password1'] = crypt_user_pass($userModDetails['password1']);
+	$userModDetails['password2'] = crypt_user_pass($userModDetails['password2']);
 	# for length check
 	$userModDetails['password1orig'] = $_POST['password1'];
 	$userModDetails['password2orig'] = $_POST['password2'];	

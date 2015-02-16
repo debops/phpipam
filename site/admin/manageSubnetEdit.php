@@ -10,6 +10,9 @@ require_once('../../functions/functions.php');
 /* verify that user is logged in */
 isUserAuthenticated(false);
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* verify that user has permissions if add */
 if($_POST['action'] == "add") {
 	$sectionPerm = checkSectionPermission ($_POST['sectionId']);
@@ -46,7 +49,7 @@ if ($_POST['action'] != "add") {
 # we are adding new subnet - get section details
 else {
 	# for selecting master subnet if added from subnet details!
-	if(strlen($_REQUEST['subnetId']) > 0) {
+	if(strlen($_POST['subnetId']) > 0) {
     	$tempData = getSubnetDetailsById ($_POST['subnetId']);	
     	$subnetDataOld['masterSubnetId'] = $tempData['id'];			// same master subnet ID for nested
     	$subnetDataOld['vlanId'] 		 = $tempData['vlanId'];		// same default vlan for nested
@@ -91,10 +94,11 @@ else															{ $readonly = false; }
         <td>
         	<?php
         	# set CIDR
-        	if ($_POST['location'] == "ipcalc") { $cidr = $_POST['subnet'] .'/'. $_POST['bitmask']; }  
-            if ($_POST['action'] != "add") 		{ $cidr = transform2long($subnetDataOld['subnet']) .'/'. $subnetDataOld['mask']; }       	
+        	if (isset($tempData['subnet']))		{  $cidr = transform2long($tempData['subnet']) .'/'. ($tempData['mask']+1);} 			//for nested
+        	if ($_POST['location'] == "ipcalc") { $cidr = $_POST['subnet'] .'/'. $_POST['bitmask']; }  								//from ipcalc
+            if ($_POST['action'] != "add") 		{ $cidr = transform2long($subnetDataOld['subnet']) .'/'. $subnetDataOld['mask']; } 	//editing existing
         	?>
-            <input type="text" class="form-control input-sm input-w-200" name="subnet"   placeholder="<?php print _('subnet in CIDR'); ?>"   value="<?php print $cidr; ?>" <?php if ($readonly) print "readonly"; ?>>
+            <input type="text" class="form-control input-sm input-w-200" name="subnet"   placeholder="<?php print _('subnet in CIDR'); ?>"   value="<?php print @$cidr; ?>" <?php if ($readonly) print "readonly"; ?>>
         </td>
         <td class="info2">
         	<button class="btn btn-xs btn-default"  id='get-ripe' rel='tooltip' data-placement="bottom" title='<?php print _('Get information from RIPE database'); ?>'><i class="fa fa-refresh"></i></button>
@@ -163,7 +167,7 @@ else															{ $readonly = false; }
 	if(empty($subnetDataOld['allowRequests'])) 	{ $subnetDataOld['allowRequests'] = "0"; }
 
 	/* if vlan support is enabled print available vlans */	
-	if($settings['enableVRF'] == 1) {
+	if($settings['enableVRF'] == "1") {
 	
 		print '<tr>' . "\n";
         print '	<td class="middle">'._('VRF').'</td>' . "\n";
@@ -261,17 +265,30 @@ else															{ $readonly = false; }
         print '	<td class="info2">'._('Show Subnet name instead of subnet IP address').'</td>' . "\n";
     	print '</tr>' . "\n";	    
 
-		#
-		if( isset($subnetDataOld['pingSubnet']) && ($subnetDataOld['pingSubnet'] == 1) )	{ $checked = "checked"; }
-		else																				{ $checked = ""; }
 	
 		# check host status
+		if( isset($subnetDataOld['pingSubnet']) && ($subnetDataOld['pingSubnet'] == 1) )	{ $checked = "checked"; }
+		else																				{ $checked = ""; }
+		
 		print '<tr>' . "\n";
         print '	<td>'._('Check hosts status').'</td>' . "\n";
         print '	<td>' . "\n";
         print '		<input type="checkbox" name="pingSubnet" value="1" '.$checked.'>'. "\n";
         print '	</td>' . "\n";
         print '	<td class="info2">'._('Ping hosts inside subnet to check avalibility').'</td>' . "\n";
+        print '</tr>';
+        
+		# Discover new hosts
+		if( isset($subnetDataOld['discoverSubnet']) && ($subnetDataOld['discoverSubnet'] == 1) )	{ $checked = "checked"; }
+		else																						{ $checked = ""; }
+		
+		print '<tr>' . "\n";
+        print '	<td>'._('Discover new hosts').'</td>' . "\n";
+        print '	<td>' . "\n";
+        print '		<input type="checkbox" name="discoverSubnet" value="1" '.$checked.'>'. "\n";
+        print '	</td>' . "\n";
+        print '	<td class="info2">'._('Discover new hosts in this subnet').'</td>' . "\n";
+        print '</tr>';        
 
     	# custom Subnet fields
 	    if(sizeof($customSubnetFields) > 0) {
@@ -352,7 +369,7 @@ else															{ $readonly = false; }
 				}	
 				//text
 				elseif($field['type'] == "text") {
-					print ' <textarea class="form-control input-sm" name="'. $field['nameNew'] .'" placeholder="'. $field['name'] .'" '.$delete.' rowspan=3 rel="tooltip" data-placement="right" title="'.$field['Comment'].'">'. $subnetDataOld[$field['name']]. '</textarea>'. "\n"; 				
+					print ' <textarea class="form-control input-sm" name="'. $field['nameNew'] .'" placeholder="'. $field['name'] .'" '.$delete.' rowspan=3 rel="tooltip" data-placement="right" title="'.$field['Comment'].'">'. str_replace("\\n","",$subnetDataOld[$field['name']]). '</textarea>'. "\n"; 
 				}	
 				//default - input field
 				else {

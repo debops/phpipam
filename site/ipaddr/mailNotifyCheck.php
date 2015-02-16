@@ -15,8 +15,11 @@ CheckReferrer();
 /* verify that user is authenticated! */
 isUserAuthenticated ();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
 /* verify mail recipients - multiple mails can be separated with ; */
-$recipients_temp = explode(",", $_REQUEST['recipients']);
+$recipients_temp = explode(",", $_POST['recipients']);
 
 foreach ($recipients_temp as $rec) {
 	//verify each email
@@ -28,8 +31,8 @@ foreach ($recipients_temp as $rec) {
 
 # if no errors send mail
 if (!$errors) {
-	if(!sendIPnotifEmail($_REQUEST['recipients'], $_REQUEST['subject'], $_REQUEST['content']))	{ print '<div class="alert alert-danger">'._('Sending mail failed').'!</div>'; }
-	else																						{ print '<div class="alert alert-success">'._('Sending mail succeeded').'!</div>'; }
+	if(!sendIPnotifEmail($_POST['recipients'], $_POST['subject'], $_POST['content']))	{ print '<div class="alert alert-danger">'._('Sending mail failed').'!</div>'; }
+	else																				{ print '<div class="alert alert-success">'._('Sending mail succeeded').'!</div>'; }
 }
 else {
 	print '<div class="alert alert-danger">'._('Wrong recipients! (separate multiple with ,)').'</div>';

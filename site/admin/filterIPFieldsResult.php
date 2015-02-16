@@ -7,6 +7,9 @@
 /* required functions */
 require_once('../../functions/functions.php'); 
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* glue together */
 $selected = implode(';', $_POST);
 

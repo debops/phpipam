@@ -25,9 +25,9 @@ Available controllers:
 	subnets
 	addresses
 	vlans
-	users
-	groups
-	requests
+	vrfs
+	//users
+	//groups
 
 Available actions:
 ------------------
@@ -48,8 +48,8 @@ Output format for subnets and IP addresses
 
 
 
-Per-controller options
-======================
+Per-controller options and examples
+===================================
 
 = Sections
 ----------
@@ -61,28 +61,17 @@ Per-controller options
 		example: ?controller=sections&action=read&id=1
 
 	= create
-		name			(mandatory) section name
-		description		(mandatory) section description
-		strictMode		strict mode on/off (bool)
-		order			order in which section is placed (int)
-		subnetOrdering	order in which subnet is displayed (field,direction - subnet,desc)
-
-		example: ?controller=sections&action=create&name=section1&description=description1&strictMode=1
-
+		not available
+		
 	= update
-		id				(mandatory) id of section to be updated
-		name			section name
-		description		section description
-		strictMode		strict mode on/off (bool)
-		order			order in which section is placed (int)
-		subnetOrdering	order in which subnet is displayed (field,direction - subnet,desc)
-
-		example: ?controller=sections&action=update&id=15&description=description2&strictMode=0
-	
+		not available	
+		
 	= delete
 		id				(mandatory) id of the section to be deleted
+		subnets			will delete also belonging subnets (default = true)
+		addresses		will delete also belonging ips (default = true)
 
-		example: ?controller=sections&action=delete&id=15
+		example: ?controller=sections&action=delete&id=1
 		
 
 = Subnets
@@ -96,16 +85,75 @@ Per-controller options
 		example: ?controller=subnets&action=read&id=1
 		
 	= create
-		sectionId		(mandatory) sectionId for subnet
-		masterSubnetId	(mandatory) parent subnet Id (0 = root)
-		subnet
-		mask
-		description
-		vrfId
-		vlanId
-		allowRequests
-		showName
-		permissions
-		pingSubnet
+		not available
+
+	= update
+		not available
+
+	= delete
+		id				(mandatory)	 subnet id
+		addresses		will delete also belonging ips (default = true)
+
+		example: ?controller=addresses&action=delete&id=1
+		
+
+= IP addresses
+--------------		
+	= read
+		subnetId		returns all ip addresses in subnet
+		id				returns ip address details by id
+		format			returns ip in specified format
+		
+		example: ?controller=addresses&action=read&id=1
+		
+	= create
+		not available
+
+	= update
+		not available
+
+	= delete
+		id				(mandatory)	
+
+		example: ?controller=addresses&action=delete&id=1
 		
 		
+= Vlans
+-------		
+	= read
+		all				returns all vlans
+		id				returns vlan details by id
+		subnets			return also ids of all attached subnets
+		
+		example: ?controller=vlans&action=read&id=1
+		
+	= create
+		not available
+
+	= update
+		not available
+
+	= delete
+		id				(mandatory)	
+
+		example: ?controller=vlans&action=delete&id=1
+
+= VRFs
+-------		
+	= read
+		all				returns all vrfs
+		id				returns vrf details by id
+		subnets			return also ids of all attached subnets
+		
+		example: ?controller=vrfs&action=read&id=1
+		
+	= create
+		not available
+
+	= update
+		not available
+
+	= delete
+		id				(mandatory)	
+
+		example: ?controller=vrfs&action=delete&id=1

@@ -7,10 +7,18 @@
  */
 
 
+/* filter input */
+$_GET = filter_user_input($_GET, true, true, false);
+
+/* must be numeric */
+if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+if(!is_numeric($_GET['section']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
+
 # ip address details, subnets, vlans or vrfs
 
 # ip address details
-if($_REQUEST['page'] == "subnets" && isset($_REQUEST['ipaddrid'])) {
+if($_GET['page'] == "subnets" && isset($_GET['ipaddrid'])) {
 		# print ip address details
 		print "<div class='subnetDetails'>";
 		include_once("ipDetails.php");
@@ -24,9 +32,9 @@ if($_REQUEST['page'] == "subnets" && isset($_REQUEST['ipaddrid'])) {
 		}
 }
 # subnets
-elseif($_REQUEST['page'] == "subnets") {
+elseif($_GET['page'] == "subnets") {
 	# fetch subnet details
-	$slaves = getAllSlaveSubnetsBySubnetId ($_REQUEST['subnetId']);
+	$slaves = getAllSlaveSubnetsBySubnetId ($_GET['subnetId']);
 	
 	# print subnet and ip addresses
 	if(sizeof($slaves) == 0) 	{ 
@@ -64,7 +72,7 @@ elseif($_REQUEST['page'] == "subnets") {
 	}
 }
 # VLANSs
-elseif($_REQUEST['page'] == "vlan") {
+elseif($_GET['page'] == "vlan") {
 		# print VLAN details
 		print "<div class='subnetDetails'>";
 		include_once("vlanDetails.php");
@@ -76,7 +84,7 @@ elseif($_REQUEST['page'] == "vlan") {
 		print '</div>';	
 }
 # VRFS
-elseif($_REQUEST['page'] == "vrf") {
+elseif($_GET['page'] == "vrf") {
 		# print VRF details
 		print "<div class='subnetDetails'>";
 		include_once("vrfDetails.php");
@@ -88,7 +96,7 @@ elseif($_REQUEST['page'] == "vrf") {
 		print '</div>';		
 }
 # folders
-elseif($_REQUEST['page'] == "folder") {
+elseif($_GET['page'] == "folder") {
 		# print VRF details
 		print "<div class='subnetDetails'>";
 		include_once("folderDetails.php");

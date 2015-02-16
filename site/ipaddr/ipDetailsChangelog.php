@@ -8,10 +8,10 @@
 isUserAuthenticated ();
 
 # get clog entries
-$clogs = getChangelogEntries("ip_addr", $_REQUEST['ipaddrid']);
+$clogs = getChangelogEntries("ip_addr", $_GET['ipaddrid']);
 
 # permissions
-$permission = checkSubnetPermission ($_REQUEST['subnetId']);
+$permission = checkSubnetPermission ($_GET['subnetId']);
 if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not have permission to access this network')."!</div>"); }
 
 # header

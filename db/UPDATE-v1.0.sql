@@ -14,6 +14,7 @@ ALTER TABLE `subnets` CHANGE `vlanId` `vlanId` INT(11)  UNSIGNED  NULL  DEFAULT 
 ALTER TABLE `subnets` CHANGE `isFolder` `isFolder` BOOL  NULL  DEFAULT '0';
 ALTER TABLE `subnets` CHANGE `pingSubnet` `pingSubnet` BOOL  NULL  DEFAULT '0';
 
+UPDATE `ipaddresses` set `switch` = 0 where `switch` = "";
 ALTER TABLE `ipaddresses` CHANGE `subnetId` `subnetId` INT(11)  UNSIGNED  NULL  DEFAULT NULL;
 ALTER TABLE `ipaddresses` CHANGE `switch` `switch` INT(11)  UNSIGNED  NULL  DEFAULT NULL;
 

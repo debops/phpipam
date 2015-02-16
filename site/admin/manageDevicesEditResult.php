@@ -10,17 +10,18 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+/* prevent XSS in action */
+$_POST['action'] = filter_user_input ($_POST['action'], false, true, true);
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* get modified details */
 $device = $_POST;
 
-/* sanitize post! */
-$device['hostname'] 	= htmlentities($device['hostname'], ENT_COMPAT | ENT_HTML401, "UTF-8");		# prevent XSS
-$device['ip_addr'] 		= htmlentities($device['ip_addr'], ENT_COMPAT | ENT_HTML401, "UTF-8");		# prevent XSS
-$device['vendor'] 		= htmlentities($device['vendor'], ENT_COMPAT | ENT_HTML401, "UTF-8");		# prevent XSS
-$device['model'] 		= htmlentities($device['model'], ENT_COMPAT | ENT_HTML401, "UTF-8");		# prevent XSS
-$device['version'] 		= htmlentities($device['version'], ENT_COMPAT | ENT_HTML401, "UTF-8");		# prevent XSS
-$device['description'] 	= htmlentities($device['description'], ENT_COMPAT | ENT_HTML401, "UTF-8");	# prevent XSS
-
+/* must be numeric */
+if($_POST['action']!="add") {
+	if(!is_numeric($_POST['switchId']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+}
 
 /* available devices */
 foreach($device as $key=>$line) {

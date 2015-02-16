@@ -15,6 +15,13 @@ $db['name'] = "phpipam";
  ******************************/
 $debugging = false;
 
+/**
+ *	manual set session name for auth
+ *	increases security
+ *	optional
+ */
+$phpsessname = "phpipam";
+
 /**	
  *	BASE definition if phpipam 
  * 	is not in root directory (e.g. /phpipam/)

@@ -57,6 +57,7 @@ $cFields['devices']['tooltip'] 		= "Add new custom device field";
 	<td><?php print _('Field type'); ?></td>
 	<td><?php print _('Default'); ?></td>
 	<td><?php print _('Required'); ?></td>
+	<td><?php print _('Visible'); ?></td>
 	<td></td>
 </tr>
 
@@ -64,7 +65,7 @@ $cFields['devices']['tooltip'] 		= "Add new custom device field";
 	<?php
 	# printout each
 	foreach($cFields as $k=>$cf) {
-	
+			
 		# save vars and unset
 		$title   = $cf['title'];
 		$tooltip = $cf['tooltip'];
@@ -75,6 +76,10 @@ $cFields['devices']['tooltip'] 		= "Add new custom device field";
 		# set key 
 		$table = $k;
 
+		# get custom fields
+		$ffields = json_decode($settings['hiddenCustomFields'], true);		
+		if(is_array($ffields[$table]))	{ $ffields = $ffields[$table]; }
+		else							{ $ffields = array(); }
 	
 		print "<tbody id='custom-$k'>";
 	
@@ -121,6 +126,10 @@ $cFields['devices']['tooltip'] 		= "Add new custom device field";
 				# NULL
 				if(@$f['Null']=="NO")		{ print "<td>"._('Required')."</td>"; }
 				else						{ print "<td></td>"; }
+				
+				# visible
+				if(in_array($f['name'], $ffields))	{ print "<td><span class='text-danger'>"._('No')."</span></td>"; }
+				else								{ print "<td><span class='text-success'>"._('Yes')."</span></td>"; }
 	
 				#actions
 				print "<td class='actions'>";
@@ -143,7 +152,14 @@ $cFields['devices']['tooltip'] 		= "Add new custom device field";
 		//add
 		print "<tr>";
 		print "<td colspan='8' style='padding-right:0px;'>";
-		print "	<button class='btn btn-xs btn-default pull-right edit-custom-field' data-action='add'  data-fieldname='$field[name]' data-table='$table' rel='tooltip' data-placement='right' title='"._($tooltip)."'><i class='fa fa-plus'></i>";
+		print "	<button class='btn btn-xs btn-default pull-right edit-custom-field' data-action='add'  data-fieldname='$field[name]' data-table='$table' rel='tooltip' data-placement='right' title='"._($tooltip)."'><i class='fa fa-plus'></i></button>";
+		print "</td>";
+		print "</tr>";
+		
+		//filter
+		print "<tr>";
+		print "<td colspan='8' style='padding-right:0px;'>";
+		print "	<button class='btn btn-xs btn-info pull-right edit-custom-filter' data-fieldname='$field[name]' data-table='$table' rel='tooltip' data-placement='right' title='"._("Set which field to display in table")."'><i class='fa fa-filter'></i> Filter</button>";
 		print "</td>";
 		print "</tr>";
 	

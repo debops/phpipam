@@ -11,6 +11,9 @@ require_once( dirname(__FILE__) . '/../functions.php' );
 require_once( dirname(__FILE__) . '/../scripts/Thread.php');
 require_once( dirname(__FILE__) . '/config-scan.php');
 
+# get settings
+$settings = getAllSettings();
+
 // no error reporting!
 ini_set('display_errors', 1);
 error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
@@ -121,14 +124,13 @@ elseif($scanType=="update") {
 
 $z = 0;			//addresses array index
 
-
 // run per MAX_THREADS
-for ($m=0; $m<=$max; $m += $MAX_THREADS) {
+for ($m=0; $m<=$max; $m += $settings['scanMaxThreads']) {
     // create threads 
     $threads = array();
     
     // fork processes
-    for ($i = 0; $i <= $MAX_THREADS && $i <= $max; $i++) {
+    for ($i = 0; $i <= $settings['scanMaxThreads'] && $i <= $max; $i++) {
     	//only if index exists!
     	if(isset($ip[$z])) {      	
 			//start new thread

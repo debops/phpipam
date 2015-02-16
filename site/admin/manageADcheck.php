@@ -12,6 +12,9 @@ ini_set('display_errors', 0);
 /* verify that user is admin */
 checkAdmin();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
 /* get settings */
 $ad = $_POST;
 

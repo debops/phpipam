@@ -63,6 +63,19 @@ $mailsettings = getAllMailSettings();
 	<td class="info2"><?php print _('Set SMTP server port'); ?> (25, 465 or 587)</td>
 </tr>
 
+<!-- tls -->
+<tr>
+	<td><?php print _('Security'); ?></th>
+	<td>
+		<select name="msecure" class="smtp form-control input-sm input-w-auto">
+			<option value="none"><?php print _('None'); ?></option>
+			<option value="ssl" <?php if($mailsettings['msecure']=="ssl") print "selected='selected'"; ?>><?php print _('SSL'); ?></option>
+			<option value="tls" <?php if($mailsettings['msecure']=="tls") print "selected='selected'"; ?>><?php print _('TLS'); ?></option>
+		</select>
+	</td>
+	<td class="info2"><?php print _('Select yes if authentication is required'); ?></td>
+</tr>
+
 <!-- Server auth -->
 <tr>
 	<td><?php print _('Server authentication'); ?></th>

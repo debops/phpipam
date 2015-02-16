@@ -10,6 +10,11 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* prevent XSS in action */
+$_POST['action'] = filter_user_input ($_POST['action'], false, true, true);
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* get post */
 $vlanPost = $_POST;
 
@@ -47,7 +52,7 @@ $(document).ready(function(){
 	<tr>
 		<td><?php print _('Number'); ?></td>
 		<td>
-			<input type="text" class="number form-control input-sm" name="number" placeholder="<?php print _('VLAN number'); ?>" value="<?php if(isset($vlan['number'])) print $vlan['number']; ?>" <?php print $readonly; ?>>
+			<input type="text" class="number form-control input-sm" name="number" placeholder="<?php print _('VLAN number'); ?>" value="<?php if(isset($vlan['number'])) print $vlan['number']; ?><?php if(isset($_POST['vlanNum'])) print $_POST['vlanNum']; ?>" <?php print $readonly; ?>>
 		</td>
 	</tr>
 

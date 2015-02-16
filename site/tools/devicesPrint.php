@@ -55,11 +55,20 @@ else {
 /* get custom fields */
 $custom = getCustomFields('devices');
 
+/* get hidden fields */
+if(!isset($settings)) 	{ $settings = getAllSettings(); }
+$ffields = json_decode($settings['hiddenCustomFields'], true);		
+if(is_array($ffields['devices']))	{ $ffields = $ffields['devices']; }
+else								{ $ffields = array(); }
+
 
 //sort icons
 if($sort['direction'] == 'asc') 	{ $icon = "<i class='fa fa-angle-down'></i> "; }
 else								{ $icon = "<i class='fa fa-angle-up'></i> "; }
 
+# title
+print "<h4>"._('List of network devices')."</h4>";
+print "<hr>";
 
 //filter
 print "<div class='filter' style='margin-bottom:5px;text-align:right'>";
@@ -106,14 +115,17 @@ print "	<th class='hidden-sm hidden-xs'><a href='' data-id='version|$sort[direct
 
 if(sizeof($custom) > 0) {
 	foreach($custom as $field) {
-		print "<th class='hidden-sm hidden-xs hidden-md'><a href='' data-id='$field[name]|$sort[directionNext]'  class='sort' rel='tooltip' data-container='body' title='"._('Sort by')." $field[name]'>"; ; 	if($sort['field'] == $field['name']) print $icon; print $field['name']."</th>";
+		if(!in_array($field['name'], $ffields)) {
+			print "<th class='hidden-sm hidden-xs hidden-md'><a href='' data-id='$field[name]|$sort[directionNext]'  class='sort' rel='tooltip' data-container='body' title='"._('Sort by')." $field[name]'>"; ; 	if($sort['field'] == $field['name']) print $icon; print $field['name']."</th>";
+			$colspanCustom++;
+		}
 	}
 }
 print '	<th class="actions"></th>';
 print '</tr>';
 
 if(sizeof($devices) == 0) {
-	$colspan = 9 + sizeof($custom);
+	$colspan = 9 + $colspanCustom;
 	print "<tr>";
 	print "	<td colspan='$colspan'><div class='alert alert-info'>"._('No devices configured')."!</div></td>";
 	print "</tr>";
@@ -126,7 +138,7 @@ if(sizeof($devices) == 0) {
 	//print details
 	print '<tr>'. "\n";
 	
-	print "	<td>". $device['hostname'] .'</td>'. "\n";
+	print "	<td><a href='".create_link("tools","devices","hosts",$device['id'])."'>". $device['hostname'] .'</a></td>'. "\n";
 	print "	<td>". $device['ip_addr'] .'</td>'. "\n";
 	print '	<td class="description">'. $device['description'] .'</td>'. "\n";
 	print '	<td><strong>'. $cnt .'</strong> '._('Hosts').'</td>'. "\n";
@@ -138,11 +150,13 @@ if(sizeof($devices) == 0) {
 	//custom
 	if(sizeof($custom) > 0) {
 		foreach($custom as $field) {
-			print "<td class='hidden-sm hidden-xs hidden-md'>".$device[$field['name']]."</td>";
+			if(!in_array($field['name'], $ffields)) {
+				print "<td class='hidden-sm hidden-xs hidden-md'>".$device[$field['name']]."</td>";
+			}
 		}
 	}
 	
-	print '	<td class="actions"><a href="tools/devices/hosts/'.$device['id'].'/" class="btn btn-sm btn-default"><i class="fa fa-angle-right"></i> '._('Show all hosts').'</a></td>';	
+	print '	<td class="actions"><a href="'.create_link("tools","devices","hosts",$device['id']).'" class="btn btn-sm btn-default"><i class="fa fa-angle-right"></i> '._('Show all hosts').'</a></td>';	
 	print '</tr>'. "\n";
 	
 	}
@@ -164,10 +178,12 @@ if(sizeof($devices) == 0) {
 	//custom
 	if(sizeof($custom) > 0) {
 		foreach($custom as $field) {
-			print "<td class='hidden-sm hidden-xs hidden-md'></td>";
+			if(!in_array($field['name'], $ffields)) {
+				print "<td class='hidden-sm hidden-xs hidden-md'></td>";
+			}
 		}
 	}
-	print '	<td class="actions"><a href="tools/devices/hosts/0/" class="btn btn-sm btn-default"><i class="fa fa-angle-right"></i> '._('Show all hosts').'</a></td>';		
+	print '	<td class="actions"><a href="'.create_link("tools","devices","hosts","0").'" class="btn btn-sm btn-default"><i class="fa fa-angle-right"></i> '._('Show all hosts').'</a></td>';		
 	print '</tr>'. "\n";	
 }	
 

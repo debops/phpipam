@@ -1,4 +1,4 @@
-<div id="login">
+<div id="login" class="request">
 <form name="requestIP" id="requestIP">
 
 <div class="requestIP">
@@ -39,7 +39,7 @@ if($n == 0) {
 
 	<!-- back to login page -->
 	<div class="iprequest" style="text-align:left">
-	<a href="#login" class="backToLogin">
+	<a href="<?php print create_link("login"); ?>" class="backToLogin">
 		<i class="fa fa-angle-left fa-pad-right"></i> <?php print _('Back to login'); ?>
 	</a>		
 	</div>
@@ -146,7 +146,7 @@ if(in_array('owner', $setFields)) {
 
 <!-- back to login page -->
 <div class="iprequest" style="text-align:left">
-	<a href="login/">
+	<a href="<?php print create_link("login"); ?>">
 		<i class="fa fa-angle-left fa-pad-right"></i> <?php print _('Back to login'); ?>
 	</a>		
 </div>

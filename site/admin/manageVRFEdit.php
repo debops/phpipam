@@ -10,6 +10,10 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
+
 /* get post */
 $vrfPost = $_POST;
 

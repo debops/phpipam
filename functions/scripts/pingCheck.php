@@ -35,13 +35,9 @@ $settings = getAllSettings();
 // set ping statuses
 $statuses = explode(";", $settings['pingStatus']);
 
-//set execution start time
-$sTime = time();
-
-
 //verify that pign path is correct
-if(!file_exists($pathPing)) {
-	print "Invalid ping path! You can set parameters for scan under functions/scan/config-scan.php\n";
+if(!file_exists($settings['scanPingPath'])) {
+	print "Invalid ping path! You can set parameters for scan under Administration > ping settings\n";
 }
 //threads not supported, scan 1 by one - it is highly recommended to enable threading for php
 elseif(!$threads) {
@@ -51,7 +47,7 @@ elseif(!$threads) {
 	//scan each
 	foreach($addresses as $ip) {
 		//calculate diff since last alive
-		$tDiff = $sTime - strtotime($ip['lastSeen']);
+		$tDiff = time() - strtotime($ip['lastSeen']);
 		//set Old status
 		if($tDiff < $statuses[1])	{ $addresses[$m]['oldStatus'] = 0; }	//old online
 		else						{ $addresses[$m]['oldStatus'] = 2; }	//old offline
@@ -86,16 +82,16 @@ else {
 	$z = 0;			//addresses array index
 
 	//run per MAX_THREADS
-    for ($m=0; $m<=$size; $m += $MAX_THREADS) {
+    for ($m=0; $m<=$size; $m += $settings['scanMaxThreads']) {
         // create threads 
         $threads = array();
         
         //fork processes
-        for ($i = 0; $i <= $MAX_THREADS && $i <= $size; $i++) {
+        for ($i = 0; $i <= $settings['scanMaxThreads'] && $i <= $size; $i++) {
         	//only if index exists!
         	if(isset($addresses[$z])) {
         		//calculate diff since last alive
-				$tDiff = $sTime - strtotime($addresses[$z]['lastSeen']);
+				$tDiff = time() - strtotime($addresses[$z]['lastSeen']);
 				//set Old status
 				if($tDiff <= $statuses[1])	{ $addresses[$z]['oldStatus'] = 0; }	//old online
 				else						{ $addresses[$z]['oldStatus'] = 2; }	//old offline        	
@@ -211,15 +207,15 @@ if(sizeof($stateDiff)>0 && $email)
 			if(is_null($change['lastSeen']) || $change['lastSeen']=="0000-00-00 00:00:00") {
 				$ago	  = "never";
 			} else {
-				$timeDiff = $sTime - strtotime($change['lastSeen']);
+				$timeDiff = time() - strtotime($change['lastSeen']);
 				$ago 	  = $change['lastSeen']." (".sec2hms($timeDiff)." ago)";
 			}
 			
 			$html[] = "<tr>";
-			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]subnets/$section[id]/$subnet[id]/'>".Transform2long($change['ip_addr'])."</a></td>";
+			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]".create_link("subnets",$section['id'],$subnet['id'])."'>".Transform2long($change['ip_addr'])."</a></td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$change[description]</td>";
-			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]subnets/$section[id]/$subnet[id]/'>$subnetPrint</a></td>";
-			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]subnets/$section[id]/'>$sectionPrint</a></td>";
+			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]".create_link("subnets",$section['id'],$subnet['id'])."'>$subnetPrint</a></td>";
+			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'><a href='$settings[siteURL]".create_link("subnets",$section['id'])."'>$sectionPrint</a></td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$ago</td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$oldStatus</td>";
 			$html[] = "	<td style='padding:3px 8px;border:1px solid silver;'>$newStatus</td>";
@@ -238,7 +234,6 @@ if(sizeof($stateDiff)>0 && $email)
 
 		//send to all admins
 		sendStatusUpdateMail($mail['content'], $mail['subject']);
-		//mail($settings['siteAdminMail'], $mail['subject'], $mail['content'], $mail['headers']);
 	}
 }
 

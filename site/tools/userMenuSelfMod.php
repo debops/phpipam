@@ -15,6 +15,9 @@ CheckReferrer();
 /* get old details */
 $user_old = getActiveUserDetails();
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* get changed details */
 $modData = $_POST;
 
@@ -24,12 +27,12 @@ if (!checkEmail($modData['email'])) 											{ $error = _('Email not valid!');
 /* verify password if changed (not empty) */
 if (strlen($modData['password1']) != 0) {
 	
-	/* Hash passwords */
-	$modData['password1'] = md5($modData['password1']);
-	$modData['password2'] = md5($modData['password2']);
-
 	if ( (strlen($_POST['password1']) < 8) && (!empty($_POST['password1'])) ) 	{ $error = _('Password must be at least 8 characters long!'); }
 	else if ($modData['password1'] != $modData['password2']) 					{ $error = _('Passwords do not match!'); }
+
+	/* Crypt passwords */
+	$modData['password1'] = crypt_user_pass($modData['password1']);
+	$modData['password2'] = crypt_user_pass($modData['password2']);
 }
 
 

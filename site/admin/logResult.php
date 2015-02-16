@@ -1,4 +1,20 @@
-<table id="logs" class="table table-condensed table-hover table-top" style="margin-top:10px;">
+<script type="text/javascript">
+$(document).ready(function() {
+	if ($("[rel=tooltip]").length) { $("[rel=tooltip]").tooltip(); }
+	
+	return false;
+});
+</script>
+
+
+
+
+<div id="dashboard" class="row-fluid">
+<div class="widget-dash">
+<div class="inner">
+<div class="hContent">
+
+<table id="logs" class="table table-condensed table-hover table-top" style="margin-top:0px;">
 
 <?php
 
@@ -10,6 +26,9 @@
 if(!function_exists('countAllLogs')) {
 require_once('../../functions/functions.php'); 
 }
+
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
 
 /* if nothing is provided display all! */
 if ( empty($_POST['Informational']) && empty($_POST['Notice']) && empty($_POST['Warning']) ) {
@@ -34,7 +53,7 @@ if ( empty($_POST['Informational']) && empty($_POST['Notice']) && empty($_POST['
 $numberOfLogs = countAllLogs();
 
 /* fetch 25 at once logs */
-$logCount = 20;
+$logCount = 40;
 
 /* set classes based on severity */   
 if ($_POST['Informational'] == _("Informational")) {
@@ -82,7 +101,7 @@ foreach ($logs as $log)
 	    }
 	    else {
 	        $log['severityText'] = _("Warning");
-	        $color = "error";
+	        $color = "danger";
 	    }
     
     	if (in_array($log['severityText'], $_POST)) {
@@ -111,6 +130,11 @@ foreach ($logs as $log)
 ?>
 
 </table>	<!-- end filter table -->
+
+</div>
+</div>
+</div>
+</div>
 
 <?php
 if(sizeof($logs)== 0) { print "<div class='alert alert-info'>"._('No logs available')."!</div>"; }

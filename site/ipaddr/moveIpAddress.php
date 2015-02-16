@@ -13,10 +13,17 @@ require_once('../../functions/functions.php');
 /* check referer and requested with */
 CheckReferrer();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
+/* must be numeric */
+if(!is_numeric($_POST['subnetId']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+if(!is_numeric($_POST['id']))			{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
 /* get posted values */
-$subnetId= $_REQUEST['subnetId'];
-$action  = $_REQUEST['action'];
-$id      = $_REQUEST['id'];
+$subnetId= $_POST['subnetId'];
+$action  = $_POST['action'];
+$id      = $_POST['id'];
 
 
 /* set subnet -> for adding new only */
@@ -45,7 +52,7 @@ $details = getIpAddrDetailsById ($id);
 		<td>
 			<input type="text" name="ip_addr" class="ip_addr form-control input-sm" value="<?php print $details['ip_addr']; ?>" size="30" readonly>
     		
-   			<input type="hidden" name="action" 	 	value="<?php print $_REQUEST['action']; 	?>">
+   			<input type="hidden" name="action" 	 	value="<?php print $_POST['action']; 	?>">
 			<input type="hidden" name="id" 		 	value="<?php print $id; 		?>">
 			<input type="hidden" name="subnet"   	value="<?php print $subnet; 	?>">
 			<input type="hidden" name="subnetId" 	value="<?php print $subnetId; 	?>">

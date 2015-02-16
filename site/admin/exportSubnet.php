@@ -19,8 +19,11 @@ require_once '../../functions/PEAR/Spreadsheet/Excel/Writer.php';
 $filename = "phpipam_subnet_export.xls";
 $workbook = new Spreadsheet_Excel_Writer();
 
+/* filter input */
+$_GET = filter_user_input($_GET, true, true, false);
+
 //get requested subnet Id
-$subnetId = $_REQUEST['subnetId'];
+$subnetId = $_GET['subnetId'];
 
 //get all subnet details
 $subnet = getSubnetDetailsById ($subnetId);
@@ -63,7 +66,10 @@ $colSize = $colSize + $myFieldsSize -2;
 
 
 // Create a worksheet
-$worksheet =& $workbook->addWorksheet($subnet['description']);
+//$worksheet =& $workbook->addWorksheet($subnet['description']);
+$worksheet_name = $subnet['description']; 
+$worksheet_name = (strlen($worksheet_name) > 30) ? substr($worksheet_name,0,27).'...' : $worksheet_name; 
+$worksheet =& $workbook->addWorksheet($worksheet_name); 
 
 $lineCount = 0;
 

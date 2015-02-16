@@ -13,6 +13,9 @@ checkAdmin();
 /* get all settings */
 $settings = getAllSettings();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
 ?>
 
 
@@ -68,7 +71,7 @@ else {
 	    <td>
 	    	<select name="app_permissions" class="form-control input-sm input-w-auto">
 	    	<?php
-	    	$perms = array("0"=>"Disabled","1"=>"Read","2"=>"Read / Write");
+	    	$perms = array("0"=>"Disabled","1"=>"Read","2"=>"Read / Write","3"=>"Read / Write / Admin");
 	    	foreach($perms as $k=>$p) {
 		    	if($k==$api['app_permissions'])	{ print "<option value='$k' selected='selected'>"._($p)."</option>"; }
 		    	else							{ print "<option value='$k' 				   >"._($p)."</option>"; }
@@ -79,15 +82,13 @@ else {
     </tr>
 
     <!-- description -->
-<!--
     <tr>
     	<td><?php print _('Description'); ?></td> 
     	<td>
-    		<input type="text" name="app_description" class="input-xlarge" value="<?php print @$api['app_description']; ?>" <?php if($_POST['action'] == "delete") print "readonly"; ?>>
+    		<input type="text" name="app_comment" class="form-control input-sm" value="<?php print @$api['app_comment']; ?>" <?php if($_POST['action'] == "delete") print "readonly"; ?>>
     	</td>   
     	<td class="info2"><?php print _('Enter description'); ?></td>
     </tr>
--->
 
 </table>
 </form>

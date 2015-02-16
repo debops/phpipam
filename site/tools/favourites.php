@@ -46,20 +46,20 @@ else {
 			print "<tr class='favSubnet-$f[subnetId]'>";
 			
 			if($f['isFolder']==1) {
-				print "	<td><a href='folder/$f[sectionId]/$f[subnetId]/'><i class='fa fa-folder fa-sfolder'></i> $f[description]</a></td>";
+				print "	<td><a href='".create_link("folder",$f['sectionId'],$f['subnetId'])."'><i class='fa fa-folder fa-sfolder'></i> $f[description]</a></td>";
 			}
 			else {
 				//master?
 				if(sizeof(getAllSlaveSubnetsBySubnetId ($f['subnetId']))>0) {
-				print "	<td><a href='subnets/$f[sectionId]/$f[subnetId]/'><i class='fa fa-sfolder fa-folder-o'></i>".transform2long($f['subnet'])."/$f[mask]</a></td>";	
+				print "	<td><a href='".create_link("subnets",$f['sectionId'],$f['subnetId'])."'><i class='fa fa-sfolder fa-folder-o'></i>".transform2long($f['subnet'])."/$f[mask]</a></td>";	
 				}
 				else {
-				print "	<td><a href='subnets/$f[sectionId]/$f[subnetId]/'><i class='fa fa-sfolder fa-sitemap' ></i> ".transform2long($f['subnet'])."/$f[mask]</a></td>";	
+				print "	<td><a href='".create_link("subnets",$f['sectionId'],$f['subnetId'])."'><i class='fa fa-sfolder fa-sitemap' ></i> ".transform2long($f['subnet'])."/$f[mask]</a></td>";	
 				}	
 			}
 			
 			print "	<td>$f[description]</td>";
-			print "	<td><a href='subnets/$f[sectionId]/'>$f[section]</a></td>";
+			print "	<td><a href='".create_link("folder",$f['sectionId'])."'>$f[section]</a></td>";
 			if(strlen($f['vlanId'])>0) {
 			# get vlan info
 			$vlan = getVlanById($f['vlanId']);

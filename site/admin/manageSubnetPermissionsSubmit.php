@@ -10,6 +10,9 @@ require_once('../../functions/functions.php');
 /* verify that user is logged in */
 isUserAuthenticated(true);
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* verify that user is admin */
 checkAdmin();
 

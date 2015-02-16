@@ -14,9 +14,9 @@ require_once('../../functions/functions.php');
 CheckReferrer();
 
 /* get posted values */
-$subnetId= $_REQUEST['subnetId'];
-$action  = $_REQUEST['action'];
-$id      = $_REQUEST['id'];
+$subnetId= $_POST['subnetId'];
+$action  = $_POST['action'];
+$id      = $_POST['id'];
 
 /* set subnet -> for adding new only */
 $subnet = getSubnetDetailsById($subnetId);
@@ -117,7 +117,7 @@ $myFieldsSize = sizeof($myFields);
 		<td><?php print _('IP address'); ?> *</td>
 		<td>
 		<div class="input-group">
-			<input type="text" name="ip_addr" class="ip_addr form-control input-sm" value="<?php print $details['ip_addr']; if(is_numeric($_REQUEST['stopIP'])>0) print "-".transform2long($_REQUEST['stopIP']); ?>" placeholder="<?php print _('IP address'); ?>">
+			<input type="text" name="ip_addr" class="ip_addr form-control input-sm" value="<?php print $details['ip_addr']; if(is_numeric($_POST['stopIP'])>0) print "-".transform2long($_POST['stopIP']); ?>" placeholder="<?php print _('IP address'); ?>">
     		<span class="input-group-addon">
     			<i class="fa fa-gray fa-info" rel="tooltip" data-html='true' data-placement="left" title="<?php print _('You can add,edit or delete multiple IP addresses<br>by specifying IP range (e.g. 10.10.0.0-10.10.0.25)'); ?>"></i>
     		</span>
@@ -135,22 +135,12 @@ $myFieldsSize = sizeof($myFields);
     	</td>
 	</tr>
 
-	<!-- description -->
-	<tr>
-		<td><?php print _('Description'); ?></td>
-		<td>
-			<input type="text" name="description" class="ip_addr form-control input-sm" value="<?php if(isset($details['description'])) {print $details['description'];} ?>" size="30" 
-			<?php if ( $act == "delete" ) { print " readonly";} ?> 
-			placeholder="<?php print _('Description'); ?>">
-		</td>
-	</tr>
-
 
 	<!-- DNS name -->
 	<?php
 	if(!isset($details['dns_name'])) {$details['dns_name'] = "";}
 		print '<tr>'. "\n";
-		print '	<td>'._('DNS name').'</td>'. "\n";
+		print '	<td>'._('Hostname').'</td>'. "\n";
 		print '	<td>'. "\n";
 		print '	<div class="input-group">';
 		print ' <input type="text" name="dns_name" class="ip_addr form-control input-sm" placeholder="'._('Hostname').'" value="'. $details['dns_name']. '" '.$delete.'>'. "\n";
@@ -161,6 +151,17 @@ $myFieldsSize = sizeof($myFields);
 		print '	</td>'. "\n";
 		print '</tr>'. "\n";
 	?>
+
+	<!-- description -->
+	<tr>
+		<td><?php print _('Description'); ?></td>
+		<td>
+			<input type="text" name="description" class="ip_addr form-control input-sm" value="<?php if(isset($details['description'])) {print $details['description'];} ?>" size="30" 
+			<?php if ( $act == "delete" ) { print " readonly";} ?> 
+			placeholder="<?php print _('Description'); ?>">
+		</td>
+	</tr>
+
 	<!-- MAC address -->
 	<?php
 	if(in_array('mac', $setFields)) {
@@ -201,7 +202,7 @@ $myFieldsSize = sizeof($myFields);
 
 		print '<select name="switch" class="ip_addr form-control input-sm input-w-auto" '.$delete.'>'. "\n";
 		print '<option disabled>'._('Select device').':</option>'. "\n";
-		print '<option value="" selected>'._('None').'</option>'. "\n";
+		print '<option value="0" selected>'._('None').'</option>'. "\n";
 		$devices = getAllUniqueDevices();
 		
 		foreach($devices as $device) {
@@ -391,13 +392,13 @@ $myFieldsSize = sizeof($myFields);
 	#get type
 	 $type = IdentifyAddress( $subnet2['subnet'] );
 
-	 if($subnet2['mask'] < 31 && $action=='add' && $type == "IPv4" ) { ?>
+	 if($subnet2['mask'] < 31 && ($action=='add' ||  substr($action, 0,4)=="all-") && $type == "IPv4" ) { ?>
 	 <!-- ignore NW /BC checks -->
 	 <tr>
 		<td><?php print _('Not strict'); ?></td>
 		<td>
 		<div class='checkbox info2'>
-			<input type="checkbox" name="nostrict" value="yes" style="margin-top:0px;"><?php print _('Permit adding network/broadcast as IP'); ?>
+			<input type="checkbox" name="nostrict" value="yes"><?php print _('Permit adding network/broadcast as IP'); ?>
 		</div>
 		</td>
 	</tr>
@@ -410,7 +411,7 @@ $myFieldsSize = sizeof($myFields);
 		<td><?php print _('Not strict'); ?></td>
 		<td>
 		<div class='checkbox info2'>
-			<input type="checkbox" name="nostrict" value="yes" style="margin-top:0px;"><?php print _('Permit adding network/broadcast as IP'); ?>
+			<input type="checkbox" name="nostrict" value="yes"><?php print _('Permit adding network/broadcast as IP'); ?>
 		</div>
 		</td>
 	</tr>

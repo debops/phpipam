@@ -52,6 +52,29 @@ $langs = getLanguages ();
 	</td>
 	<td class="info2"><?php print _('Set site URL'); ?></td>
 </tr>
+<!-- prettyLinks -->
+<tr>
+	<td class="title"><?php print _('Prettify links'); ?></td>
+	<td>
+		<select name="prettyLinks" class="form-control input-sm input-w-auto">
+		<?php
+			print "<option value='No'>"._('No')."</option>";
+			if($settings['prettyLinks']=="Yes") { print "<option value='Yes' selected='selected'>"._('Yes')."</option>"; }
+			else								{ print "<option value='Yes'>"._('Yes')."</option>"; }
+		?>
+		</select>
+	</td>
+	<td class="info2">
+		<?php print _('Use nicer URL structure'); ?>?<br>
+		<ul>
+			<li><?php print _("No"); ?>:  ?page=administration&link2=settings</li>
+			<li><?php print _("Yes"); ?>: /administration/settings/</li>
+		</ul>
+		<?php print _("Please note that mod_rewrite is required with appropriate settings if pretified links are selected."); ?><br>
+		<a href="http://phpipam.net/prettified-links-with-mod_rewrite/">http://phpipam.net/prettified-links-with-mod_rewrite/</a>
+		</td>
+</tr>
+
 <!-- Default language -->
 <tr>
 	<td class="title"><?php print _('Default language'); ?></td>
@@ -71,6 +94,26 @@ $langs = getLanguages ();
 	</td>
 	<td class="info2"><?php print _('Select default language'); ?></td>
 </tr>
+
+<!-- Mex session duration -->
+<tr>
+	<td class="title"><?php print _('Inactivity timeout'); ?></td>
+	<td>
+		<select name="inactivityTimeout" class="form-control input-sm input-w-auto">
+		<?php
+		$durations = array("900"=>"15 minutes","1800"=>"30 minutes", "3600"=>"1 hour", "7200"=>"2 hours", "21600"=>"6 hours", "43200"=>"12 hours", "86400"=>"24 hours");
+		//default
+		foreach($durations as $k=>$d) {
+			if($k==$settings['inactivityTimeout']) 	{ print "<option value='$k' selected='selected'>$d</option>"; }
+			else									{ print "<option value='$k' 				   >$d</option>"; }
+		}
+		?>
+		</select>
+	</td>
+	<td class="info2"><?php print _('Select inactive timeout for user sessions. Please note that if default php session settings in php.ini are lower they will override this'); ?></td>
+</tr>
+
+
 
 
 <!-- Admin settings -->
@@ -177,6 +220,17 @@ $langs = getLanguages ();
 	</td>
 </tr>
 
+<!-- Max VLAN number -->
+<tr>
+	<td class="title"><?php print _('Highest VLAN number'); ?></td>
+	<td>
+		<input type="text" class="form-control input-sm" name="vlanMax" value="<?php print $settings['vlanMax']; ?>">
+	</td>
+	<td class="info2">
+		<?php print _('Set highest VLAN number (default 4096)'); ?>
+	</td>
+</tr>
+
 <!-- changelog -->
 <tr>
 	<td class="title"><?php print _('Changelog'); ?></td>
@@ -241,6 +295,17 @@ $langs = getLanguages ();
 	</td>
 	<td class="info2">
 		<?php print _('Compress DHCP ranges in IP table'); ?>
+	</td>
+</tr>
+
+<!-- Hide free range -->
+<tr>
+	<td class="title"><?php print _('Hide free range'); ?></td>
+	<td>
+		<input type="checkbox" value="1" name="hideFreeRange" <?php if($settings['hideFreeRange'] == 1) print 'checked'; ?>>
+	</td>
+	<td class="info2">
+		<?php print _('Do not display free range in IP address and subnets list'); ?>
 	</td>
 </tr>
 

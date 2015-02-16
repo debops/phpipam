@@ -71,7 +71,7 @@ if($ipamusername['domainUser'] == "0") {
 <tr>
 	<td><?php print _('Language'); ?></td>
 	<td>
-		<select name="lang" class="form-control input-sm">
+		<select name="lang" class="form-control input-sm input-w-auto">
 			<?php
 			foreach($langs as $lang) {
 				if($lang['l_id']==$ipamusername['lang'])	{ print "<option value='$lang[l_id]' selected>$lang[l_name] ($lang[l_code])</option>"; }
@@ -82,6 +82,31 @@ if($ipamusername['domainUser'] == "0") {
 	</td>
 	<td class="info2"><?php print _('Select language'); ?></td>
 </tr>
+
+<?php if($ipamusername['role']=="Administrator") { ?>
+<!-- weather to receive mails -->
+<tr>
+	<td><?php print _('Mail notifications'); ?></td>
+	<td>
+		<select name="mailNotify" class="form-control input-sm input-w-auto">
+			<option value="No"><?php print _("No"); ?></option>
+			<option value="Yes" <?php if($ipamusername['mailNotify']=="Yes") { print "selected='selected'"; } ?>><?php print _("Yes"); ?></option>
+		</select>
+	</td>
+	<td class="info2"><?php print _('Select yes to receive notification change mail for state change'); ?></td>
+</tr>
+<!-- weather to receive mails for changelog -->
+<tr>
+	<td><?php print _('Mail Changelog'); ?></td>
+	<td>
+		<select name="mailChangelog" class="form-control input-sm input-w-auto">
+			<option value="No"><?php print _("No"); ?></option>
+			<option value="Yes" <?php if($ipamusername['mailChangelog']=="Yes") { print "selected='selected'"; } ?>><?php print _("Yes"); ?></option>
+		</select>
+	</td>
+	<td class="info2"><?php print _('Select yes to receive notification change mail for changelog'); ?></td>
+</tr>
+<?php } ?>
 
 <!-- Submit and hidden values -->
 <tr class="th">

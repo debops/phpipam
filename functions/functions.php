@@ -3,30 +3,34 @@
 /* @config file ------------------- */
 require_once( dirname(__FILE__) . '/../config.php' );
 
+/* fix for ajax-loaded windows */
+if(!isset($_SESSION)) {
+	/* set cookie parameters for max lifetime */
+	/*
+	ini_set('session.gc_maxlifetime', '86400');
+	ini_set('session.save_path', '/tmp/php_sessions/');
+	*/
+	if(strlen($phpsessname)>0) { session_name($phpsessname); }  
+	session_start();
+}
+
 /* @database functions ------------------- */
 require_once( dirname(__FILE__) . '/dbfunctions.php' );
 
 /* @debugging functions ------------------- */
 ini_set('display_errors', 1);
 if (!$debugging) { error_reporting(E_ERROR ^ E_WARNING); }
-else			 { error_reporting(E_ALL ^ E_NOTICE); }
+else			 { error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT); }
 
+/* set caching array to store vlans, sections etc */
+$cache = array();
 
 /**
  * Translations
  *
- * 	recode .po to .mo > msgfmt env_cp.po -o env_cp.mo
+ * 	recode .po to .mo > msgfmt phpipam.po -o phpipam.mo
  *	lang codes locale -a
  */
-
-if(!isset($_SESSION)) { 								//fix for ajax-loaded windows
-	/* set cookie parameters for max lifetime */
-	/*
-	ini_set('session.gc_maxlifetime', '86400');
-	ini_set('session.save_path', '/tmp/php_sessions/');
-	*/
-	session_start();
-}
  
 /* Check if lang is set */
 if(isset($_SESSION['ipamlanguage'])) {
@@ -38,14 +42,18 @@ if(isset($_SESSION['ipamlanguage'])) {
 	}	
 }
 
+/* detext missing gettext and fake function */
+if(!function_exists(gettext)) {
+	function gettext ($text) 	{ return $text; }
+	function _($text) 			{ return $text; }
+}
 
-/* set latest version */
-define("VERSION", "1.0");									//version changes if database structure changes
-/* set latest revision */
-define("REVISION", "000");									//revision always changes, verision only if database structure changes
-/* set last possible upgrade */
-define("LAST_POSSIBLE", "0.9");								//minimum required version to be able to upgrade
+/* open persistent DB connection */
+$database = new database($db['host'], $db['user'], $db['pass'], $db['name'], NULL, false);
+if($database->connect_error) { $dbFail = true; }
 
+/* get version */
+include_once('version.php');
 
 /* @general functions ------------------- */
 include_once('functions-common.php');

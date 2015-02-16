@@ -1,43 +1,40 @@
-version - 1.1
+version - 1.2
+
+	+ Add missing api actions;
+
+	+ support multiple authentication methods
+		
+	+ per-section DNS resolvers (PEAR DNS2)
+	
+	+ l2 vlan domains
+
+	+ assign a state to a subnet, ipaddr, vlan, user-editable
 
 	+ status - available, trash (preveri kako)
-	+ salting passwords
 	
-	+ delete confirmation
+	+ IP address owner (from internal users)
 	
-	+ link to change password for new users in emails
-	+ search also covers sections
-	
+	+ Define Default Gateway for a Subnet
+				
 	+ Mark subnet as full
-			
+	
+	+ Temporary share IP details / subnet
+	
 
 features for next releases:
 ---------------------------
 	
-	- Planned
+	+ Imports
+		+ Import from IPPlan
 	
-		+ Imports
-			+ Import from IPPlan
-			+ Import from 
-		
-		+ Scan subnet for alive hosts and import
-			SNMP router table fetching
-			NMAP scan
-		
-		+ Subnets import with vlan information;
-				
-		+ User actvity display;
-		
-		+ VLAN header ordering;
-		
-		+ Permissions for custom fields;
-		
-		
-		Martin Komon:
-		
-		+ Subnet importing via cli with switches;
-		
+	+ Scan subnet for alive hosts and import
+		SNMP router table fetching
+		NMAP scan
 	
-	- Optional
-		- RDNS zone file export (in admin!);
-		- IPv6 migration guide document;
+	+ Subnets import with vlan information;
+	
+	+ Permissions for custom fields;	
+	
+	Martin Komon:
+	
+	+ Subnet importing via cli with switches;

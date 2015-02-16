@@ -18,7 +18,20 @@ print "<h4 style='margin-top:30px;'>"._('Changelog')."</h4><hr>";
 # if enabled
 if($settings['enableChangelog'] == 1) {	
 	# set default size
-	if(!isset($_REQUEST['climit']))	{ $_REQUEST['climit'] = 50; }
+	if(!isset($_REQUEST['subnetId']))	{ $_REQUEST['climit'] = 50; }
+	else								{ $_REQUEST['climit'] = $_GET['subnetId']; }
+
+	# change parameters - search string provided
+	if(isset($_GET['sPage'])) {
+		$_REQUEST['cfilter']  = $_REQUEST['subnetId'];
+		$_REQUEST['climit']  = $_REQUEST['sPage'];
+	}
+	elseif(isset($_GET['subnetId'])) {
+		$_REQUEST['climit']  = $_REQUEST['subnetId'];
+	}
+	else {
+		$_REQUEST['climit']  = 50;
+	}
 ?>
 	
 	<!-- filter -->

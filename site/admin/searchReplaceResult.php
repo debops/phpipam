@@ -10,6 +10,9 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 
 /* verify posts */
 if(empty($_POST['search'])) {

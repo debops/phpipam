@@ -5,138 +5,145 @@
  */
 
 class Subnet
-{	
+{
+	# variables
+	var $query;				// db query
+	var $result;			// array result from database
+	var $format;			// set IP format
+	
+	# classes
+	var $Database;			// to store database object
+	var $Common;			// Common functions 
+	
+
+	/**
+	 * 	construct
+	 */
+	public function __construct() 
+	{
+		# initialize database class
+		require( dirname(__FILE__) . '/../../config.php' );
+		$this->Database = new database($db['host'], $db['user'], $db['pass'], $db['name'], NULL, false);
+		# common class
+		$this->Common = new Common;
+		# set defauld method
+		$this->format = "decimal";
+	}
+	
 	
 	/**
-	* get subnet details
-	*/
-	public function getSubnet() {
-	
-		/**
-		* all subnets 
-		*/
+	 *	fetch form database
+	 */
+	private function fetchArray() 
+	{
+		try { $this->result = $this->Database->getArray( $this->query ); }
+	    catch (Exception $e) 													{ throw new Exception($e->getMessage()); }
+	}
+
+
+	/**
+	 *	execute query
+	 */
+	private function executeQuery() 
+	{
+		try { $this->result = $this->Database->executeQuery( $this->query ); }
+	    catch (Exception $e) 													{ throw new Exception($e->getMessage()); }
+	}
+
+
+	/**
+	 * 	get Subnet
+	 */
+	public function readSubnet()
+	{
+		/* check input */
+		$this->Common->check_input;
+		
+		/* all subnets */
 		if($this->all) {
-			//get subnet by id
-			$res = fetchAllSubnets ();
+			//set query
+			$this->query = "select * from `subnets`;";
+			$this->fetchArray();
+			if(sizeof($this->result)==0) 										{ throw new Exception('No subnets available'); }
 		}
-
-		/** 
-		* all subnets in section
-		*/
-		elseif($this->sectionId) {
-			//id must be set and numberic
-			if ( is_null($this->sectionId) || !is_numeric($this->sectionId) ) 	{ throw new Exception('Invalid section Id - '.$this->sectionId); }
-			//get all subnets in section
-			$res = fetchSubnets ($this->sectionId);
-			//throw new exception if not existing
-			if(sizeof($res)==0) {
-				//check if section exists
-				if(sizeof(getSectionDetailsById ($this->sectionId))==0) 		{ throw new Exception('Section not existing');	}
-			}
-		}
-		
-		/** 
-		* subnet by id 
-		*/
+		/* subnet by id */
 		elseif($this->id) {
-			//id must be set and numberic
-			if ( is_null($this->id) || !is_numeric($this->id) ) 				{ throw new Exception('Subnet id not existing - '.$this->id); }
-			//get subnet by id
-			$res = getSubnetDetailsById ($this->id);
-			//throw new exception if not existing
-			if(sizeof($res)==0) 												{ throw new Exception('Subnet not existing'); }
+			//set query
+			$this->query = "select * from `subnets` where `id` = ".$this->id.";";
+			$this->fetchArray();
+			if(sizeof($this->result)==0) 										{ throw new Exception('Invalid subnet Id '.$this->id); }
 		}
-		
-		/**
-		* subnet by name 
-		*/
-		elseif($this->name) {
-			//id must be set and numberic
-			if ( is_null($this->name) || strlen($this->name)==0 ) 				{ throw new Exception('Invalid subnet name - '.$this->name); }
-			//get subnet by id
-			$res = getSubnetDetailsByName ($this->name);
-			//throw new exception if not existing
-			if(sizeof($res)==0) 												{ throw new Exception('Subnet not existing'); }
+		/* all subnets in section */
+		elseif($this->sectionId) {
+			//set query
+			$this->query = "select * from `subnets` where `sectionId` = ".$this->sectionId.";";
+			$this->fetchArray();
+			if(sizeof($this->result)==0) 										{ throw new Exception('Invalid section Id or no subnets '.$this->sectionId); }
 		}
-		
-		/** 
-		* method missing 
-		*/
+		/* method missing */
 		else 																	{ throw new Exception('Selector missing'); }
-
-		//create object from results
-		foreach($res as $key=>$line) {
-			$this->$key = $line;
-		}
-		//output format
-		$format = $this->format;
-		//remove input parameters from output
-		unset($this->all);															//remove from result array
-		unset($this->format);
-		unset($this->name);	
-		unset($this->id);
-		unset($this->sectionId);	
+	
 		//convert object to array
-		$result = $this->toArray($this, $format);	
+		$result = $this->Common->toArray($this->result);
+		
+		//reformat?
+		if($this->format == "ip") { $result = $this->Common->format_ip($result); }
+			
 		//return result
 		return $result;
 	}
 
 
 	/**
-	* create new subnet
-	*/
-	public function createSubnet() {
-		# verications
-		if(!isset($this->sectionId) || !is_numeric($this->sectionId)) 			{ throw new Exception('Invalid section Id'); }				//mandatory parameters
-		if(!isset($this->masterSubnetId) || !is_numeric($this->masterSubnetId)) { throw new Exception('Invalid master Subnet Id'); }		//mandatory parameters
-		if(!isset($this->subnet)) 												{ throw new Exception('Invalid subnet'); }					//mandatory parameters
-		if(!isset($this->mask) || !is_numeric($this->mask)) 					{ throw new Exception('Invalid mask'); }					//mandatory parameters
-		if(!is_numeric($this->vrfId))											{ throw new Exception('Invalid VRF Id'); }
-		if(!is_numeric($this->vlanId))											{ throw new Exception('Invalid VRF Id'); }
-		if($this->allowRequests != 0 || $this->allowRequests !=1)				{ throw new Exception('Invalid allow requests value'); }
-		if($this->showName != 0 || $this->showName !=1)							{ throw new Exception('Invalid show Name value'); }
-		if($this->pingSubnet != 0 || $this->pingSubnet !=1)						{ throw new Exception('Invalid ping subnet value'); }
-
-
-		//output format
-		$format = $this->format;
-		
-		//create array to write new section
-		$newSubnet = $this->toArray($this, $format);
-		//create new section
-		$res = UpdateSection2 ($newSection, true);								//true means from API	
-		//return result (true/false)
-		if(!$res) 																{ throw new Exception('Invalid query'); } 
-		else {
-			//format response
-			return "Subnet created";		
-		}
-	}
-	
-
-	/**
-	* function to return multidimensional array
-	*/
-	public function toArray($obj, $format)
+	 *	delete Subnet 
+	 *		id must be provided
+	 *
+	 *		we must also delete all IP addresses if requested!
+	 */	
+	public function deleteSubnet ()
 	{
-		//if object create array
-		if(is_object($obj)) $obj = (array) $obj;
-		if(is_array($obj)) {
-			$arr = array();
-			foreach($obj as $key => $val) {
-				// proper format
-				if($key=="subnet" && $format=="ip") {
-					$val = transform2long($val);
+		//check input
+		$this->Common->check_var ("int", $this->id, null);
+		
+		//verify that it exists
+		try { $this->readSubnet(); }
+		catch (Exception $e) 													{ throw new Exception($e->getMessage()); }
+
+		# we need address class to delete IPs!
+		if($this->addresses) {
+			$Address = new Address;
+			
+			//fetch and delete all ips in subnet
+			$Address->subnetId = $this->id;			//provide subnetis
+			try { $addresses = $Address->readAddress(); }
+			catch (Exception $e) 												{ 
+				//if empty it is ok!
+				if($e->getMessage()=="No addresses") 							{  }
+				else															{ throw new Exception($e->getMessage()); }
+			}
+			
+			//delete all Ips
+			if(sizeof($addresses)>0) {
+				foreach($addresses as $a) {
+					$Address->id = $a['id'];			//provide id
+					//delete
+					try { $addresses = $Address->deleteAddress(); }
+					catch (Exception $e) 										{ throw new Exception($e->getMessage()); }
+					
 				}
-				// output format
-				$arr[$key] = $this->toArray($val, $format);
 			}
 		}
-		else { 
-			$arr = $obj;
-		}
-		//return an array of items
-		return $arr;
+		
+		//set query to delete subnet and execute
+		$this->query = "delete from `subnets` where `id` = ".$this->id.";";
+		$this->executeQuery();
+		
+		//set result
+		$result['result']   = "success";
+		$result['response'] = "subnet id ".$this->id." deleted successfully!";
+
+		//return result
+		return $result;
 	}
+	
 }

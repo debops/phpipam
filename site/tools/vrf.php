@@ -20,7 +20,7 @@ $vrfs = getAllVRFs ();
 print "<h4>"._('Available VRFs and belonging subnets')."</h4>";
 print "<hr>";
 if($admin) {
-	print "<a class='btn btn-sm btn-default' href='administration/manageVRF/' data-action='add'  data-switchid=''><i class='fa fa-pencil'></i> ". _('Manage')."</a>";
+	print "<a class='btn btn-sm btn-default' href='".create_link("administration","manageVRF")."' data-action='add'  data-switchid=''><i class='fa fa-pencil'></i> ". _('Manage')."</a>";
 }
 
 /* for each VRF check which subnet has it configured */
@@ -80,7 +80,7 @@ else {
 	
 				print "	<td>$subnet[VLAN]</td>";
 				print "	<td>$subnet[description]</td>";
-				print "	<td><a href='subnets/$section[id]/$subnet[id]/'>".transform2long($subnet['subnet'])."/$subnet[mask]</a></td>";    
+				print "	<td><a href='".create_link("subnets",$section['id'],$subnet['id'])."'>".transform2long($subnet['subnet'])."/$subnet[mask]</a></td>";    
 	    
 				if($masterSubnet) { 
 					print '	<td>/</td>' . "\n"; 
@@ -89,7 +89,7 @@ else {
 					$master = getSubnetDetailsById ($subnet['masterSubnetId']);
 					# orphaned
 					if(strlen($master['subnet']) == 0)	{ print "	<td><div class='alert alert-warning'>"._('Master subnet does not exist')."!</div></td>";}
-					else 								{ print "	<td><a href='subnets/$subnet[sectionId]/$subnet[masterSubnetId]/'>".transform2long($master['subnet'])."/$master[mask] ($master[description])</a></td>"; }
+					else 								{ print "	<td><a href='".create_link("subnets",$subnet['sectionId'],$subnet['masterSubnetId'])."'>".transform2long($master['subnet'])."/$master[mask] ($master[description])</a></td>"; }
 				}
 	
 				# details

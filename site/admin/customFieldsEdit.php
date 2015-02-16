@@ -19,6 +19,11 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* prevent XSS in action */
+$_POST['action'] = filter_user_input ($_POST['action'], false, true, true);
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* reset field name for add! */
 if($_POST['action'] == "add") 	{ $_POST['fieldName'] = ""; }
 else 							{ $_POST['oldname'] = $_POST['fieldName'];}

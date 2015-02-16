@@ -10,14 +10,12 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
+
 /* get modified details */
 $vrf = $_POST;
-
-/* sanitize post! */
-$vrf['name'] 		= htmlentities($vrf['name'], ENT_COMPAT | ENT_HTML401, "UTF-8");		# prevent XSS
-$vrf['rd'] 			= htmlentities($vrf['rd'], ENT_COMPAT | ENT_HTML401, "UTF-8");			# prevent XSS
-$vrf['description'] = htmlentities($vrf['description'], ENT_COMPAT | ENT_HTML401, "UTF-8");	# prevent XSS
-
 
 /* Hostname must be present! */
 if($vrf['name'] == "") { die('<div class="alert alert-danger">'._('Name is mandatory').'!</div>'); }

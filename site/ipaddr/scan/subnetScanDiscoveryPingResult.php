@@ -10,15 +10,21 @@ require_once('../../../functions/functions.php');
 /* verify that user is logged in */
 isUserAuthenticated(true);
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
+/* subnet Id must be a integer */
+if(!is_numeric($_POST['subnetId']) || $_POST['subnetId']==0)	{ die("<div class='alert alert-danger'>Invalid subnetId!</div>"); }
+
 /* verify that user has write permissions for subnet */
-$subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
+$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 if($subnetPerm < 2) 		{ die('<div class="alert alert-danger">'._('You do not have permissions to modify hosts in this subnet').'!</div>'); }
 
 # verify post
 CheckReferrer();
 
 # ok, lets get results form post array!
-foreach($_REQUEST as $key=>$line) {
+foreach($_POST as $key=>$line) {
 	// IP address
 	if(substr($key, 0,2)=="ip") 			{ $res[substr($key, 2)]['ip_addr']  	= $line; }
 	// description
@@ -28,7 +34,7 @@ foreach($_REQUEST as $key=>$line) {
 
 	//verify that it is not already in table!
 	if(substr($key, 0,2)=="ip") {
-		if(checkDuplicate ($line, $_REQUEST['subnetId']) == true) {
+		if(checkDuplicate ($line, $_POST['subnetId']) == true) {
 			die ("<div class='alert alert-danger'>IP address $line already exists!</div>");
 		}
 	}
@@ -36,7 +42,7 @@ foreach($_REQUEST as $key=>$line) {
 
 # insert entries
 if(sizeof($res)>0) {
-	if(insertScanResults($res, $_REQUEST['subnetId'])) {
+	if(insertScanResults($res, $_POST['subnetId'])) {
 		print "<div class='alert alert-success'>"._("Scan results added to database")."!</div>";
 	}
 }

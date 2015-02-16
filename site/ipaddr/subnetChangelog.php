@@ -8,20 +8,20 @@
 isUserAuthenticated ();
 
 # get clog entries
-$clogs = getChangelogEntries("subnet", $_REQUEST['subnetId']);
+$clogs = getChangelogEntries("subnet", $_GET['subnetId']);
 
 # changelog for allslaves
-$clogsSlaves = getSubnetSlaveChangelogEntries($_REQUEST['subnetId']);
+$clogsSlaves = getSubnetSlaveChangelogEntries($_GET['subnetId']);
 
 # changelog for each IP address, also in slave subnets
-$clogsIP = getSubnetIPChangelogEntries($_REQUEST['subnetId']);
+$clogsIP = getSubnetIPChangelogEntries($_GET['subnetId']);
 
 # get subnet
-$subnetDetails = getSubnetDetailsById ($_REQUEST['subnetId']);
+$subnetDetails = getSubnetDetailsById ($_GET['subnetId']);
 
 
 # permissions
-$permission = checkSubnetPermission ($_REQUEST['subnetId']);
+$permission = checkSubnetPermission ($_GET['subnetId']);
 if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not have permission to access this network')."!</div>"); }
 
 # header
@@ -29,9 +29,9 @@ print "<h4>"._('Subnet')." - "._('Changelog')."</h4><hr>";
 
 # back
 if($subnetDetails['isFolder']==1) {
-	print "<a class='btn btn-sm btn-default' href='folder/$_REQUEST[section]/$_REQUEST[subnetId]/'><i class='fa fa-gray fa-chevron-left'></i> "._('Back to subnet')."</a>";
+	print "<a class='btn btn-sm btn-default' href='".create_link("folder",$_GET['section'],$_GET['subnetId'])."'><i class='fa fa-gray fa-chevron-left'></i> "._('Back to subnet')."</a>";
 } else {
-	print "<a class='btn btn-sm btn-default' href='subnets/$_REQUEST[section]/$_REQUEST[subnetId]/'><i class='fa fa-gray fa-chevron-left'></i> "._('Back to subnet')."</a>";
+	print "<a class='btn btn-sm btn-default' href='".create_link("subnets",$_GET['section'],$_GET['subnetId'])."'><i class='fa fa-gray fa-chevron-left'></i> "._('Back to subnet')."</a>";
 }
 
 
@@ -61,13 +61,14 @@ else {
 	
 	# logs
 	foreach($clogs as $l) {
-	
 		# format diff
 		$l['cdiff'] = str_replace("\n", "<br>", $l['cdiff']);
 	
 		print "<tr>";
 		print "	<td>$l[real_name]</td>";
-		print "	<td><a href='subnets/$l[sectionId]/$l[id]/'>".transform2long($subnetDetails['subnet'])."/$subnetDetails[mask]</a></td>";
+		# folder?
+		if($subnetDetails['isFolder']==1)	{ print "	<td><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'])."'>$subnetDetails[description]</a></td>"; }
+		else 								{ print "	<td><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'])."'>".transform2long($subnetDetails['subnet'])."/$subnetDetails[mask]</a></td>"; }
 		print "	<td>"._("$l[caction]")."</td>";
 		print "	<td>"._("$l[cresult]")."</td>";
 		print "	<td>$l[cdate]</td>";
@@ -109,7 +110,7 @@ if($clogsSlaves) {
 	
 		print "<tr>";
 		print "	<td>$l[real_name]</td>";
-		print "	<td><a href='subnets/$l[sectionId]/$l[id]/'>".transform2long($l['subnet'])."/$l[mask]</a></td>";
+		print "	<td><a href='".create_link("subnets",$l['sectionId'],$l['id'])."'>".transform2long($l['subnet'])."/$l[mask]</a></td>";
 		print "	<td>$l[description]</td>";
 		print "	<td>"._("$l[caction]")."</td>";
 		print "	<td>"._("$l[cresult]")."</td>";
@@ -150,7 +151,7 @@ if($clogsIP) {
 	
 		print "<tr>";
 		print "	<td>$l[real_name]</td>";
-		print "	<td><a href='subnets/$_REQUEST[section]/$l[subnetId]/ipdetails/$l[id]/'>".transform2long($l['ip_addr'])."</a></td>";
+		print "	<td><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"ipdetails",$l['id'])."'>".transform2long($l['ip_addr'])."</a></td>";
 		print "	<td>"._("$l[caction]")."</td>";
 		print "	<td>"._("$l[cresult]")."</td>";
 		print "	<td>$l[cdate]</td>";

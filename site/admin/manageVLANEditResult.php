@@ -10,6 +10,11 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+/* prevent XSS in action */
+$_POST['action'] = filter_user_input ($_POST['action'], false, true, true);
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* get modified details */
 $vlan = $_POST;
 
@@ -22,6 +27,13 @@ if($vlan['action'] == "add") {
 	if(!getVLANbyNumber($vlan['number'])) 	{ }
 	else 									{ die('<div class="alert alert-danger">'._('VLAN already exists').'!</div>'); }	
 }
+}
+
+/* if number too high */
+if($vlan['number']>$settings['vlanMax'])	{ die('<div class="alert alert-danger">'._('Highest possible VLAN number is ').$settings['vlanMax'].'!</div>'); }
+if($vlan['action']=="add") {
+	if($vlan['number']<0)					{ die('<div class="alert alert-danger">'._('VLAN number cannot be negative').'!</div>'); }
+	elseif(!is_numeric($vlan['number']))	{ die('<div class="alert alert-danger">'._('Not number').'!</div>'); }
 }
 
 //custom

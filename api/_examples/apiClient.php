@@ -10,14 +10,16 @@ class ApiCaller
    private $_app_id;
    private $_app_key;
    private $_api_url;
+   private $_api_resp;						// json, array > in which format to return data
     
    //construct an ApiCaller object, taking an
    //APP ID, APP KEY and API URL parameter
-   public function __construct($app_id, $app_key, $api_url)
+   public function __construct($app_id, $app_key, $api_url, $api_resp="array")
    {
-      $this->_app_id = $app_id;
-      $this->_app_key = $app_key;
-      $this->_api_url = $api_url;
+      $this->_app_id 	= $app_id;
+      $this->_app_key 	= $app_key;
+      $this->_api_url 	= $api_url;
+      $this->_api_resp 	= $api_resp;
    }
     
    //send the request to the API server
@@ -58,7 +60,11 @@ class ApiCaller
       }
        
       //if everything went great, return the data
-      return $result['data'];
+      if($this->_api_resp == "json") {
+	      return json_encode($result['data']);
+	  } else {
+	      return ($result['data']);
+	  }
    }
 }
 

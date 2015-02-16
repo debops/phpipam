@@ -11,15 +11,19 @@ checkAdmin();
 # verify post
 CheckReferrer();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
+
 /* http://apps.db.ripe.net/whois/lookup/ripe/inetnum/212.58.224.0-212.58.255.255.html.xml */
 /* http://apps.db.ripe.net/whois/lookup/ripe/inet6num/2102:840::/32.xml */
 
 
 # identify address and set proper url
-$type = IdentifyAddress($_REQUEST['subnet']);
+$type = IdentifyAddress($_POST['subnet']);
 	
-if ($type == "IPv4") 	{ $url = "http://apps.db.ripe.net/whois/lookup/ripe/inetnum/$_REQUEST[subnet].xml"; }
-else 					{ $url = "http://apps.db.ripe.net/whois/lookup/ripe/inet6num/$_REQUEST[subnet].xml"; }
+if ($type == "IPv4") 	{ $url = "http://apps.db.ripe.net/whois/lookup/ripe/inetnum/$_POST[subnet].xml"; }
+else 					{ $url = "http://apps.db.ripe.net/whois/lookup/ripe/inet6num/$_POST[subnet].xml"; }
 
 /* querry ripe db and parse result */
 $xml = @simplexml_load_file($url);

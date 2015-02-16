@@ -7,7 +7,7 @@ require_once( dirname(__FILE__) . '/../../../functions/functions.php' );
 
 /* if direct request that redirect to tools page */
 if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{ 
-	header("Location: ".BASE."administration/logs/");
+	header("Location: ".BASE.create_link("administration","logs"));
 }
 
 /* print last 5 access logs */

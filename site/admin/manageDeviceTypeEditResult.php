@@ -10,6 +10,11 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+/* must be numeric */
+if($_POST['action']!="add") {
+	if(!is_numeric($_POST['tid']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+}
+
 /* Hostname must be present! */
 if($_POST['tname'] == "") {
 	die('<div class="alert alert alert-danger">'._('Name is mandatory').'!</div>');

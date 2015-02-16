@@ -7,6 +7,10 @@
 # if slaves reset IP addresses!
 $slaves = getAllSlaveSubnetsBySubnetId ($subnetId); 
 
+# check number of hosts for all subnets, including sub-subnets!
+if(sizeof($slaves)>0) {
+	$ipaddresses = getIpAddressesBySubnetIdSlavesSort ($subnetId);
+}
 
 # for statistics we need to deduct 2 for each subnet bigger than /31
 $d=0;
@@ -14,11 +18,6 @@ foreach($slaves as $s) {
 	if($s['mask']<31) {
 		$d=$d+2;
 	}
-}
-
-# slaves details are provided with ipaddressprintslaves script
-if(sizeof($slaves)>0) {
-	$ipaddresses   = getIpAddressesBySubnetIdSlavesSort ($subnetId);
 }
 
 # get offline, reserved and DHCP

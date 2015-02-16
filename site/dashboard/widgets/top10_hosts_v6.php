@@ -18,7 +18,9 @@ $height = 200;
 $slimit = 10;
 
 # get widget parameters
-$widget = getWidgetByFile($_REQUEST['subpage']);
+if(strlen(@$_REQUEST['section'])>0) {
+	$widget = getWidgetByFile($_REQUEST['section']);	
+}
 
 # if direct request include plot JS 
 if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{ 
@@ -37,7 +39,7 @@ if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{
 
 # get subnets statistic
 $type = 'IPv6';
-$subnetHost = getSubnetStatsDashboard($type, $slimit, false);
+$subnetHost = getSubnetStatsDashboard($type, 1000000, false);
 
 /* detect duplicates */
 $unique = array();	
@@ -74,11 +76,11 @@ $(function () {
 					$subnet['descriptionLong'] = $subnet['description'];
 					# odd/even if more than 5 items
 					if(sizeof($subnetHost) > 5) {
-						if ($m&1) 	{ print "['|<br>$subnet[description]', $subnet[usage], '$subnet[descriptionLong] ($subnet[subnet]/$subnet[mask])'],";	}
-						else		{ print "['$subnet[description]', $subnet[usage], '$subnet[descriptionLong] ($subnet[subnet]/$subnet[mask])'],";	}
+						if ($m&1) 	{ print "['|<br>" . addslashes($subnet[description]) . "', $subnet[usage], '" . addslashes($subnet[descriptionLong]) . " ($subnet[subnet]/$subnet[mask])'],";	}
+						else		{ print "['" . addslashes($subnet[description]) . "', $subnet[usage], '" . addslashes($subnet[descriptionLong]) . " ($subnet[subnet]/$subnet[mask])'],";	}
 					}
 					else {
-									{ print "['$subnet[description]', $subnet[usage], '$subnet[descriptionLong] ($subnet[subnet]/$subnet[mask])'],";	}			
+									{ print "['" . addslashes($subnet[description]) . "', $subnet[usage], '" . addslashes($subnet[descriptionLong]) . " ($subnet[subnet]/$subnet[mask])'],";	}			
 					}	
 					# next
 					$m++;
@@ -202,10 +204,28 @@ $(function () {
     		mouseActiveRadius: 3
     		}
     };
-    
+
+	<?php
+	if($m!=0) {
+	?>
     $.plot($("#<?php print $type; ?>top10Hosts"), [ data ], options);
+    <?php } else { ?>
+    $("#IPv6top10Hosts").hide();
+    <?php } ?>
 });
 </script>
+
+<?php
+if($m==0) {
+	print "<hr>";
+
+	print "<blockquote style='margin-top:20px;margin-left:20px;'>";
+	print "<p>"._("No $type hosts configured")."</p>";
+	print "<small>"._("Add some hosts to subnets to show graph of used hosts per subnet")."</small>";
+	print "</blockquote>";
+}
+?>
+
 
 <?php
 }

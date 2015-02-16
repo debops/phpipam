@@ -140,7 +140,7 @@ if(sizeof($uwidgets)>1) {
 				print "	<div class='col-xs-12 col-sm-12 col-md-12 col-lg-$wdet[wsize] widget-dash' id='w-$wdet[wfile]'>";
 				print "	<div class='inner'><i class='fa fa-times remove-widget icon-action fa-gray pull-right'></i>";
 				// href?
-				if($wdet['whref']=="yes")	{ print "<a href='widgets/$wdet[wfile]/'> <h4>"._($wdet['wtitle'])."<i class='fa fa-external-link fa-gray pull-right'></i></h4></a>"; }
+				if($wdet['whref']=="yes")	{ print "<a href='".create_link("widgets",$wdet['wfile'])."'> <h4>"._($wdet['wtitle'])."<i class='fa fa-external-link fa-gray pull-right'></i></h4></a>"; }
 				else						{ print "<h4>"._($wdet['wtitle'])."</h4>"; }
 				print "		<div class='hContent'>";
 				print "			<div style='text-align:center;padding-top:50px;'><strong>"._('Loading statistics')."</strong><br><i class='fa fa-spinner fa-spin'></i></div>";

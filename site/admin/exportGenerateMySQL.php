@@ -13,12 +13,16 @@ ini_set('display_errors', 0);
 checkAdmin();
 
 //set filename
-$filename = "phpipam_IP_adress_export_". date("Y-m-d") .".sql";
+$filename = "phpipam_MySQL_dump_". date("Y-m-d") .".sql";
 
 //set content
 /* $command = "mysqldump --opt -h $db['host'] -u $db['user'] -p $db['pass'] $db['name'] | gzip > $backupFile"; */
 $command = "mysqldump --opt -h ". $db['host'] ." -u ". $db['user'] ." -p". $db['pass'] ." ". $db['name'];
-$content = shell_exec($command);
+
+$content  = "# phpipam Database dump \n";
+$content .= "#    command executed: $command \n";
+$content .= "# --------------------- \n\n";
+$content .= shell_exec($command);
 
 /* headers */
 header("Cache-Control: private");

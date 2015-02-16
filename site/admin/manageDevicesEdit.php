@@ -10,8 +10,18 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+/* prevent XSS in action */
+$_POST['action'] = filter_user_input ($_POST['action'], false, true, true);
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* get custom fields */
 $custom = getCustomFields('devices');
+
+/* must be numeric */
+if($_POST['action']!="add") {
+	if(!is_numeric($_POST['switchId']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+}
 
 /* get switch detaild by Id! */
 if( ($_POST['action'] == "edit") || ($_POST['action'] == "delete") ) {

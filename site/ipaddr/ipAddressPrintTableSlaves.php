@@ -9,7 +9,7 @@ $('body').tooltip({ selector: '[rel=tooltip]' });
  ***************************************************************************************/
 
 /* get master subnet ID */
-$subnetId = $_REQUEST['subnetId'];
+$subnetId = $_GET['subnetId'];
 
 /* get all slaves */
 $slaves = getAllSlaveSubnetsBySubnetId ($subnetId);
@@ -49,6 +49,7 @@ $m = 0;
 foreach ($slaves as $slave) {
 
 	# if first check for free space
+	if($settings['hideFreeRange']!=1) {
 	if($m == 0) {
 		# if master start != first slave start print free space
 		if($master['subnet'] != $slave['subnet']) {
@@ -60,8 +61,7 @@ foreach ($slaves as $slave) {
 			print "	<td class='small description'><a href='#' data-sectionId='$section[id]' data-masterSubnetId='$subnetId' class='btn btn-sm btn-default createfromfree' data-cidr='".getFirstPossibleSubnet(transform2long($master['subnet']) , $diff, false)."'><i class='fa fa-plus'></i></a> "._('Free space')."</td>";
 			print "	<td colspan='5'>". transform2long($master['subnet']) ." - ". transform2long(gmp_strval(gmp_add($master['subnet'], gmp_sub($diff,1)))) ." ( ".$diff." )</td>";
 			print "</tr>";
-		}
-	}
+	}	}	}
 
 	
 	# reformat empty VLAN
@@ -73,17 +73,16 @@ foreach ($slaves as $slave) {
 	
 	print "<tr>";
     print "	<td class='small'>$slave[VLAN]</td>";
-    print "	<td class='small description'><a href='subnets/$section[id]/$slave[id]/'>$slave[description]</a></td>";
-    print "	<td><a href='subnets/$section[id]/$slave[id]/'>".transform2long($slave['subnet'])."/$slave[mask]</a></td>";
+    print "	<td class='small description'><a href='".create_link("subnets",$section['id'],$slave['id'])."'>$slave[description]</a></td>";
+    print "	<td><a href='".create_link("subnets",$section['id'],$slave['id'])."'>".transform2long($slave['subnet'])."/$slave[mask]</a></td>";
     
     # count IP addresses
 	$hasSlaves = getAllSlaveSubnetsBySubnetId ($slave['id']); 
 
 	# slaves details are provided with ipaddressprintslaves script
-	if(sizeof($hasSlaves)>0)	{ $ipCount = sizeof(getIpAddressesBySubnetIdSlavesSort ($slave['id'])); }	//ip count - slaves
-	else 						{ $ipCount = countIpAddressesBySubnetId ($slave['id']);	}					//ip count - direct subnet  
+	if(sizeof($hasSlaves)>0)	{ $ipCount = countAllSlaveIPAddresses ($slave['id']); }		//ip count - all slaves
+	else 						{ $ipCount = countIpAddressesBySubnetId ($slave['id']);	}	//ip count - direct subnet  
 
-    
 	$calculate = calculateSubnetDetails ( gmp_strval($ipCount), $slave['mask'], $slave['subnet'] );
     print ' <td class="small hidden-xs hidden-sm hidden-md">'. $calculate['used'] .'/'. $calculate['maxhosts'] .'</td>'. "\n";
     print '	<td class="small hidden-xs hidden-sm hidden-md">'. $calculate['freehosts_percent'] .'</td>';
@@ -123,6 +122,7 @@ foreach ($slaves as $slave) {
 	
 	
 	# check if some free space between this and next subnet
+	if($settings['hideFreeRange']!=1) {
 	if(isset($slaves[$m+1])) {
 		# get IP type
 		if ( IdentifyAddress( $master['subnet'] ) == "IPv4") 	{ $type = 0; }
@@ -131,8 +131,9 @@ foreach ($slaves as $slave) {
 		# set $diffAdd based on mask!
 		if($slaves[$m]['mask'] == "32")		{ $diffAdd = 0; }
 		elseif($slaves[$m]['mask'] == "31")	{ $diffAdd = 0; }
+		elseif($type==1)					{ $diffAdd = 0; }
 		else								{ $diffAdd = 2; }
-		
+
 		# get max host for current
 		$slave['maxip'] = gmp_strval(gmp_add(MaxHosts($slave['mask'],$type),$diffAdd));
 		# calculate diff
@@ -145,8 +146,7 @@ foreach ($slaves as $slave) {
 			print "	<td class='small description'><a href='#' data-sectionId='$section[id]' data-masterSubnetId='$subnetId' class='btn btn-sm btn-default createfromfree' data-cidr='".getFirstPossibleSubnet(transform2long(gmp_strval(gmp_add($slave['maxip'], $slave['subnet']))) , $diff, false)."'><i class='fa fa-plus'></i></a> "._('Free space')."</td>";
 			print "	<td colspan='5'>". transform2long(gmp_strval(gmp_add($slave['maxip'], $slave['subnet']))) ." - ". transform2long(gmp_strval(gmp_add(gmp_add($slave['maxip'], $slave['subnet']), gmp_sub($diff,1)))) ." ( ".$diff." )</td>";
 			print "</tr>";			
-		}		
-	}
+		}	}	}
 	
 	# next - for free space check
 	$m++;	
@@ -160,6 +160,7 @@ foreach ($slaves as $slave) {
 		# set $diffAdd based on mask!
 		if($slaves[$m-1]['mask'] == "32")		{ $diffAdd = 0; }
 		elseif($slaves[$m-1]['mask'] == "31")	{ $diffAdd = 0; }
+		elseif($type==1)						{ $diffAdd = 0; }
 		else									{ $diffAdd = 2; }
 		
 		# calculate end of master and last slave
@@ -172,13 +173,14 @@ foreach ($slaves as $slave) {
 		$diff   = gmp_strval(gmp_sub($max_m, $max_s));
 	
 		# if slave stop < master stop print free space
+		if($settings['hideFreeRange']!=1) {
 		if($max_m > $max_s) {			
 			print "<tr class='success'>";
 			print "	<td></td>";
 			print "	<td class='small description'><a href='#' data-sectionId='$section[id]' data-masterSubnetId='$subnetId' class='btn btn-sm btn-default createfromfree' data-cidr='".getFirstPossibleSubnet(transform2long(gmp_strval(gmp_sub($max_m, $diff))) , $diff, false)."'><i class='fa fa-plus'></i></a> "._('Free space')."</td>";
 			print "	<td colspan='5'>". transform2long(gmp_strval(gmp_sub($max_m, $diff))) ." - ". transform2long(gmp_strval(gmp_sub($max_m, 1))) ." ( $diff )</td>";
 			print "</tr>";
-		}	
+		}	}
 	}
 
 }

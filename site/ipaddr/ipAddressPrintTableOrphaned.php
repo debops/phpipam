@@ -99,7 +99,7 @@ if(sizeof($ipaddresses) > 0) {
 ?>
 
 	<!-- actions -->
-	<th class="actions" width="10px"></th>
+	<th class="actions"></th>
 
 </tr>
 </tbody>
@@ -166,11 +166,9 @@ foreach($ipaddresses as $ipaddress)
 		
 			# print action links if user can edit 
 			print "<td class='btn-actions'>";
-			print "	<div class='btn-toolbar'>";
 			print "	<div class='btn-group'>";
 			print "		<a class='move_ipaddress   btn btn-xs btn-default moveIPaddr' data-action='move'   data-subnetId='$SubnetDetails[id]' data-id='".$ipaddress['id']."' href='#' rel='tooltip' title='"._('Move to different subnet')."'>		<i class='fa fa-gray fa-pencil'>  </i></a>";
 			print "		<a class='delete_ipaddress btn btn-xs btn-default modIPaddr'  data-action='delete' data-subnetId='$SubnetDetails[id]' data-id='".$ipaddress['id']."' href='#' rel='tooltip' title='"._('Delete IP address')."'>				<i class='fa fa-gray fa-times'>  </i></a>";
-			print "	</div>";
 			print "	</div>";
 			print "</td>";		
 

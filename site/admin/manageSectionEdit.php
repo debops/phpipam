@@ -13,6 +13,11 @@ checkAdmin();
 /* verify post */
 CheckReferrer();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
+
+
 /**
  * Fetch section info
  */
@@ -63,7 +68,8 @@ $section = getSectionDetailsById ($_POST['sectionId']);
 					<?php
 					$sections = fetchsections(false);
 					foreach($sections as $s) {
-						if($s['masterSection']==0) {
+						# show only roots and ignore self
+						if($s['masterSection']==0 && $s['id']!=$_POST['sectionId']) {
 							if($s['id']==$section['masterSection'])	{ print "<option value='$s[id]' selected='selected'>$s[name]</option>"; }
 							else									{ print "<option value='$s[id]'>$s[name]</option>"; }
 						}
@@ -214,7 +220,7 @@ $section = getSectionDetailsById ($_POST['sectionId']);
 	<!-- delete warning -->
 	<?php
 	if ($_POST['action'] == "delete") {
-		print '<div class="alert alert-warning"><b>'._('Warning').'!</b><br>'._('Deleting Section will delete all belonging subnets and IP addresses').'!</div>' . "\n";
+		//print '<div class="alert alert-warning"><b>'._('Warning').'!</b><br>'._('Deleting Section will delete all belonging subnets and IP addresses').'!</div>' . "\n";
 	}
 	?>
 </div>

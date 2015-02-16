@@ -17,7 +17,7 @@ $typeTypes = getAllDeviceTypes();
 <hr>
 
 <div class="btn-group">
-	<a href="administration/manageDevices/" class="btn btn-sm btn-default"><i class='fa fa-angle-left'></i> <?php print _('Back'); ?></a>
+	<a href="<?php print create_link("administration", "manageDevices"); ?>" class="btn btn-sm btn-default"><i class='fa fa-angle-left'></i> <?php print _('Back'); ?></a>
 	<button class='btn btn-sm btn-default editDevType' data-action='add'   data-tid='' style='margin-bottom:10px;'><i class='fa fa-plus'></i> <?php print _('Add device type'); ?></button>
 </div>
 

@@ -10,6 +10,12 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
+/* must be numeric */
+if(!is_numeric($_POST['gid']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
 /* parse result */
 foreach($_POST as $k=>$p) {
 	if(substr($k, 0,4) == "user") {

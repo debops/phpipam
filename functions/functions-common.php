@@ -27,8 +27,263 @@ function CheckReferrer()
 }
 
 
+/**
+ * create links function
+ *
+ *	if rewrite is enabled in settings use rewrite, otherwise ugly links
+ *
+ *	levels: page=$1&section=$2&subnetId=$3&sPage=$4&ipaddrid=$5
+ */
+function create_link($l1 = null, $l2 = null, $l3 = null, $l4 = null, $l5 = null, $install = false )
+{
+	# get settings
+	global $settings;
+	if(!isset($settings) && !$install) { $settings = getAllSettings(); }
+	
+	# set rewrite
+	if($settings['prettyLinks']=="Yes") {
+		if(!is_null($l5))		{ $link = "$l1/$l2/$l3/$l4/$l5/"; }
+		elseif(!is_null($l4))	{ $link = "$l1/$l2/$l3/$l4/"; }
+		elseif(!is_null($l3))	{ $link = "$l1/$l2/$l3/"; }
+		elseif(!is_null($l2))	{ $link = "$l1/$l2/"; }
+		elseif(!is_null($l1))	{ $link = "$l1/"; }
+		else					{ $link = ""; }
+	}
+	# normal
+	else {
+		if(!is_null($l5))		{ $link = "?page=$l1&section=$l2&subnetId=$l3&sPage=$l4&ipaddrid=$l5"; }
+		elseif(!is_null($l4))	{ $link = "?page=$l1&section=$l2&subnetId=$l3&sPage=$l4"; }
+		elseif(!is_null($l3))	{ $link = "?page=$l1&section=$l2&subnetId=$l3"; }
+		elseif(!is_null($l2))	{ $link = "?page=$l1&section=$l2"; }
+		elseif(!is_null($l1))	{ $link = "?page=$l1"; }
+		else					{ $link = ""; }
+	}
+	
+	# result
+	return $link;
+}
+
+
+
+/**
+ *	verify GET parameters
+ *
+ *		we need to make sure that GET parameters are valid for phpipam scheme
+ */
+validate_get ($_GET);
+function validate_get ($get)
+{
+	# l1 check
+	if(isset($get['page']))	{
+		$valid = array("administration","dashboard","install","ipaddr","login","tools","upgrade","error","subnets","folder","vlan","vrf","request_ip","widgets");
+		if(!in_array($get['page'], $valid)) {
+			header("Location:".create_link("error","406"));
+		}
+	}
+	# validate all post vars
+	if(sizeof($get)>0) {
+	foreach($get as $g) {
+	    if(preg_match('/[^A-Za-z0-9_.#\\-$]/', $g)) {
+	    	# permit for search
+	    	if($get['section']!="search") {
+		    header("Location:".create_link("error","406"));
+	}	}	}	}
+}
+
+
+/**
+ *	create URL
+ */
+function createURL ()
+{
+	# reset url for base
+	if($_SERVER['SERVER_PORT'] == "443") 		{ $url = "https://$_SERVER[HTTP_HOST]".BASE; }
+	// reverse proxy doing SSL offloading
+	elseif(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') 	{ $url = "https://$_SERVER[SERVER_NAME]".BASE; }
+	elseif(isset($_SERVER['HTTP_X_SECURE_REQUEST'])  && $_SERVER['HTTP_X_SECURE_REQUEST'] == 'true') 	{ $url = "https://$_SERVER[SERVER_NAME]".BASE; }
+	// custom port
+	elseif($_SERVER['SERVER_PORT']!="80")  		{ $url = "http://$_SERVER[HTTP_HOST]:$_SERVER[SERVER_PORT]".BASE; }
+	// normal http
+	else								 		{ $url = "http://$_SERVER[HTTP_HOST]".BASE; }
+	
+	//result
+	return $url;
+}
+
+
+
+
+/**
+ * protect against injections
+ *
+ *	sql protects against SQL injections (mysql_escape_string)
+ *	xss protects agains XSS injections (strip_tags)
+ *	action sets permitted actions!
+ */
+function filter_user_input ($input, $sql = true, $xss = true, $actions = false)
+{
+	# XSS
+	if($xss) {
+
+		if(is_array($input)) {
+			foreach($input as $k=>$v) { $input[$k] = strip_tags($v); }
+		}
+		else {
+			$input = strip_tags($input);
+		}		
+	}
+
+	# sql?
+	if($sql) {
+		global $database;
+		
+		if(is_array($input)) {
+			foreach($input as $k=>$v) { $input[$k] = $database->real_escape_string($v); }
+		}
+		else {
+			$input = $database->real_escape_string($input);
+		}
+	}
+	
+	# actions
+	if($actions) {
+		$permitted = array("add", "edit", "delete", "truncate", "split", "resize", "move");
+		if(!in_array($input, $permitted)) {
+			die("<div class='alert alert-danger'>Invalid action!</div>");
+		}
+	}
+	
+	
+	return $input;
+}
+
+
+/**
+ *	Trim user input
+ */
+function trim_user_input($input)
+{
+	if(is_array($input)) {
+		foreach($input as $k=>$v) { $input[$k] = trim($v); }
+	}
+	else {
+		$input = $database->trim($input);
+	}
+	
+	return $input;
+}
+
+
+
+
+
+
+
+
+/* @crypt functions */
+
+/**
+ *	function to crypt user pass, randomly generates salt. Use sha256 if possible, otherwise Blowfish or md5 as fallback
+ *
+ *		types:	
+ *			CRYPT_MD5 == 1   		(Salt starting with $1$, 12 characters )
+ *			CRYPT_BLOWFISH == 1		(Salt starting with $2a$. The two digit cost parameter: 09. 22 characters )
+ *			CRYPT_SHA256 == 1		(Salt starting with $5$rounds=5000$, 16 character salt.)
+ *			CRYPT_SHA512 == 1		(Salt starting with $6$rounds=5000$, 16 character salt.)
+ *
+ */
+function crypt_user_pass($input)
+{
+	# initialize salt
+	$salt = "";
+	# set possible salt characters in array
+	$salt_chars = array_merge(range('A','Z'), range('a','z'), range(0,9));
+	# loop to create salt
+	for($i=0; $i < 22; $i++) { $salt .= $salt_chars[array_rand($salt_chars)]; }
+	# get prefix
+	$prefix = detect_crypt_type();
+	# return crypted variable
+	return crypt($input, $prefix.$salt);
+}
+
+/**
+ *	this function will detect highest crypt type to use for system
+ */
+function detect_crypt_type () {
+	if(CRYPT_SHA512 == 1)		{ return '$6$rounds=3000$'; }
+	elseif(CRYPT_SHA512 == 1)	{ return '$5$rounds=3000$'; }
+	elseif(CRYPT_BLOWFISH == 1)	{ return '$2y$'; }
+	elseif(CRYPT_MD5 == 1)		{ return '$5$rounds=3000$'; }
+	else						{ die("<div class='alert alert-danger'>No crypt types supported!</div>"); }
+}
+
+
+
+
+
 
 /* @user based functions ---------- */
+
+
+
+if(!function_exists(check_blocked_ip)) {
+/**
+ *	check
+ */
+function check_blocked_ip ($ip) 
+{
+	# first purge
+	purge_blocked_entries();
+	
+    global $db;                                                                      
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);
+	# set date
+	$now = date("Y-m-d H:i:s", time() - 5*60);
+    
+    # set check query and get result
+    $query = "select * from `loginAttempts` where `ip` = '$ip' and `datetime` > '$now';";
+    
+    # execute
+    try { $ips = $database->getArray( $query ); }
+    catch (Exception $e) { 
+        return false;
+    }
+    
+    # verify
+    if(sizeof($ips[0])>0)	{ return $ips[0]['count']; }
+    else					{ return false; }
+}
+ 
+/**
+ *	purge records
+ */
+function purge_blocked_entries()
+{
+    global $db;                                                                      
+    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);
+	# set date
+	$now = date("Y-m-d H:i:s", time() - 5*60);
+	# query
+	$query = "delete from `loginAttempts` where `datetime` < '$now'; ";
+
+    # execute
+    try { $database->executeQuery( $query ); }
+    catch (Exception $e) {}
+    # return
+    return true;
+}
+}
+
+
+
+/**
+ * reset inactivity time
+ */
+function reset_inactivity_time()
+{
+	$_SESSION['lastactive'] = time();
+}
+ 
 
 /**
  * Functions to check if user is authenticated properly for ajax-loaded pages
@@ -37,19 +292,18 @@ function CheckReferrer()
 function isUserAuthenticated($die = true) 
 {	
     /* open session and get username / pass */
-	if (!isset($_SESSION)) {  session_start(); }
+	if (!isset($_SESSION)) {  global $phpsessname; if(strlen($phpsessname)>0) { session_name($phpsessname); }  session_start(); }
     /* redirect if not authenticated */
     if (empty($_SESSION['ipamusername'])) {
     	# save requested page
     	$_SESSION['phpipamredirect'] = $_SERVER['HTTP_REFERER'];												//here we need referrer
-    	
-    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
-    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].BASE; }
-    	else								 	{ $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
+    	    	
+    	$url = createURL ();
     	# die
-    	if($die) { die('<div class="alert alert-danger"><a href="'.$url.'login/">'._('Please login first').'!</a></div>'); }
-    	else	 { die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-danger'>"._('Please login first')."!</div></div><div class='pFooter'><a class='btn btn-sm btn-default' href='".$url."login/'>"._('Login')."</a>"); }
+    	if($die) { die('<div class="alert alert-danger"><a href="'.$url.create_link("login").'">'._('Please login first').'!</a></div>'); }
+    	else	 { die("<div class='pHeader'>"._('Error')."</div><div class='pContent'><div class='alert alert-danger'>"._('Please login first')."!</div></div><div class='pFooter'><a class='btn btn-sm btn-default' href='".$url.create_link("login")."'>"._('Login')."</a>"); }
     }
+
     /* close session */
     session_write_close();
 }
@@ -63,18 +317,29 @@ function isUserAuthenticated($die = true)
 function isUserAuthenticatedNoAjax () 
 {
     /* open session and get username / pass */
-	if (!isset($_SESSION)) { session_start(); }
+	if (!isset($_SESSION)) { global $phpsessname; if(strlen($phpsessname)>0) { session_name($phpsessname); }  session_start(); }
     /* redirect if not authenticated */
     if (empty($_SESSION['ipamusername'])) {
     	# save requested page
     	$_SESSION['phpipamredirect'] = $_SERVER['SCRIPT_URI'];
     	
-    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
-    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].BASE; }
-    	else								 	{ $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
+    	$url = createURL ();
     	# redirect
-    	header("Location:".$url."login/");    
+    	header("Location:".$url.create_link("login","timeout"));    
     }
+    else {
+	    if($_GET['page']!="login" && $_GET['page']!="request_ip" && $_GET['page']!="upgrade" && $_GET['page']!="install") {
+		    global $settings;
+	    	/* check inactivity time */
+			if( strlen($settings['inactivityTimeout']>0) && (time()-$_SESSION['lastactive']) > $settings['inactivityTimeout']) {
+	    		# redirect
+	    		$url = createURL ();
+				header("Location:".$url.create_link("login","timeout")); 			
+			}
+		}
+		reset_inactivity_time();
+    }
+    
     /* close session */
     session_write_close();    
 }
@@ -83,29 +348,27 @@ function isUserAuthenticatedNoAjax ()
 /**
  * Check if user is admin
  */
-function checkAdmin ($die = true, $startSession = true) 
-{
-    global $db;                                                                      # get variables from config file
-    
+function checkAdmin ($die = true) 
+{    
     /* first get active username */
-    if(!isset($_SESSION)) { session_start(); }
+    if(!isset($_SESSION)) { global $phpsessname; if(strlen($phpsessname)>0) { session_name($phpsessname); }  session_start(); }
     $ipamusername = $_SESSION['ipamusername'];
     session_write_close();
     
     /* set check query and get result */
-    $database = new database ($db['host'], $db['user'], $db['pass'], $db['name']);
+    global $database;
 
     /* Check connection */
     if ($database->connect_error) {
-    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['SERVER_NAME'].BASE; }
-    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].BASE; }
-    	else								 	{ $url = "http://".$_SERVER['SERVER_NAME'].BASE; }
+    	if($_SERVER['SERVER_PORT'] == "443") 	{ $url = "https://".$_SERVER['HTTP_HOST'].BASE; }
+    	elseif($_SERVER['SERVER_PORT']!="80")	{ $url = "http://".$_SERVER['HTTP_HOST'].":".$_SERVER['SERVER_PORT'].BASE; }
+    	else								 	{ $url = "http://".$_SERVER['HTTP_HOST'].BASE; }
     	# redirect
-    	header("Location:".$url."login/");  
+    	header("Location:".$url.create_link("login"));  
 	}
 
 	/* set query if database exists! */
-    $query = 'select role from users where username = "'. $ipamusername .'";';
+    $query = 'select role from users where `username` = "'. $ipamusername .'";';
     
     /* fetch role */
     try { $role = $database->getRow( $query ); }
@@ -114,8 +377,6 @@ function checkAdmin ($die = true, $startSession = true)
         die ("<div class='alert alert-danger'>"._('Error').": $error</div>");
     } 
 
-    /* close database connection */
-    $database->close();
     
     /* return true if admin, else false */
     if ($role[0] == "Administrator") {
@@ -136,8 +397,7 @@ function checkAdmin ($die = true, $startSession = true)
  */
 function getActiveUserDetails ()
 {
-/*     session_start(); */
-	if (!isset($_SESSION)) { session_start(); }
+	if (!isset($_SESSION)) { global $phpsessname; if(strlen($phpsessname)>0) { session_name($phpsessname); }  session_start(); }
 
 	if(isset($_SESSION['ipamusername'])) {
     	return getUserDetailsByName ($_SESSION['ipamusername']);
@@ -151,10 +411,10 @@ function getActiveUserDetails ()
  */
 function getAllUsers ()
 {
-    global $db;                                                                      # get variables from config file
+    global $database; 
+
     /* set query, open db connection and fetch results */
     $query    = 'select * from users order by `role` asc, `real_name` asc;';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
 
     /* execute */
     try { $details = $database->getArray( $query ); }
@@ -174,10 +434,9 @@ function getAllUsers ()
  */
 function getNumberOfUsers ()
 {
-    global $db;                                                                      # get variables from config file
+    global $database; 
     /* set query, open db connection and fetch results */
-    $query    = 'select count(*) as count from users order by id desc;';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+    $query    = 'select count(*) as count from users;';
 
     /* execute */
     try { $details = $database->getArray( $query ); }
@@ -197,10 +456,17 @@ function getNumberOfUsers ()
  */
 function getAllAdminUsers ()
 {
-    global $db;                                                                      # get variables from config file
+    global $database; 
+    
+    /* check for possible errors because of cron */
+    if(isset($database->error)) {
+	    unset($database);
+	    global $db;
+	    $database = new database($db['host'], $db['user'], $db['pass'], $db['name'], NULL, false);
+    }
+    
     /* set query, open db connection and fetch results */
     $query    = 'select * from users where `role` = "Administrator" order by id desc;';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
 
     /* execute */
     try { $details = $database->getArray( $query ); }
@@ -220,44 +486,84 @@ function getAllAdminUsers ()
  */
 function getUserDetailsById ($id)
 {
-    global $db;                                                                      # get variables from config file
-    /* set query, open db connection and fetch results */
-    $query    = 'select * from users where id = "'. $id .'";';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
-
-    /* execute */
-    try { $details = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
-        return false;
-    } 
-    
-    /* return results */
-    return($details[0]);
+	# check if already in cache
+	if($user = checkCache("user", $id)) {
+		return $user;
+	}
+	# query
+	else {
+	    global $database; 
+	    /* set query, open db connection and fetch results */
+	    $query    = 'select * from users where id = "'. $id .'";';
+	
+	    /* execute */
+	    try { $details = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        return false;
+	    } 
+	    
+	    # save cache - id and name
+	    writeCache("user", $id, $details[0]);
+	    writeCache("user", $details[0]['username'], $details[0]);
+	    
+	    /* return results */
+	    return($details[0]);
+	}
 }
 
 
 /**
  * Get user details by name
  */
-function getUserDetailsByName ($username)
+function getUserDetailsByName ($username, $killsession = true)
 {
-    global $db;                                                                      # get variables from config file
-    /* set query, open db connection and fetch results */
-    $query    = 'select * from users where username LIKE BINARY "'. $username .'";';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+	# check if already in cache
+	if($user = checkCache("user", $username)) {
+		return $user;
+	}
+	# query
+	else {
+		# for db upgrade!
+		if(strpos($_SERVER['SCRIPT_URI'], "databaseUpgrade.php")>0) {
+			global $db;
+			$database = new database($db['host'], $db['user'], $db['pass'], $db['name']);
+		}
+		else {
+			global $database;
+		} 
+	    /* set query, open db connection and fetch results */
+	    $query    = 'select * from users where `username` = "'. $username .'";';
 
-    /* execute */
-    try { $details = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
-        return false;
-    } 
-    
-    /* return results */
-    return($details[0]);
+	    /* execute */
+	    try { $details = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        return false;
+	    } 
+	    
+	    # result must be more than 1!
+	    if(!isset($details[0]))	{
+	    	if($killsession) {
+		    	global $phpsessname; 
+		    	if(strlen($phpsessname)>0) { session_name($phpsessname); }  
+		    	session_start();
+		    	session_destroy();
+			  	return false;
+		  	}
+	    }
+	    else {
+		    # save cache - id and name
+		    writeCache("user", $details[0]['id'], $details[0]);
+		    writeCache("user", $username, $details[0]);
+		    
+		    /* return results */
+		    return($details[0]);		    
+	    }
+		
+	}
 }
 
 /**
@@ -265,10 +571,9 @@ function getUserDetailsByName ($username)
  */
 function getUserLang ($username)
 {
-    global $db;                                                                      # get variables from config file
+    global $database; 
     /* set query, open db connection and fetch results */
     $query    = 'select `lang`,`l_id`,`l_code`,`l_name` from `users` as `u`,`lang` as `l` where `l_id` = `lang` and `username` = "'.$username.'";;';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
 
     /* execute */
     try { $details = $database->getArray( $query ); }
@@ -288,10 +593,9 @@ function getUserLang ($username)
  */
 function getLanguages ()
 {
-    global $db;                                                                      # get variables from config file
+    global $database; 
     /* set query, open db connection and fetch results */
     $query    = 'select * from `lang`;';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
 
     /* execute */
     try { $details = $database->getArray( $query ); }
@@ -311,21 +615,29 @@ function getLanguages ()
  */
 function getLangById ($id)
 {
-    global $db;                                                                      # get variables from config file
-    /* set query, open db connection and fetch results */
-    $query    = 'select * from `lang` where `l_id` = "'.$id.'";';
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+	# check cache
+	if($vtmp = checkCache("lang", $id)) {
+		return $vtmp;
+	}
+	else {
 
-    /* execute */
-    try { $details = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
-        return false;
-    } 
-    
-    /* return results */
-    return($details[0]);
+	    global $database; 
+	    /* set query, open db connection and fetch results */
+	    $query    = 'select * from `lang` where `l_id` = "'.$id.'";';
+	
+	    /* execute */
+	    try { $details = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        return false;
+	    } 
+	    
+	    # save cache
+	    writeCache("lang", $id, $details[0]);
+	    /* return results */
+	    return($details[0]);
+	}
 }
 
 
@@ -334,8 +646,7 @@ function getLangById ($id)
  */
 function getAllWidgets($admin = false, $inactive = false)
 {
-    global $db; 
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    global $database;
     
 	# inactive also - only for administration
 	if($inactive) 	{ $query = "select * from `widgets`; ";
@@ -369,8 +680,7 @@ function getAllWidgets($admin = false, $inactive = false)
  */
 function getWidgetById($wid)
 {
-    global $db; 
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    global $database;
 	# query
 	$query = "select * from `widgets` where `wid` = '$wid'; ";
 
@@ -392,8 +702,7 @@ function getWidgetById($wid)
  */
 function getWidgetByFile($wfile)
 {
-    global $db; 
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    global $database;
 	# query
 	$query = "select * from `widgets` where `wfile` = '$wfile'; ";
 
@@ -452,8 +761,7 @@ function getFavouriteSubnets()
  */
 function getUserFavouriteSubnets($subnetIds)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+    global $database; 
 
 	# get details for each id
 	foreach($subnetIds as $id) {
@@ -508,8 +816,7 @@ function isSubnetFavourite($subnetId)
  */
 function editFavourite($post)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
+    global $database; 
 
     # get user details and favourites
     $user = getActiveUserDetails();
@@ -570,10 +877,14 @@ function getTranslationVersion ($code)
  */
 function getFullFieldData($table, $field)
 {
-    global $db;                                                                      # get variables from config file
+    global $database; 
+    
+    /* escape vars to prevent SQL injection */
+	$table = filter_user_input ($table, true, true);
+	$field = filter_user_input ($field, true, true);
+    
     /* set query, open db connection and fetch results */
     $query = "show full columns from `$table` where `Field` = '$field';";
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
 
     /* execute */
     try { $details = $database->getArray( $query ); }
@@ -604,13 +915,15 @@ function getFullFieldData($table, $field)
 function checkSectionPermission ($sectionId)
 {
     # open session and get username / pass
-	if (!isset($_SESSION)) {  session_start(); }
+	if (!isset($_SESSION)) {  global $phpsessname; if(strlen($phpsessname)>0) { session_name($phpsessname); }  session_start(); }
     # redirect if not authenticated */
     if (empty($_SESSION['ipamusername'])) 	{ return "0"; }
     else									{ $username = $_SESSION['ipamusername']; }
     
 	# get all user groups
-	$user = getUserDetailsByName ($username);
+	global $userDetails;
+	if(!isset($userDetails)) 	{ $user = getUserDetailsByName ($username); }
+	else						{ $user = $userDetails; }
 	$groups = json_decode($user['groups']);
 	
 	# if user is admin then return 3, otherwise check
@@ -647,13 +960,15 @@ function checkSectionPermission ($sectionId)
 function checkSubnetPermission ($subnetId)
 {
     # open session and get username / pass
-	if (!isset($_SESSION)) {  session_start(); }
+	if (!isset($_SESSION)) {  global $phpsessname; if(strlen($phpsessname)>0) { session_name($phpsessname); }  session_start(); }
     # redirect if not authenticated */
     if (empty($_SESSION['ipamusername'])) 	{ return "0"; }
     else									{ $username = $_SESSION['ipamusername']; }
     
 	# get all user groups
-	$user = getUserDetailsByName ($username);
+	global $userDetails;
+	if(!isset($userDetails)) 	{ $user = getUserDetailsByName ($username); }
+	else						{ $user = $userDetails; }
 	$groups = json_decode($user['groups']);
 	
 	# if user is admin then return 3, otherwise check
@@ -723,35 +1038,45 @@ function checkSubnetPermission ($subnetId)
  */
 function getAllSettings()
 {
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass']); 
-
-    /* first check if table settings exists */
-    $query    = 'SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_schema = "'. $db['name'] .'" AND table_name = "settings";';
-
-    /* execute */
-    try { $count = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
-        return false;
-    } 
-  
-	/* return true if it exists */
-	if($count[0]['count'] == 1) {
-	
-		/* select database */
-		$database->selectDatabase($db['name']);
-	
-	    /* first update request */
-	    $query    = 'select * from settings where id = 1';
-	    $settings = $database->getArray($query); 
-  
-		/* return settings */
-		return($settings[0]);
-	}
+	global $settings;
+	# check if it already exists
+	if(isset($settings)) {
+		if(isset($settings[0]))	{ return $settings[0]; }
+		else					{ return $settings; }
+	} 
 	else {
-		return false;
+
+	    global $db;
+		global $database;
+	
+	    /* first check if table settings exists */
+	    $query    = 'SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_schema = "'. $db['name'] .'" AND table_name = "settings";';
+			
+	    /* execute */
+	    try { $count = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        return false;
+	    }
+	  
+		/* return true if it exists */
+		if($count[0]['count'] == 1) {
+		
+			/* select database */
+			$database->selectDatabase($db['name']);
+		
+		    /* get settings */
+		    $query    = 'select * from settings where id = 1';
+		    $settings = $database->getArray($query); 
+	  
+			/* return settings */
+			return($settings[0]);
+		}
+		else {
+			return false;
+		}
+		
 	}
 }
 
@@ -762,7 +1087,7 @@ function getAllSettings()
 function getAllMailSettings()
 {
     global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass']); 
+    global $database; 
 
     /* first check if table settings exists */
     $query    = 'SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_schema = "'. $db['name'] .'" AND table_name = "settingsMail";';
@@ -938,9 +1263,14 @@ function get_menu_html( $subnets, $rootId = 0 )
 		$parent = $rootId;
 		$parent_stack = array();
 		
+		# verify subnetId
+		if(isset($_GET['subnetId']))	{
+			if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+		}
+		
 		# display selected subnet as opened
-		if(isset($_REQUEST['subnetId'])) 	{ $allParents = getAllParents ($_REQUEST['subnetId']); }
-		else 								{ $allParents = array(); }
+		if(isset($_GET['subnetId'])) 	{ $allParents = getAllParents ($_GET['subnetId']); }
+		else 							{ $allParents = array(); }
 		
 		# Menu start
 		$html[] = '<ul id="subnets">';
@@ -951,26 +1281,26 @@ function get_menu_html( $subnets, $rootId = 0 )
 			$count = count( $parent_stack ) + 1;
 
 			# set opened or closed tag for displaying proper folders
-			if(in_array($option['value']['id'], $allParents))			{ $open = "open";	$openf = "-open"; }
-			else														{ $open = "close";	$openf = ""; }
+			if(in_array($option['value']['id'], $allParents))		{ $open = "open";	$openf = "-open"; }
+			else													{ $open = "close";	$openf = ""; }
 						
 			# show also child's by default
-			if($option['value']['id']==$_REQUEST['subnetId']) {
-				if(subnetContainsSlaves($_REQUEST['subnetId']))			{ $open = "open";	$openf = "-open"; }
-				else													{ $open = "close";	$openf = ""; }
+			if($option['value']['id']==$_GET['subnetId']) {
+				if(subnetContainsSlaves($_GET['subnetId']))			{ $open = "open";	$openf = "-open"; }
+				else												{ $open = "close";	$openf = ""; }
 			}			
 			
 			# override if cookie is set
 			if(isset($_COOKIE['expandfolders'])) {
-				if($_COOKIE['expandfolders'] == "1")					{ $open='open';		$openf = "-open"; }
+				if($_COOKIE['expandfolders'] == "1")				{ $open='open';		$openf = "-open"; }
 			}
 			
 			# for active class
-			if(isset($_REQUEST['subnetId']) && ($option['value']['id'] == $_REQUEST['subnetId']))	{ $active = "active";	$leafClass=""; }
+			if($_GET['page']=="subnets" && ($option['value']['id'] == $_GET['subnetId']))			{ $active = "active";	$leafClass=""; }
 			else 																					{ $active = ""; 		$leafClass="icon-gray" ;}
-			
+
 			# override folder
-			if($option['value']['isFolder'] == 1 && ($option['value']['id'] == $_REQUEST['subnetId']))	{ $open = "open"; $openf = "-open"; }
+			if($option['value']['isFolder'] == 1 && ($option['value']['id'] == $_GET['subnetId']))	{ $open = "open"; $openf = "-open"; $active = "active"; }
 			
 			# check for permissions if id is provided
 			if($option['value']['id'] != "") {
@@ -992,18 +1322,18 @@ function get_menu_html( $subnets, $rootId = 0 )
 				if($sp != 0) {	
 					# folder
 					if($option['value']['isFolder'] == 1) {
-						$html[] = '<li class="folderF folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-sfolder fa-folder'.$openf.'" rel="tooltip" data-placement="right" data-html="true" title="'._('Folder contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
-						$html[] = '<a href="folder/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/">'.$option['value']['description'].'</a>'; 				
+						$html[] = '<li class="folderF folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder fa-folder'.$openf.'" rel="tooltip" data-placement="right" data-html="true" title="'._('Folder contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
+						$html[] = '<a href="'.create_link("folder",$option['value']['sectionId'],$option['value']['id']).'">'.$option['value']['description'].'</a>'; 				
 					}
 					# print name
 					elseif($option['value']['showName'] == 1) {
 						$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('Subnet contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
-						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'">'.$option['value']['description'].'</a>'; 				
+						$html[] = '<a href="'.create_link("subnets",$option['value']['sectionId'],$option['value']['id']).'" rel="tooltip" data-placement="right" title="'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'">'.$option['value']['description'].'</a>'; 				
 					}
 					# print subnet
 					else {
 						$html[] = '<li class="folder folder-'.$open.' '.$active.'""><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('Subnet contains more subnets').'<br>'._('Click on folder to open/close').'"></i>';
-						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.$option['value']['description'].'">'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'</a>'; 										
+						$html[] = '<a href="'.create_link("subnets",$option['value']['sectionId'],$option['value']['id']).'" rel="tooltip" data-placement="right" title="'.$option['value']['description'].'">'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'</a>'; 										
 					}
 
 					# print submenu
@@ -1020,17 +1350,17 @@ function get_menu_html( $subnets, $rootId = 0 )
 					# folder - opened
 					if($option['value']['isFolder'] == 1) {
 						$html[] = '<li class="leaf '.$active.'"><i class="fa fa-gray fa-sfolder fa-folder'.$openf.'"></i>';
-						$html[] = '<a href="folder/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/">'.$option['value']['description'].'</a></li>';
+						$html[] = '<a href="'.create_link("folder",$option['value']['sectionId'],$option['value']['id']).'">'.$option['value']['description'].'</a></li>';
 					}
 					# print name
 					elseif($option['value']['showName'] == 1) {				
-						$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
-						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'">'.$option['value']['description'].'</a></li>';
+						$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
+						$html[] = '<a href="'.create_link("subnets",$option['value']['sectionId'],$option['value']['id']).'" rel="tooltip" data-placement="right" title="'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'">'.$option['value']['description'].'</a></li>';
 					}
 					# print subnet
 					else {
-						$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
-						$html[] = '<a href="subnets/'.$option['value']['sectionId'].'/'.$option['value']['id'].'/" rel="tooltip" data-placement="right" title="'.$option['value']['description'].'">'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'</a></li>';					
+						$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
+						$html[] = '<a href="'.create_link("subnets",$option['value']['sectionId'],$option['value']['id']).'" rel="tooltip" data-placement="right" title="'.$option['value']['description'].'">'.Transform2long($option['value']['subnet']).'/'.$option['value']['mask'].'</a></li>';					
 					}
 				}
 		}
@@ -1051,6 +1381,10 @@ function get_menu_vlan( $vlans, $sectionId )
 {
 		$html = array();
 
+		# must be numberic
+		if(isset($_GET['vlanId']))		{ if(!is_numeric($_GET['vlanId']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); } }
+		if(isset($_GET['subnetId']))	{ if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); } }
+
 		# Menu start
 		$html[] = '<ul id="subnets">';
 		
@@ -1058,12 +1392,12 @@ function get_menu_vlan( $vlans, $sectionId )
 		foreach ( $vlans as $item ) {	
 		
 			# set open / closed -> vlan directly
-			if($_REQUEST['vlanId'] == $item['vlanId'] && !isset($_REQUEST['subnetId'])) {
+			if($_GET['subnetId'] == $item['vlanId'] && $_GET['page']=="vlan") {
 				$open = "open";
 				$active = "active";
 				$leafClass="fa-gray";					
 			}
-			elseif(isSubnetIdVlan ($_REQUEST['subnetId'], $item['vlanId'])) {
+			elseif(isSubnetIdVlan ($_GET['subnetId'], $item['vlanId'])) {
 				$open = "open";
 				$active = "";
 				$leafClass="fa-gray";				
@@ -1076,7 +1410,7 @@ function get_menu_vlan( $vlans, $sectionId )
 			
 			# new item
 			$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('VLAN contains subnets').'.<br>'._('Click on folder to open/close').'"></i>';
-			$html[] = '<a href="vlan/'.$sectionId.'/'.$item['vlanId'].'/" rel="tooltip" data-placement="right" title="'.$item['description'].'">'.$item['number'].' ('.$item['name'].')</a>'; 				
+			$html[] = '<a href="'.create_link("vlan",$sectionId,$item['vlanId']).'" rel="tooltip" data-placement="right" title="'.$item['description'].'">'.$item['number'].' ('.$item['name'].')</a>'; 				
 
 			# fetch all subnets in VLAN
 			$subnets = getAllSubnetsInSectionVlan ($item['vlanId'], $sectionId);
@@ -1095,17 +1429,17 @@ function get_menu_vlan( $vlans, $sectionId )
 					if($permission > 0) {
 					
 						# for active class
-						if(isset($_REQUEST['subnetId']) && ($subnet['id'] == $_REQUEST['subnetId']))	{ $active = "active";	$leafClass=""; }
-						else 																			{ $active = ""; 		$leafClass="icon-gray" ;}		
+						if(isset($_GET['subnetId']) && ($subnet['id'] == $_GET['subnetId']))	{ $active = "active";	$leafClass=""; }
+						else 																	{ $active = ""; 		$leafClass="icon-gray" ;}		
 						
 						# check if showName is set
 						if($subnet['showName'] == 1) {
 							$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
-							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'">'.$subnet['description'].'</a></li>';						
+							$html[] = '<a href="'.create_link("subnets",$subnet['sectionId'],$subnet['id']).'" rel="tooltip" data-placement="right" title="'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'">'.$subnet['description'].'</a></li>';						
 						}
 						else {
 							$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
-							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.$subnet['description'].'">'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'</a></li>';												
+							$html[] = '<a href="'.create_link("subnets",$subnet['sectionId'],$subnet['id']).'" rel="tooltip" data-placement="right" title="'.$subnet['description'].'">'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'</a></li>';												
 						}
 					
 					}
@@ -1136,16 +1470,20 @@ function get_menu_vrf( $vrfs, $sectionId )
 		# Menu start
 		$html[] = '<ul id="subnets">';
 		
+		# vrfId must be numberic
+		if(isset($_GET['subnetId']))	{ if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); } }
+		if(isset($_GET['vrfIf']))		{ if(!is_numeric($_GET['vrfId']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); } }
+		
 		# loop through vlans
 		foreach ( $vrfs as $item ) {	
-		
+					
 			# set open / closed -> vlan directly
-			if($_REQUEST['vrfId'] == $item['vrfId'] && !isset($_REQUEST['subnetId'])) {
+			if($_GET['subnetId'] == $item['vrfId'] && $_GET['page']=="vrf") {
 				$open = "open";
 				$active = "active";
 				$leafClass="fa-gray";					
 			}
-			elseif(isSubnetIdVrf ($_REQUEST['subnetId'], $item['vrfId'])) {
+			elseif(isSubnetIdVrf ($_GET['subnetId'], $item['vrfId'])) {
 				$open = "open";
 				$active = "";
 				$leafClass="fa-gray";				
@@ -1158,7 +1496,7 @@ function get_menu_vrf( $vrfs, $sectionId )
 			
 			# new item
 			$html[] = '<li class="folder folder-'.$open.' '.$active.'"><i class="fa fa-gray fa-folder-'.$open.'-o" rel="tooltip" data-placement="right" data-html="true" title="'._('VRF contains subnets').'.<br>'._('Click on folder to open/close').'"></i>';
-			$html[] = '<a href="vrf/'.$sectionId.'/'.$item['vrfId'].'/" rel="tooltip" data-placement="right" title="'.$item['description'].'">'.$item['name'].'</a>'; 				
+			$html[] = '<a href="'.create_link("vrf",$sectionId,$item['vrfId']).'" rel="tooltip" data-placement="right" title="'.$item['description'].'">'.$item['name'].'</a>'; 				
 
 			# fetch all subnets in VLAN
 			$subnets = getAllSubnetsInSectionVrf ($item['vrfId'], $sectionId);
@@ -1177,17 +1515,17 @@ function get_menu_vrf( $vrfs, $sectionId )
 					if($permission > 0) {
 					
 						# for active class
-						if(isset($_REQUEST['subnetId']) && ($subnet['id'] == $_REQUEST['subnetId']))	{ $active = "active";	$leafClass=""; }
-						else 																			{ $active = ""; 		$leafClass="icon-gray" ;}		
+						if(isset($_GET['subnetId']) && ($subnet['id'] == $_GET['subnetId']))	{ $active = "active";	$leafClass=""; }
+						else 																	{ $active = ""; 		$leafClass="icon-gray" ;}		
 						
 						# check if showName is set
 						if($subnet['showName'] == 1) {
 							$html[] = '<li class="leaf '.$active.'"><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
-							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'">'.$subnet['description'].'</a></li>';						
+							$html[] = '<a href="'.create_link("subnets",$subnet['sectionId'],$subnet['id']).'" rel="tooltip" data-placement="right" title="'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'">'.$subnet['description'].'</a></li>';						
 						}
 						else {
 							$html[] = '<li class="leaf '.$active.'""><i class="'.$leafClass.' fa fa-gray fa-angle-right"></i>';
-							$html[] = '<a href="subnets/'.$subnet['sectionId'].'/'.$subnet['id'].'/" rel="tooltip" data-placement="right" title="'.$subnet['description'].'">'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'</a></li>';												
+							$html[] = '<a href="'.create_link("subnets",$subnet['sectionId'],$subnet['id']).'" rel="tooltip" data-placement="right" title="'.$subnet['description'].'">'.Transform2long($subnet['subnet']).'/'.$subnet['mask'].'</a></li>';												
 						}
 					
 					}
@@ -1221,6 +1559,15 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 		}
 		}
 		
+		global $settings;
+		/* set hidden fields */
+		$ffields = json_decode($settings['hiddenCustomFields'], true);		
+		if(is_array($ffields['subnets']))	{ $ffields = $ffields['subnets']; }
+		else								{ $ffields = array(); }
+		
+		# must be numeric
+		if(isset($_GET['subnetId']))	{ if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); } }
+		
 		# loop will be false if the root has no children (i.e., an empty menu!)
 		$loop = !empty( $children[$rootId] );
 		
@@ -1229,8 +1576,8 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 		$parent_stack = array();
 		
 		# display selected subnet as opened
-		if(isset($_REQUEST['subnetId']))
-		$allParents = getAllParents ($_REQUEST['subnetId']);
+		if(isset($_GET['subnetId']))
+		$allParents = getAllParents ($_GET['subnetId']);
 		
 		# return table content (tr and td's)
 		while ( $loop && ( ( $option = each( $children[$parent] ) ) || ( $parent > $rootId ) ) )
@@ -1299,17 +1646,17 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 					if($count==1) {
 						# is folder?
 						if($option['value']['isFolder']==1) {
-						$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-pad-right-3 fa-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'> $description</a></td>";						
+						$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-pad-right-3 fa-folder-open'></i> <a href='".create_link("folder",$option['value']['sectionId'],$option['value']['id'])."'> $description</a></td>";						
 						$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-pad-right-3 fa-folder-open'></i>  $description</td>";						
 	
 						}
 						else {
 							# last?
 							if(!empty( $children[$option['value']['id']])) {
-								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i><a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> $description</td>";						
 							} else {
-								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i><a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> $description</td>";						
 							}
 					}
@@ -1317,17 +1664,17 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 						# is folder?
 						if($option['value']['isFolder']==1) {
 							# last?
-								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'> $description</a></td>";						
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open'></i> <a href='".create_link("folder",$option['value']['sectionId'],$option['value']['id'])."'> $description</a></td>";						
 								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open'></i> $description</td>";						
 						}
 						else {
 							# last?
 							if(!empty( $children[$option['value']['id']])) {							
-								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> <a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-folder-open-o'></i> $description</td>";						
 							}
 							else {
-								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> <a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 								$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-gray fa-pad-right-3 fa-angle-right'></i> $description</td>";						
 								
 							}
@@ -1343,7 +1690,9 @@ function printSubnets( $subnets, $actions = true, $vrf = "0", $custom = array() 
 					# custom
 					if(sizeof($custom)>0) {
 						foreach($custom as $field) {
-				    		$html[] =  "	<td class='hidden-xs hidden-sm'>".$option['value'][$field['name']]."</td>"; 
+							if(!in_array($field['name'], $ffields)) {
+					    		$html[] =  "	<td class='hidden-xs hidden-sm'>".$option['value'][$field['name']]."</td>"; 
+							}
 				    	}
 					}
 					if($actions) {
@@ -1412,42 +1761,111 @@ $removeSlaves = array();
 
 function getAllSlaves ($subnetId, $multi = false) 
 {
-	global $removeSlaves;
-	$end = false;			# breaks while
-	
-	$removeSlaves[] = $subnetId;		# first
+	# check cache
+	if($vtmp = checkCache("allslaves", $subnetId."_$multi")) {
+		return $vtmp;
+	}
+	else {
 
-	# db
-	global $db;                                                                      # get variables from config file
-	$database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+		global $removeSlaves;
+		$end = false;			# breaks while
+		
+		$removeSlaves[] = $subnetId;		# first
 	
-	while($end == false) {
+		# db
+		global $database; 
 		
-		/* get all immediate slaves */
-		$query = "select * from `subnets` where `masterSubnetId` = '$subnetId' order by `id` asc; ";    
-		/* execute query */
-		try { $slaves2 = $database->getArray( $query ); }
-		catch (Exception $e) { 
-        	$error =  $e->getMessage(); 
-        	print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
-        	return false;
-        }
-		
-		# we have more slaves
-		if(sizeof($slaves2) != 0) {
-			# recursive
-			foreach($slaves2 as $slave) {
-				$removeSlaves[] = $slave['id'];
-				getAllSlaves ($slave['id']);
+		while($end == false) {
+			
+			/* get all immediate slaves */
+			$query = "select * from `subnets` where `masterSubnetId` = '$subnetId' order by `id` asc; ";    
+			/* execute query */
+			try { $slaves2 = $database->getArray( $query ); }
+			catch (Exception $e) { 
+	        	$error =  $e->getMessage(); 
+	        	print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        	return false;
+	        }
+			
+			# we have more slaves
+			if(sizeof($slaves2) != 0) {
+				# recursive
+				foreach($slaves2 as $slave) {
+					$removeSlaves[] = $slave['id'];
+					getAllSlaves ($slave['id']);
+					$end = true;
+				}
+			}
+			# no more slaves
+			else {
 				$end = true;
 			}
 		}
-		# no more slaves
-		else {
-			$end = true;
+		
+		# save cache
+		if(sizeof($removeSlaves)>0) {
+			writeCache("allslaves", $subnetId."_$multi", $removeSlaves);
 		}
 	}
 }
+
+
+/**
+ *	get whole tree path for subnetId - from parent all slaves
+ *
+ * 	if multi than create multidimensional array
+ */
+function getAllSlavesReturn ($subnetId) 
+{
+	# check cache
+	if($vtmp = checkCache("allslavesReturn", $subnetId)) {
+		return $vtmp;
+	}
+	else {
+		$end = false;					# breaks while
+		
+		$allSlaves[] = $subnetId;		# first
+	
+		# db
+		global $database; 
+		
+		while($end == false) {
+			
+			/* get all immediate slaves */
+			$query = "select `id` from `subnets` where `masterSubnetId` = '$subnetId' order by `id` asc; ";    
+			/* execute query */
+			try { $slaves2 = $database->getArray( $query ); }
+			catch (Exception $e) { 
+	        	$error =  $e->getMessage(); 
+	        	print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        	return false;
+	        }
+			
+			# we have more slaves
+			if(sizeof($slaves2) != 0) {
+				# recursive
+				foreach($slaves2 as $slave) {
+					$allSlaves[] = $slave['id'];
+					getAllSlavesReturn ($slave['id']);
+					$end = true;
+				}
+			}
+			# no more slaves
+			else {
+				$end = true;
+			}
+		}
+		
+		# save cache
+		if(sizeof($allSlaves)>0) {
+			writeCache("allslaves", $subnetId, $allSlaves);
+		}
+		
+		# return
+		return $allSlaves;
+	}
+}
+
 
 
 /**
@@ -1468,19 +1886,19 @@ function printBreadcrumbs ($req)
 			if(is_numeric($req['section']))	{ $section = getSectionDetailsById($req['section']); }					# if id is provided
 			else							{ $section = getSectionDetailsByName($req['section']); }				# if name is provided
 			
-			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'></span></li>";	# section name
+			print "	<li><a href='".create_link("subnets",$section['id'])."'>$section[name]</a> <span class='divider'></span></li>";	# section name
 			
 			foreach($parents as $parent) {
 			$subnet = getSubnetDetailsById($parent);
 			if($subnet['isFolder']==1) {
-				print "	<li><a href='subnets/$section[id]/$parent/'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
+				print "	<li><a href='".create_link("subnets",$section['id'],$parent)."'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
 			} else {
-				print "	<li><a href='subnets/$section[id]/$parent/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";								# subnets in between				
+				print "	<li><a href='".create_link("subnets",$section['id'],$parent)."'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";								# subnets in between				
 			}
 			}
 			# parent subnet
 			$subnet = getSubnetDetailsById($req['subnetId']);
-			print "	<li><a href='subnets/$section[id]/$subnet[id]/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";																# active subnet
+			print "	<li><a href='".create_link("subnets",$section['id'],$subnet['id'])."'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";																# active subnet
 			# ip
 			$ip = getIpAddrDetailsById($req['ipaddrid']);
 			print "	<li class='active'>$ip[ip_addr]</li>";																# IP address
@@ -1500,14 +1918,14 @@ function printBreadcrumbs ($req)
 			if(is_numeric($req['section']))	{ $section = getSectionDetailsById($req['section']); }					# if id is provided
 			else							{ $section = getSectionDetailsByName($req['section']); }				# if name is provided
 			
-			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'></span></li>";	# section name
+			print "	<li><a href='".create_link("subnets",$section['id'])."'>$section[name]</a> <span class='divider'></span></li>";	# section name
 			
 			foreach($parents as $parent) {
 			$subnet = getSubnetDetailsById($parent);
 			if($subnet['isFolder']==1) {
-				print "	<li><a href='subnets/$section[id]/$parent/'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
+				print "	<li><a href='".create_link("subnets",$section['id'],$parent)."'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
 			} else {
-				print "	<li><a href='subnets/$section[id]/$parent/'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";								# subnets in between				
+				print "	<li><a href='".create_link("subnets",$section['id'],$parent)."'>$subnet[description] (".Transform2long($subnet['subnet']).'/'.$subnet['mask'].")</a> <span class='divider'></span></li>";								# subnets in between				
 			}
 			}
 			$subnet = getSubnetDetailsById($req['subnetId']);
@@ -1528,11 +1946,11 @@ function printBreadcrumbs ($req)
 			if(is_numeric($req['section']))	{ $section = getSectionDetailsById($req['section']); }					# if id is provided
 			else							{ $section = getSectionDetailsByName($req['section']); }				# if name is provided
 			
-			print "	<li><a href='subnets/$section[id]/'>$section[name]</a> <span class='divider'></span></li>";	# section name
+			print "	<li><a href='".create_link("subnets",$section['id'])."'>$section[name]</a> <span class='divider'></span></li>";	# section name
 			
 			foreach($parents as $parent) {
 			$subnet = getSubnetDetailsById($parent);
-			print "	<li><a href='subnets/$section[id]/$parent/'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
+			print "	<li><a href='".create_link("subnets",$section['id'],$parent)."'><i class='icon-folder-open icon-gray'></i> $subnet[description]</a> <span class='divider'></span></li>";								# subnets in between
 			}
 			$subnet = getSubnetDetailsById($req['subnetId']);
 			print "	<li class='active'>$subnet[description]</li>";																# active subnet
@@ -1548,11 +1966,113 @@ function printBreadcrumbs ($req)
 	else if ($req['page'] == "tools") {
 		if(isset($req['tpage'])) {
 			print "<ul class='breadcrumb'>";
-			print "	<li><a href='tools/'>"._('Tools')."</a> <span class='divider'></span></li>";
+			print "	<li><a href='".create_link("tools")."'>"._('Tools')."</a> <span class='divider'></span></li>";
 			print "	<li class='active'>$req[tpage]></li>";
 			print "</ul>";
 		}
 	}
+}
+
+
+
+
+/**
+ *	print pagination
+ *
+ *		$page = current page id
+ *		$pages = number of subpages
+ */
+function print_pagination ($page, $pages)
+{
+	
+	print "<hr>";
+	print "<div class='text-right'>";
+	print "<ul class='pagination pagination-sm'>";
+	
+	//previous - disabled?
+	if($page == 1)			{ print "<li class='disabled'><a href='#'>&laquo;</a></li>"; }
+	else					{ print "<li>				<a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page".($page-1))."'>&laquo;</a></li>"; }
+	
+	# less than 8
+	if($pages<8) {
+		for($m=1; $m<=$pages; $m++) {
+			//active?
+			if($page==$m)	{ print "<li class='active'><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+			else			{ print "<li>				<a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+		}
+	}
+	# more than seven
+	else {	
+		//first page
+		if($page<=3) {
+			for($m=1; $m<=5; $m++) {
+				//active?
+				if($page==$m)	{ print "<li class='active'><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+				else			{ print "<li>				<a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+			}	
+			print "<li class='disabled'><a href='#'>...</a></li>";	
+			print "<li>				    <a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$pages")."'>$pages</a></li>";				
+		}
+		//last pages
+		elseif($page>$pages-4) {
+			print "<li>				    <a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page1")."'>1</li>";
+			print "<li class='disabled'><a href='#'>...</a></li>";
+			for($m=$pages-4; $m<=$pages; $m++) {
+				//active?
+				if($page==$m)	{ print "<li class='active'><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+				else			{ print "<li>				<a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+			}	
+		}
+		//page more than 2
+		else {
+			print "<li>				    <a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page1")."'>1</li>";
+			print "<li class='disabled'><a href='#'>...</a></li>";
+			for($m=$page-1; $m<=$page+1; $m++) {
+				//active?
+				if($page==$m)	{ print "<li class='active'><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+				else			{ print "<li>				<a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$m")."'>$m</a></li>"; }
+			}
+			print "<li class='disabled'><a href='#'>...</a></li>";	
+			print "<li><a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page$pages")."'>$pages</li>";				
+		}
+	}
+	
+	//next - disabled?
+	if($page == $pages)		{ print "<li class='disabled'><a href='#'>&raquo;</a></li>"; }
+	else					{ print "<li>				  <a href='".create_link("subnets",$_GET['section'],$_GET['subnetId'],"page".($page+1))."'>&raquo;</a></li>"; }			
+	
+	print "</ul>";
+	print "</div>";
+}
+
+
+
+
+
+
+
+
+
+/* @cache functions */
+
+/**
+ * Check if object already cached
+ */
+function checkCache($type, $objectID)
+{
+	global $cache;
+	if(isset($cache[$type][$objectID])) { return $cache[$type][$objectID]; }
+	else								{ return false; }
+}
+
+
+/**
+ * Save to cache
+ */
+function writeCache($type, $objectID, $value) 
+{
+	global $cache;
+	$cache[$type][$objectID] = $value;
 }
 
 

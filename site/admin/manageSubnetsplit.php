@@ -7,8 +7,16 @@
 /* required functions */
 require_once('../../functions/functions.php'); 
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
+
+/* must be numeric */
+if(!is_numeric($_POST['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
+
 /* verify that user has write permissions for subnet */
-$subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
+$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 if($subnetPerm < 3) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to resize subnet').'!</div>'); }
 
 

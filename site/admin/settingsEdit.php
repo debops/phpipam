@@ -10,6 +10,9 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin(false);
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /* fetch all settings */
 $settings = $_POST;
 

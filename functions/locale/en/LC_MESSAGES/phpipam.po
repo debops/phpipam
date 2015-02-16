@@ -4,7 +4,7 @@
 # miha petkovsek <miha.petkovsek@gmail.com>, 2013.
 #
 
-# "Project-Id-Version: 0.99.001\n"
+# "Project-Id-Version: 1.1\n"
 # "Report-Msgid-Bugs-To: Miha Petkovsek <miha.petkovsek@gmail.com>\n"
 # "POT-Creation-Date: 2013-04-02 14:33+0200\n"
 # "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -1442,7 +1442,7 @@ msgid "If you like the software you can donate by clicking this button to suppor
 "further development"
 msgstr ""
 
-#: site/dashboard/statistics.php:27
+#: site/dashboard/widgets/statistics.php:27
 msgid "Number of Sections"
 msgstr ""
 
@@ -4591,7 +4591,7 @@ msgstr ""
 msgid "Sender mail"
 msgstr ""
 
-#: site/admin.settings.php
+#: site/admin/settings.php
 msgid "Set administrator name"
 msgstr ""
 
@@ -4630,4 +4630,96 @@ msgid "No hosts belonging to this device"
 msgstr ""
 
 msgid "Sort by vendor"
+msgstr ""
+
+#: site/admin/userEditPrint.php
+msgid "Mail State changes"
+msgstr ""
+
+msgid "Select yes to receive notification change mail for State change"
+msgstr ""
+
+msgid "Mail Changelog"
+msgstr ""
+
+msgid "Select yes to receive notification change mail for changelog"
+msgstr ""
+
+#: site/admin/usersEditPrint.php
+msgid "Require user to change password after initial login"
+msgstr ""
+
+#: site/tools/changePasswordRequired.php
+msgid "Password change required"
+msgstr ""
+
+msgid "You are required to change your password before you can access phpipam."
+msgstr ""
+
+msgid "Password change"
+msgstr ""
+
+msgid "Save password"
+msgstr ""
+
+#: site/login/loginCheck.php
+msgid "You have been blocked for 5 minutes due to authentication failures"
+msgstr ""
+
+#: site/admin/settings.php
+msgid "Use nicer URL structure"
+msgstr ""
+
+msgid "Please note that mod_rewrite is required with appropriate settings if pretified links are selected."
+msgstr ""
+
+#: site/admin/settings.php
+msgid "Hide free range"
+msgstr ""
+
+msgid "Do not display free range in IP address and subnets list"
+msgstr ""
+
+msgid "Highest VLAN number"
+msgstr ""
+
+msgid "Set highest VLAN number (default 4096)"
+msgstr ""
+
+#: site/admin/manageVLANresult.php
+msgid "Highest possible VLAN number is "
+msgstr ""
+
+msgid "VLAN number cannot be negative"
+msgstr ""
+
+msgid "Not number"
+msgstr ""
+
+#: site/admin/manageSubnetEditResult.php
+msgid "I will delete"
+msgstr ""
+
+msgid "Are you sure you want to delete above items?"
+msgstr ""
+
+msgid "Are you sure you want to delete IP address"
+msgstr ""
+
+#:site/settings/setitngs.php
+msgid "Inactivity timeout"
+msgstr ""
+
+msgid "Select inactive timeout for user sessions. Please note that if default php session settings in php.ini are lower they will override this"
+msgstr ""
+
+#: site/login/index.php
+msgid "You session has timed out"
+msgstr ""
+
+#: site/admin/manageSubnetEdit.php
+msgid "Discover new hosts"
+msgstr ""
+
+msgid "Discover new hosts in this subnet"
 msgstr ""

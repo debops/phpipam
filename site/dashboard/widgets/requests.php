@@ -11,7 +11,7 @@ require_once( dirname(__FILE__) . '/../../../functions/functions.php' );
 
 /* if direct request that redirect to tools page */
 if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{ 
-	header("Location: ".BASE."administration/manageRequests/");
+	header("Location: ".BASE."".create_link("administration","manageRequests"));
 }
 
 /* get all */

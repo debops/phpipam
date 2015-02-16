@@ -11,4 +11,7 @@ $url    = "http://devel.phpipam.net/api/";
 $app['id']	= "APP001";
 $app['enc']	= "bf9da2f8599a02824b2cf3cd3e3c0268";
 
+# set response type - array, json
+$format		= "array";
+
 ?>

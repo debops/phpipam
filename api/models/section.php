@@ -5,171 +5,144 @@
  */
 
 class Section
-{	
-	/**
-	* get section details
-	*/
-	public function readSection() {
+{
+	# variables
+	var $query;				// db query
+	var $result;			// array result from database
+	var $format;			// set IP format
 	
-		/**
-		* all sections 
-		*/
-		if($this->all) {
-			//get section by id
-			$res = fetchSections ();
-			unset($this->all);	//remove from result array
-		}
-		
-		/** 
-		* section by id 
-		*/
-		elseif($this->id) {
-			//id must be set and numberic
-			if ( is_null($this->id) || !is_numeric($this->id) ) 			{ throw new Exception('Section id not existing - '.$this->id); }
-			//get section by id
-			$res = getSectionDetailsById ($this->id);
-			unset($this->id);	//remove from result array
-			//throw new exception if not existing
-			if(sizeof($res)==0) 											{ throw new Exception('Section not existing'); }
-		}
-		
-		/**
-		* section by name 
-		*/
-		elseif($this->name) {
-			//id must be set and numberic
-			if ( is_null($this->name) || strlen($this->name)==0 ) 			{ throw new Exception('Invalid section name - '.$this->name); }
-			//get section by id
-			$res = getSectionDetailsByName ($this->name);
-			unset($this->name);		//remove from result array
-			//throw new exception if not existing
-			if(sizeof($res)==0) 											{ throw new Exception('Section not existing'); }
-		}
-		
-		/** 
-		* method missing 
-		*/
-		else 																{ throw new Exception('Selector missing'); }
+	# classes
+	var $Database;			// to store database object
+	var $Common;			// Common functions 
+	
 
-		//create object from results
-		foreach($res as $key=>$line) {
-			$this->$key = $line;
-		}		
+	/**
+	 * 	construct
+	 */
+	public function __construct() 
+	{
+		# initialize database class
+		require( dirname(__FILE__) . '/../../config.php' );
+		$this->Database = new database($db['host'], $db['user'], $db['pass'], $db['name'], NULL, false);
+		# common class
+		$this->Common = new Common;
+		# set defauld method
+		$this->format = "decimal";
+	}
+	
+	
+	/**
+	 *	fetch form database
+	 */
+	private function fetchArray() 
+	{
+		try { $this->result = $this->Database->getArray( $this->query ); }
+	    catch (Exception $e) 													{ throw new Exception($e->getMessage()); }
+	}
+
+
+	/**
+	 *	execute query
+	 */
+	private function executeQuery() 
+	{
+		try { $this->result = $this->Database->executeQuery( $this->query ); }
+	    catch (Exception $e) 													{ throw new Exception($e->getMessage()); }
+	}
+	
+
+	/**
+	 * 	get Section
+	 */
+	public function readSection()
+	{
+		/* check input */
+		$this->Common->check_input;
+		
+		/* section by id */
+		if($this->id) {
+			//set query
+			$this->query = "select * from `sections` where `id` = ".$this->id.";";
+			$this->fetchArray();
+			if(sizeof($this->result)==0) 										{ throw new Exception('Invalid section Id '.$this->id); }
+		}
+		/* all sections  */
+		elseif($this->all) {
+			//set query
+			$this->query = "select * from `sections`;";
+			$this->fetchArray();
+			if(sizeof($this->result)==0) 										{ throw new Exception('No sections configured'); }
+		}
+		/* section by name */
+		elseif($this->name) {
+			//set query
+			$this->query = "select * from `sections` where `name` = ".$this->name.";";
+			$this->fetchArray();
+			if(sizeof($this->result)==0) 										{ throw new Exception('Invalid section name '.$this->name); }
+		}
+		/* method missing */
+		else 																	{ throw new Exception('Selector missing'); }
+	
 		//convert object to array
-		$result = $this->toArray($this);	
+		$result = $this->Common->toArray($this->result);
+		
+		//reformat?
+		if($this->format == "ip") { $result = $this->Common->format_ip($result); }
+			
 		//return result
 		return $result;
 	}
-
-
-	/**
-	* create new section
-	*/
-	public function createSection() {
-		# verications
-		//name must be at least 2 chars
-		if(strlen($this->name)<2) 											{ throw new Exception('Invalid section name'); }
-		//strict mode can be blank (default), 1,0
-		if(isset($this->strictMode) && !(is_numeric($this->strictMode))) 	{ throw new Exception('Invalid strict mode parameter'); }
-		//order
-		if(isset($this->order) && !(is_numeric($this->order)))				{ throw new Exception('Order must be numberic value'); }
-		//check if it already exist
-		if(sizeof(getSectionDetailsByName($this->name))>0) 					{ throw new Exception('Section with this name already exists'); }
-		
-		//create array to write new section
-		$newSection = $this->toArray($this);
-		//create new section
-		$res = UpdateSection ($newSection, true);								//true means from API	
-		//return result (true/false)
-		if(!$res) {
-			throw new Exception('Invalid query');
-		} else {
-			//format response
-			return "Section created";		
-		}
-	}
-
-
-	/**
-	* update section
-	*/
-	public function updateSection() {
-		# verications
-		//id must be set
-		if(!isset($this->id)) 												{ throw new Exception('Section ID missing'); }
-		//does it exist?
-		if(sizeof($oldSection = getSectionDetailsById($this->id))==0) 		{ throw new Exception('Section does not exist'); }
-		//name must be at least 2 chars
-		if(isset($this->name) && (strlen($this->name)<2))					{ throw new Exception('Invalid section name'); }
-		//strict mode can be blank (default), 1,0
-		if(isset($this->strictMode) && !(is_numeric($this->strictMode))) 	{ throw new Exception('Invalid strict mode parameter'); }
-		//order
-		if(isset($this->order) && !(is_numeric($this->order)))				{ throw new Exception('Order must be numberic value'); }
-		
-		//fill old values if new ones are not provided
-		if(!isset($this->name)) 			{ $this->name 			= $oldSection['name']; }
-		if(!isset($this->description)) 		{ $this->description 	= $oldSection['description']; }
-		if(!isset($this->strictMode)) 		{ $this->strictMode 	= $oldSection['strictMode']; }
-		if(!isset($this->order)) 			{ $this->order 			= $oldSection['order']; }
-		if(!isset($this->subnetOrdering)) 	{ $this->subnetOrdering = $oldSection['subnetOrdering']; }
-		if(!isset($this->permissions)) 		{ $this->permissions 	= $oldSection['permissions']; }
-		
-		//create array to write new section
-		$newSection = $this->toArray($this);
-		//create new section
-		$res = UpdateSection ($newSection, true);								//true means from API	
-		//return result (true/false)
-		if(!$res) {
-			throw new Exception('Invalid query');
-		} else {
-			//format response
-			return "Section updated";		
-		}
-	}
-
-
-
-	/**
-	* delete section
-	*/
-	public function deleteSection() {
-		//verications
-		if(!isset($this->id)) 												{ throw new Exception('Section ID missing'); }
-		//does it exist?
-		if(sizeof(getSectionDetailsById($this->id))==0) 					{ throw new Exception('Section does not exist'); }
-		
-		//create array to write new section
-		$newSection = $this->toArray($this);
-		//create new section
-		$res = UpdateSection ($newSection, true);								//true means from API	
-		//return result (true/false)
-		if(!$res) {
-			throw new Exception('Invalid query');
-		} else {
-			//format response
-			return "Section deleted";		
-		}
-	}
 	
 	
-
 	/**
-	* function to return multidimensional array
-	*/
-	public function toArray($obj)
+	 *	delete Section 
+	 *		id must be provided
+	 *
+	 *		we must also delete all subnets and all IP addresses!
+	 */	
+	public function deleteSection ()
 	{
-		//if object create array
-		if(is_object($obj)) $obj = (array) $obj;
-		if(is_array($obj)) {
-			$arr = array();
-			foreach($obj as $key => $val) {
-				$arr[$key] = $this->toArray($val);
+		//check input
+		$this->Common->check_var ("int", $this->id, null);
+		
+		//verify that it exists
+		try { $this->readSection(); }
+		catch (Exception $e) 													{ throw new Exception($e->getMessage()); }
+		
+		//do we need to delete also subnets?
+		if($this->subnets) {
+			$Subnet = new Subnet;
+			
+			# get all belonging subnets
+			$Subnet->sectionId = $this->id;
+			$Subnet->addresses = $this->addresses;					//flag to delete also IPs
+			
+			try { $allsubnets = $Subnet->readSubnet(); }
+			catch (Exception $e) {
+				# empty?
+				if(substr($e->getMessage(), 0, 32)=="Invalid section Id or no subnets")	{}
+				else															{ throw new Exception($e->getMessage()); }
+			}
+			
+			# loop
+			if(sizeof($allsubnets)>0) {
+				foreach($allsubnets as $s) {
+					# provide id and parameters
+					$Subnet->id = $s['id'];
+					$Subnet->deleteSubnet();
+				}
 			}
 		}
-		else { 
-			$arr = $obj;
-		}
-		//return an array of items
-		return $arr;
+		
+		//set query and execute
+		$this->query = "delete from `sections` where `id` = ".$this->id.";";
+		$this->executeQuery();
+		
+		//set result
+		$result['result']   = "success";
+		$result['response'] = "section ".$this->id." deleted successfully!";
+
+		//return result
+		return $result;
 	}
 }

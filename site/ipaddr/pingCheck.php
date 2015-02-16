@@ -12,6 +12,11 @@ require_once( dirname(__FILE__) . '/../../functions/scan/config-scan.php');
 /* verify that user is logged in */
 isUserAuthenticated(false);
 
+/* subnet Id must be a integer */
+if(!is_numeric($_POST['subnetId']))	{ die("<div class='alert alert-danger'>Invalid subnetId!</div>"); }
+if(!is_numeric($_POST['id']))		{ die("<div class='alert alert-danger'>Invalid id!</div>"); }
+
+
 // verify that user has write access
 $subnetPerm = checkSubnetPermission ($_POST['subnetId']);
 if($subnetPerm < 2) {

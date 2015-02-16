@@ -13,6 +13,12 @@ checkAdmin();
 /* get all settings */
 $settings = getAllSettings();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
+/* must be numeric */
+if(!is_numeric($_POST['g_id']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
 # get group details
 $group = getGroupById($_POST['g_id']);
 

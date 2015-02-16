@@ -6,8 +6,14 @@
 /* verify that user is authenticated! */
 isUserAuthenticated ();
 
+
+/* filter input */
+$_GET = filter_user_input($_GET, true, true, false);
+/* must be numeric */
+if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
 /* get posted subnet, die if it is not provided! */
-if($_REQUEST['subnetId']) { $subnetId = $_REQUEST['subnetId']; }
+if($_GET['subnetId']) { $subnetId = $_GET['subnetId']; }
 
 /* get custom subnet fields */
 $customSubnetFields = getCustomFields('subnets');
@@ -46,6 +52,12 @@ $permissionsSection = checkSectionPermission ($SubnetDetails['sectionId']);
 
 # if 0 die
 if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not have permission to access this network')."!</div>"); }
+
+# verify that is it displayed in proper section, otherwise warn!
+if($SubnetDetails['sectionId']!=$_GET['section'])	{
+	$sd = getSectionDetailsById($SubnetDetails['sectionId']);
+	print "<div class='alert alert-warning'>Subnet is in section <a href='".create_link("subnets",$sd['id'],$SubnetDetails['id'])."'>$sd[name]</a>!</div>";
+}
 ?>
 
 <!-- content print! -->
@@ -69,7 +81,7 @@ if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not ha
 		<tr>
 			<th><?php print _('Hierarchy'); ?></th>
 			<td>
-				<?php printBreadCrumbs($_REQUEST); ?>
+				<?php printBreadCrumbs($_GET); ?>
 			</td>
 		</tr>
 		<tr>
@@ -126,13 +138,18 @@ if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not ha
 		}
 	
 		/* ping-check hosts inside subnet */
-		if ($SubnetDetails['pingSubnet'] == 1) {
-			print "<tr>";
-			print "	<th>"._('Hosts check')."</th>";
-			if($SubnetDetails['pingSubnet'] == 1) 		{ print "	<td>"._('enabled')."</td>"; }		# yes
-			else 										{ print "	<td>"._('disabled')."</td>";}		# no
-			print "</tr>";
-		}
+		print "<tr>";
+		print "	<th>"._('Hosts check')."</th>";
+		if($SubnetDetails['pingSubnet'] == 1) 		{ print "	<td>"._('enabled')."</td>"; }		# yes
+		else 										{ print "	<td>"._('disabled')."</td>";}		# no
+		print "</tr>";
+
+		/* scan subnet for new hosts */
+		print "<tr>";
+		print "	<th>"._('Discover new hosts')."</th>";
+		if($SubnetDetails['discoverSubnet'] == 1) 	{ print "	<td>"._('enabled')."</td>"; }		# yes
+		else 										{ print "	<td>"._('disabled')."</td>";}		# no
+		print "</tr>";
 		
 		/* print custom subnet fields if any */
 		if(sizeof($customSubnetFieldsSize) > 0) {
@@ -231,7 +248,7 @@ if($permission == "0")	{ die("<div class='alert alert-danger'>"._('You do not ha
 			// changelog
 			if($settings['enableChangelog']==1) {
 			if($sp['changelog']) 
-			print "<a class='sChangelog btn btn-xs btn-default'     									 href='subnets/$SubnetDetails[sectionId]/$SubnetDetails[id]/changelog/' data-container='body' rel='tooltip' title='"._('Changelog')."'>								<i class='fa fa-clock-o'></i></a>";				
+			print "<a class='sChangelog btn btn-xs btn-default'     									 href='".create_link("subnets",$SubnetDetails['sectionId'],$SubnetDetails['id'],"changelog")."' data-container='body' rel='tooltip' title='"._('Changelog')."'>								<i class='fa fa-clock-o'></i></a>";				
 			else 
 			print "<a class='btn btn-xs btn-default disabled'     									 	 href='' 																data-container='body' rel='tooltip' title='"._('Changelog')."'>								<i class='fa fa-clock-o'></i></a>";									
 			}

@@ -14,16 +14,12 @@ phpipam has the following requirements to run:
         + + ldap                : Adds LDAP support (Lightweight Directory Access Protocol)
         + + json				: Adds supports for JSON data-interexchange format
         + + SimpleXML			: Adds SimpleXML support for parsin XML files
+        + + Geetext				: Adds support for translation files
 	- PHP PEAR support (dev-php/pear)
     
 
 The above requirements should be met to continue with installation.
 Please also note that clients must have javascript enabled in browser for app to work, also browser with HTML5 support is *highly* recommended!
-
-!!!! important !!!!
-Since this is beta version security aspects were not taken into consideration, therefore DO NOT put this page to internet, it is suitable only for intranet.
-!!!! /important !!!!
- 
 
 #
 # Install procedure:
@@ -34,57 +30,65 @@ Since this is beta version security aspects were not taken into consideration, t
 config.php file is where site configuration and database details are configured. Please edit it according to your needs and installation.
 	vi config.php
 
+
+-----------------------------------
+2.) installation of database files
+-----------------------------------
+
+a.) Automatic installation
+--------------------------
+	phpipam can automatically install database files for you.
+	Point browser to phpipam directory and set MySQL login details (root username and password).
+
+
+	Finished! Launch browser, go to website and if something is missing / not configured properly the error will appear.
+
+b.) manual installation of database files
+------------------------------------------
+Optional method to be used instead of automatic configuration.
+
+	MySQL schema file is available under db folder.
+	First you must create new database, and then import SCHEMA file into database. Instructions below are for command-line import with local mysql installation.
+	------
+	mysql -u root -p 
+	create database phpipam;
+	exit
+	------
+	
+	Import database SCHEME.sql file:
+	------
+	mysql -u root -p phpipam < db/SCHEMA.sql
+	------
+	
+	Create user for database interaction from website and grant permissions to ipam tables. Please change the username and password (ipv6, ipv6admin) according to your needs - you must also replace default ones in config file, which will be covered in step 2.
+	------
+	mysql -u root -p
+	grant ALL on phpipam.* to ipv6@localhost identified by "ipv6admin";
+	exit
+	------
+
+
+
+---------------------------------------------------
+3.) (optional) First installation of database files
+---------------------------------------------------
+
+After installation is completed you can enable pretty links in administration. Before you do that make sure mod_rewrite is working properly and set BASE correctly.
+
 if you have placed phpipam in web subdirectory, you need to modify the following (example for /phpipam/):
 	- Set BASE in config.php to /phpipam/
 	- RewriteBase /phpipam/ in .htaccess
 
----------------------------------------------
-2a.) Automatic installation of database files
----------------------------------------------
-Since v0.4 phpipam can automatically install database files for you.
-Point browser to phpipam directory and set MySQL login details (root username and password).
-
-
-Finished! Launch browser, go to website and if something is missing / not configured properly the error will appear.
-
-
-------------------------------------------
-2b.) First installation of database files
-------------------------------------------
-Optional method to be used instead of automatic configuration.
-
-MySQL schema file is available under db folder.
-First you must create new database, and then import SCHEMA file into database. Instructions below are for command-line import with local mysql installation.
-------
-mysql -u root -p 
-create database phpipam;
-exit
-------
-
-Import database SCHEME.sql file:
-------
-mysql -u root -p phpipam < db/SCHEMA.sql
-------
-
-Create user for database interaction from website and grant permissions to ipam tables. Please change the username and password (ipv6, ipv6admin) according to your needs - you must also replace default ones in config file, which will be covered in step 2.
-------
-mysql -u root -p
-grant ALL on phpipam.* to ipv6@localhost identified by "ipv6admin";
-exit
-------
-
-
-
-
 
 
 ----------------------------------
-3.) (optional) Database backups
+4.) (optional) Database backups
 ----------------------------------
 It is *strongly* advised to backup database at least on weekly basis -> put following command to your crontab:
 ------
 # Backup IP address table
-0 1 * * 1 /usr/bin/mysqldump -u ipv6 -pipv6admin phpipam > <ipam_dir>/db/bkp/phpipam_bkp_$(date +"\%y\%m\%d").db
+@daily /usr/bin/mysqldump -u ipv6 -pipv6admin phpipam > <ipam_dir>/db/bkp/phpipam_bkp_$(date +"\%y\%m\%d").db
+@daily /usr/bin/find  <ipam_dir>/db/bkp/ -ctime +10 -exec rm {} \;
 ------
 It will backup ipam table each monday at 1AM. Change directories accordingly.
 

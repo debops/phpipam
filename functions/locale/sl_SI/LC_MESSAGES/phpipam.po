@@ -4,7 +4,7 @@
 # miha petkovsek <miha.petkovsek@gmail.com>, 2013.
 #
 
-# "Project-Id-Version: 0.99.001\n"
+# "Project-Id-Version: 1.1\n"
 # "Report-Msgid-Bugs-To: Miha Petkovsek <miha.petkovsek@gmail.com>\n"
 # "POT-Creation-Date: 2013-04-02 14:33+0200\n"
 # "PO-Revision-Date: 2013-06-28 14:33+0200\n"
@@ -4678,3 +4678,96 @@ msgstr "Noben IP ne pripada tej napravi"
 
 msgid "Sort by vendor"
 msgstr "Sortiraj po proizvajalcu"
+
+#: site/admin/userEditPrint.php
+msgid "Mail notifications"
+msgstr "E-Mail obvestila"
+
+msgid "Select yes to receive notification change mail for"
+msgstr "Izberi Da za email obvestila o spremembah (changelog)"
+
+msgid "IP edited, Subnet edited, State change"
+msgstr "IP, Omrezjnih in statusnih sprememb"
+
+#: site/admin/userEditPrint.php
+msgid "Mail State changes"
+msgstr "EMail sprememb stanja"
+
+#: site/admin/usersEditPrint.php
+msgid "Require user to change password after initial login"
+msgstr "Zahtevaj spremembo gesla ob prvi prijavi"
+
+#: site/tools/changePasswordRequired.php
+msgid "Password change required"
+msgstr "Zahtevana je sprememba gesla"
+
+msgid "You are required to change your password before you can access phpipam."
+msgstr "Preden lahko dostopate do phpipam orodja morate spremeniti svoje geslo."
+
+msgid "Password change"
+msgstr "Sprememba gesla"
+
+msgid "Save password"
+msgstr "Shrani geslo"
+
+#: site/login/loginCheck.php
+msgid "You have been blocked for 5 minutes due to authentication failures"
+msgstr "Zaradi neuspesne avtentikacije ste bili blokirani za 5 minut"
+
+#: site/admin/settings.php
+msgid "Use nicer URL structure"
+msgstr "Uporabi lepšo strukturo URL zapisa"
+
+msgid "Please note that mod_rewrite is required with appropriate settings if pretified links are selected."
+msgstr "Za uporabo lepših URL zapisov je zahtevan mod_rewrite modul s pravilnimi nastavitvami."
+
+#: site/admin/settings.php
+msgid "Hide free range"
+msgstr "Skrij prikaz prostega razpona"
+
+msgid "Do not display free range in IP address and subnets list"
+msgstr "Skrij prikaz prostega razpona IP naslovov in omrežij"
+
+msgid "Highest VLAN number"
+msgstr "Najvišja VLAN številka"
+
+msgid "Set highest VLAN number (default 4096)"
+msgstr "Nastavitev najvišje VLAN številke (privzeto 4096)"
+
+#: site/admin/manageVLANresult.php
+msgid "Highest possible VLAN number is "
+msgstr "Najvišja možna številka VLAN je "
+
+msgid "VLAN number cannot be negative"
+msgstr "VLAN številkane more biti negativna"
+
+msgid "Not number"
+msgstr "Ni številka"
+
+#: site/admin/manageSubnetEditResult.php
+msgid "I will delete"
+msgstr "Izbrisal bom"
+
+msgid "Are you sure you want to delete above items?"
+msgstr "Ste prepričani, da želite izbrisati zgornje elemente?"
+
+msgid "Are you sure you want to delete IP address"
+msgstr "Ste prepričani, da želite izbrisati IP naslov"
+
+#:site/settings/setitngs.php
+msgid "Inactivity timeout"
+msgstr "Odjava zaradi neaktivnosti"
+
+msgid "Select inactive timeout for user sessions. Please note that if default php session settings in php.ini are lower they will override this"
+msgstr "Izberite samodejno odjavo uporabnika zaradi nekativnosti. V kolikor so nastavitve v php.ini nižje od te vrednosti bodo prevlafale"
+
+#: site/login/index.php
+msgid "You session has timed out"
+msgstr "Vaša seja se je iztekla"
+
+#: site/admin/manageSubnetEdit.php
+msgid "Discover new hosts"
+msgstr "Odkrij nove naprave"
+
+msgid "Discover new hosts in this subnet"
+msgstr "Odkrij nove naprave v omrežju"

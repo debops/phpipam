@@ -27,33 +27,16 @@ class Subnets
 		}
 	}
 
+
 	/** 
-	* create new subnet 
+	* create subnet 
 	*/
-	public function createSubnets($_params)
+	public function createSubnets()
 	{
-		//init section class
-		$subnet = new Subnet();
-		//required parameters
-		$subnet->action      		= $this->_params['action'];
-		$subnet->sectionId        	= $this->_params['sectionId'];
-		$subnet->masterSubnetId 	= $this->_params['masterSubnetId'];
-		$subnet->subnet		  		= $this->_params['subnet'];
-		$subnet->mask	  			= $this->_params['mask'];
-		$subnet->description	  	= $this->_params['description'];
-		$subnet->vrfId			  	= $this->_params['vrfId'];
-		$subnet->vlanId			  	= $this->_params['vlanId'];
-		$subnet->allowRequests		= $this->_params['allowRequests'];
-		$subnet->showName			= $this->_params['showName'];
-		$subnet->permissions		= $this->_params['permissions'];
-		$subnet->pingSubnet			= $this->_params['pingSubnet'];
-
-		//create section
-		$res = $subnet->createSubnet(); 	
-		//return result
-		return $res;
-	}
-
+		/* not yet implemented */
+		throw new Exception('Action not yet implemented');
+	}	
+	
 
 	/** 
 	* read subnets 
@@ -74,7 +57,7 @@ class Subnets
 		else 								{ $subnet->id = $this->_params['id'];	}
 		
 		//fetch results
-		$res = $subnet->getSubnet(); 
+		$res = $subnet->readSubnet(); 
 		
 		//return subnet(s) in array format
 		return $res;
@@ -86,7 +69,7 @@ class Subnets
 	*/
 	public function updateSubnets()
 	{
-		/* not yet implementes */
+		/* not yet implemented */
 		throw new Exception('Action not yet implemented');
 	}	
 	
@@ -96,8 +79,23 @@ class Subnets
 	*/
 	public function deleteSubnets()
 	{
-		/* not yet implementes */
-		throw new Exception('Action not yet implemented');
+		//init subnet class
+		$subnet = new Subnet();
+		
+		//provide id
+		$subnet->id = $this->_params['id'];
+		//delete also IPs?
+		if(isset($this->_params['addresses'])) {
+			if($this->_params['addresses'] == false) { $subnet->addresses = false; }
+			else									 { $subnet->addresses = true; }
+		} else {
+													 { $subnet->addresses = true; }
+		}		
+		//fetch results
+		$res = $subnet->deleteSubnet(); 
+		
+		//return subnet(s) in array format
+		return $res;
 	}
 }
 

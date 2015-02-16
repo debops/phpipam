@@ -10,6 +10,15 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
+
+/* must be numeric */
+if($_POST['action']!="add") {
+	if(!is_numeric($_POST['tid']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+}
+
 /* get switch detaild by Id! */
 if( ($_POST['action'] == "edit") || ($_POST['action'] == "delete") ) {
 	$device = getTypeDetailsById($_POST['tid']);

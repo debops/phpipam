@@ -1152,3 +1152,134 @@ msgstr ""
 
 msgid "Sort by vendor"
 msgstr ""
+
+
+
+### 1.02.001 ###
+
+#: site/admin/userEditPrint.php
+msgid "Mail State changes"
+msgstr ""
+
+msgid "Select yes to receive notification change mail for State change"
+msgstr ""
+
+msgid "Mail Changelog"
+msgstr ""
+
+msgid "Select yes to receive notification change mail for changelog"
+msgstr ""
+
+
+### 1.03.001 ###
+
+#: site/admin/usersEditPrint.php
+msgid "Require user to change password after initial login"
+msgstr ""
+
+#: site/tools/changePasswordRequired.php
+msgid "Password change required"
+msgstr ""
+
+msgid "You are required to change your password before you can access phpipam."
+msgstr ""
+
+msgid "Password change"
+msgstr ""
+
+msgid "Save password"
+msgstr ""
+
+
+
+### 1.04.001 ###
+
+#: site/login/loginCheck.php
+msgid "You have been blocked for 5 minutes due to authentication failures"
+msgstr ""
+
+
+### 1.06.001 ###
+
+#: site/admin/settings.php
+msgid "Use nicer URL structure"
+msgstr ""
+
+msgid "Please note that mod_rewrite is required with appropriate settings if pretified links are selected."
+msgstr ""
+
+
+### 1.07.002 ##
+
+#: site/admin/settings.php
+msgid "Hide free range"
+msgstr ""
+
+msgid "Do not display free range in IP address and subnets list"
+msgstr ""
+
+msgid "Highest VLAN number"
+msgstr ""
+
+msgid "Set highest VLAN number (default 4096)"
+msgstr ""
+
+#: site/admin/manageVLANresult.php
+msgid "Highest possible VLAN number is "
+msgstr ""
+
+msgid "VLAN number cannot be negative"
+msgstr ""
+
+msgid "Not number"
+msgstr ""
+
+
+### 1.07.004 ###
+
+#: site/admin.custimFilterFields.php
+msgid "Fields saved"
+msgstr ""
+
+msgid "Filter custom field display"
+msgstr ""
+
+msgid "Selected fields will not be visible in table view, only in detail view"
+msgstr ""
+
+msgid "Save filter"
+msgstr ""
+
+
+### 1.07.010 ###
+
+#: site/admin/manageSubnetEditResult.php
+msgid "I will delete"
+msgstr ""
+
+msgid "Are you sure you want to delete above items?"
+msgstr ""
+
+msgid "Are you sure you want to delete IP address"
+msgstr ""
+
+
+### 1.08.001 ###
+
+#:site/settings/setitngs.php
+msgid "Inactivity timeout"
+msgstr ""
+
+msgid "Select inactive timeout for user sessions. Please note that if default php session settings in php.ini are lower they will override this"
+msgstr ""
+
+#: site/login/index.php
+msgid "You session has timed out"
+msgstr ""
+
+#: site/admin/manageSubnetEdit.php
+msgid "Discover new hosts"
+msgstr ""
+
+msgid "Discover new hosts in this subnet"
+msgstr ""

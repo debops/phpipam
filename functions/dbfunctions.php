@@ -9,28 +9,48 @@
  */
  
  
-class database extends mysqli 
-{
+class database extends mysqli  {
 
-  public function __construct($host = NULL, $username = NULL, $dbname = NULL, $port = NULL, $socket = NULL) {
-    parent::__construct($host, $username, $dbname, $port, $socket);
-    $this->set_charset("utf8");
-  } 
-  
-  # save last SQL insert id
-  public $lastSqlId;
+	# variables
+	public $lastSqlId;		// last SQL insert id
+	
+	
+
+	/** 
+	 * Construct object
+	 */
+	public function __construct($host = NULL, $username = NULL, $dbname = NULL, $port = NULL, $socket = NULL, $printError = true) {		
+
+		# throw exceptions
+		mysqli_report(MYSQLI_REPORT_STRICT);
+
+		# open database connection
+		try { parent::__construct($host, $username, $dbname, $port, $socket); }
+		catch (Exception $e) {
+    		if($printError) { print "<div class='alert alert-danger'>error:".$e->getMessage()."</div>"; }
+			return false;
+		}	
+
+		if(!isset($e))
+		$this->set_charset("utf8");
+		
+		
+		# change back reporting for exception throwing to scripts
+		//mysqli_report(MYSQLI_REPORT_ERROR);
+	} 
+
 	
 	/**
 	 * execute given query 
 	 *
 	 */
-	function executeQuery( $query, $lastId = false ) 
+	public function executeQuery( $query, $lastId = false ) 
 	{
-		/* execute query */
+		# execute query
 		$result     = parent::query( $query );
 		$this->lastSqlId   = $this->insert_id;
-
-		/* if it failes throw new exception */
+		
+		# if it failes throw new exception
 		if ( mysqli_error( $this ) ) {
             throw new exception( mysqli_error( $this ), mysqli_errno( $this ) ); 
       		}
@@ -40,8 +60,8 @@ class database extends mysqli
         	else 		{ return true; }
         }
 	}
-		
 	
+
 	/**
 	 * get only 1 row
 	 *
@@ -57,10 +77,8 @@ class database extends mysqli
         }
         /* return result */
         return $resp;   
-        
-        /* free result */
-		$result->close();  
     }
+
 	
 	
 	/**
@@ -107,9 +125,6 @@ class database extends mysqli
         	$fields = array();
         	return $fields;
         }
-		
-		/* free result */
-		$result->close();	
 	}
 
 
@@ -146,9 +161,6 @@ class database extends mysqli
 		
 		/* return result array of rows */
 		return($rows);
-		
-		/* free result */
-		$result->close();	
 	}
 	
 	
@@ -158,11 +170,22 @@ class database extends mysqli
 	 */
 	function executeMultipleQuerries( $query, $lastId = false ) 
 	{	
-        /* execute querries */
-		$result = parent::multi_query($query);
+        # execute querries 
+		//$result = parent::multi_query($query);
+		
+		if ($result = parent::multi_query($query)) {
+		    do {
+		        /* store first result set */
+		        if ($result = parent::store_result()) {
+		            $result->free();
+		        }
+		    } while (parent::next_result());
+		}
+		
+		# save lastid
 		$this->lastSqlId   = $this->insert_id;
 
-		/* if it failes throw new exception */
+		# if it failes throw new exception
 		if ( mysqli_error( $this ) ) {
             throw new exception( mysqli_error( $this ), mysqli_errno( $this ) ); 
       	}
@@ -170,9 +193,6 @@ class database extends mysqli
        		if($lastId)	{ return $this->lastSqlId; }
         	else 		{ return true; }
         }
-		
-		/* free result */
-		$result->close();	
 	}
 
 
@@ -191,10 +211,7 @@ class database extends mysqli
       	}
         else {
             return true;
-        }
-		
-		/* free result */
-		$result->close();	
+        }	
 	}
 }
 

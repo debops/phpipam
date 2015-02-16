@@ -30,7 +30,7 @@ CREATE TABLE `ipaddresses` (
   `subnetId` INT(11)  UNSIGNED  NULL  DEFAULT NULL,
   `ip_addr` varchar(100) NOT NULL,
   `description` varchar(64) DEFAULT NULL,
-  `dns_name` varchar(64) NOT NULL,
+  `dns_name` varchar(100) NOT NULL,
   `mac` varchar(20) DEFAULT NULL,
   `owner` varchar(32) DEFAULT NULL,
   `state` varchar(1) DEFAULT '1',
@@ -40,24 +40,25 @@ CREATE TABLE `ipaddresses` (
   `lastSeen` DATETIME  NULL  DEFAULT '0000-00-00 00:00:00',
   `excludePing` BINARY  NULL  DEFAULT '0',
   `editDate` TIMESTAMP  NULL  ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `subnetid` (`subnetId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 LOCK TABLES `ipaddresses` WRITE;
 /*!40000 ALTER TABLE `ipaddresses` DISABLE KEYS */;
 
-INSERT INTO `ipaddresses` (`id`, `subnetId`, `ip_addr`, `description`, `dns_name`, `mac`, `owner`, `state`, `switch`, `port`, `note`)
+INSERT INTO `ipaddresses` (`id`, `subnetId`, `ip_addr`, `description`, `dns_name`, `mac`, `owner`, `state`, `port`, `note`)
 VALUES
-	(1,'3','168427779','Server1','server1.cust1.local','','',1,'','',''),
-	(2,'3','168427780','Server2','server2.cust1.local','','',1,'','',''),
-	(3,'3','168427781','Server3','server3.cust1.local','','',2,'','',''),
-	(4,'3','168427782','Server4','server4.cust1.local','','',2,'','',''),
-	(5,'3','168428021','Gateway','','','','1','','',''),
-	(6,'4','168428286','Gateway','','','','1','','',''),
-	(7,'4','168428042','Server1','ser1.client2.local','','',1,'','',''),
-	(8, '6', '172037636', 'DHCP range', '', '', '', 3, '', '', ''),
-	(9, '6', '172037637', 'DHCP range', '', '', '', 3, '', '', ''),
-	(10, '6', '172037638', 'DHCP range', '', '', '', 3, '', '', '');
+	(1,'3','168427779','Server1','server1.cust1.local','','',1,'',''),
+	(2,'3','168427780','Server2','server2.cust1.local','','',1,'',''),
+	(3,'3','168427781','Server3','server3.cust1.local','','',2,'',''),
+	(4,'3','168427782','Server4','server4.cust1.local','','',2,'',''),
+	(5,'3','168428021','Gateway','','','','1','',''),
+	(6,'4','168428286','Gateway','','','','1','',''),
+	(7,'4','168428042','Server1','ser1.client2.local','','',1,'',''),
+	(8, '6', '172037636', 'DHCP range', '', '', '', 3,'', ''),
+	(9, '6', '172037637', 'DHCP range', '', '', '', 3,'', ''),
+	(10, '6', '172037638', 'DHCP range', '', '', '', 3, '', '');
 
 /*!40000 ALTER TABLE `ipaddresses` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -159,6 +160,7 @@ CREATE TABLE `settings` (
   `IPfilter` varchar(128) DEFAULT NULL,
   `printLimit` int(4) unsigned DEFAULT '25',
   `vlanDuplicate` int(1) DEFAULT '0',
+  `vlanMax` INT(8)  NULL  DEFAULT '4096',
   `subnetOrdering` varchar(16) DEFAULT 'subnet,asc',
   `visualLimit` int(2) NOT NULL DEFAULT '0',
   `pingStatus` VARCHAR(12)  NOT NULL  DEFAULT '1800;3600',
@@ -170,6 +172,10 @@ CREATE TABLE `settings` (
   `enableChangelog` TINYINT(1)  NOT NULL  DEFAULT '1',
   `scanPingPath` VARCHAR(64)  NULL  DEFAULT '/bin/ping',
   `scanMaxThreads` INT(4)  NULL  DEFAULT '128',
+  `prettyLinks` SET("Yes","No")  NOT NULL  DEFAULT 'No',
+  `hideFreeRange` tinyint(1) DEFAULT '0',
+  `hiddenCustomFields` VARCHAR(1024)  NULL  DEFAULT NULL,
+  `inactivityTimeout` INT(5)  NOT NULL  DEFAULT '3600',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -178,7 +184,7 @@ LOCK TABLES `settings` WRITE;
 
 INSERT INTO `settings` (`id`, `siteTitle`, `siteAdminName`, `siteAdminMail`, `siteDomain`, `siteURL`, `domainAuth`, `enableIPrequests`, `enableVRF`, `enableDNSresolving`, `version`, `donate`, `IPfilter`, `printLimit`, `vlanDuplicate`, `subnetOrdering`, `visualLimit`, `dhcpCompress`)
 VALUES
-	(1, 'phpipam IP address management', 'Sysadmin', 'admin@domain.local', 'domain.local', 'http://yourpublicurl.com', 0, 0, 0, 0, '1.0', 0, 'mac;owner;state;switch;note', 50, 1, 'subnet,asc', 24, 1);
+	(1, 'phpipam IP address management', 'Sysadmin', 'admin@domain.local', 'domain.local', 'http://yourpublicurl.com', 0, 0, 0, 0, '1.1', 0, 'mac;owner;state;switch;note', 50, 1, 'subnet,asc', 24, 1);
 	
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -222,6 +228,7 @@ DROP TABLE IF EXISTS `settingsMail`;
 CREATE TABLE `settingsMail` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `mtype` set('localhost','smtp') NOT NULL DEFAULT 'localhost',
+  `msecure` SET('none','ssl','tls')  NOT NULL  DEFAULT 'none',
   `mauth` set('yes','no') NOT NULL DEFAULT 'no',
   `mserver` varchar(128) DEFAULT NULL,
   `mport` int(5) DEFAULT '25',
@@ -262,6 +269,7 @@ CREATE TABLE `subnets` (
   `showName` tinyint(1) DEFAULT '0',
   `permissions` varchar(1024) DEFAULT NULL,
   `pingSubnet` BOOL NULL  DEFAULT '0',
+  `discoverSubnet` BINARY(1)  NULL  DEFAULT '0',
   `isFolder` BOOL NULL  DEFAULT '0',
   `editDate` TIMESTAMP  NULL  ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -348,7 +356,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(20) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `password` varchar(32) COLLATE utf8_bin DEFAULT NULL,
+  `password` CHAR(128)  COLLATE utf8_bin DEFAULT NULL,
   `groups` varchar(1024) COLLATE utf8_bin DEFAULT NULL,
   `role` text CHARACTER SET utf8,
   `real_name` varchar(128) CHARACTER SET utf8 DEFAULT NULL,
@@ -357,6 +365,9 @@ CREATE TABLE `users` (
   `widgets` VARCHAR(1024)  NULL  DEFAULT 'statistics;favourite_subnets;changelog;top10_hosts_v4',
   `lang` INT(11) UNSIGNED  NULL  DEFAULT '1',
   `favourite_subnets` VARCHAR(1024)  NULL  DEFAULT NULL,
+  `mailNotify` SET('Yes','No')  NULL  DEFAULT 'No',
+  `mailChangelog` SET('Yes','No')  NULL  DEFAULT 'No',
+  `passChange` SET('Yes','No')  NOT NULL  DEFAULT 'No',
   `editDate` TIMESTAMP  NULL  ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`username`),
   UNIQUE KEY `id_2` (`id`),
@@ -366,9 +377,9 @@ CREATE TABLE `users` (
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 
-INSERT INTO `users` (`id`, `username`, `password`, `groups`, `role`, `real_name`, `email`, `domainUser`,`widgets`)
+INSERT INTO `users` (`id`, `username`, `password`, `groups`, `role`, `real_name`, `email`, `domainUser`,`widgets`, `passChange`)
 VALUES
-	(1,'Admin',X'6431306262383036653937643335333866623133623535383164623131653965',X'','Administrator','phpIPAM Admin','admin@domain.local',X'30','statistics;favourite_subnets;changelog;access_logs;error_logs;top10_hosts_v4');
+	(1,'Admin',X'243624726F756E64733D33303030244A51454536644C394E70766A6546733424524B3558336F6132382E557A742F6835564166647273766C56652E3748675155594B4D58544A5573756438646D5766507A5A51506252626B38784A6E314B797974342E64576D346E4A4959684156326D624F5A33672E',X'','Administrator','phpIPAM Admin','admin@domain.local',X'30','statistics;favourite_subnets;changelog;access_logs;error_logs;top10_hosts_v4', 'Yes');
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -452,6 +463,7 @@ CREATE TABLE `api` (
   `app_id` varchar(32) NOT NULL DEFAULT '',
   `app_code` varchar(32) NOT NULL DEFAULT '',
   `app_permissions` int(1) DEFAULT '1',
+  `app_comment` TEXT  NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `app_id` (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -533,8 +545,22 @@ VALUES
 
 
 
+# Dump of table loginAttempts
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `loginAttempts`;
+
+CREATE TABLE `loginAttempts` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `ip` varchar(128) NOT NULL DEFAULT '',
+  `count` int(2) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ip` (`ip`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 
 # update version
 # ------------------------------------------------------------
-UPDATE `settings` set `version` = '1.0';
+UPDATE `settings` set `version` = '1.1';

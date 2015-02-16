@@ -7,10 +7,15 @@
 /* required functions */
 require_once('../../functions/functions.php'); 
 
-/* verify that user has write permissions for subnet */
-$subnetPerm = checkSubnetPermission ($_REQUEST['subnetId']);
-if($subnetPerm < 2) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to truncate subnet').'!</div>'); }
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
 
+/* must be numeric */
+if(!is_numeric($_POST['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
+/* verify that user has write permissions for subnet */
+$subnetPerm = checkSubnetPermission ($_POST['subnetId']);
+if($subnetPerm < 2) 	{ die('<div class="alert alert-danger">'._('You do not have permissions to truncate subnet').'!</div>'); }
 
 /* verify post */
 CheckReferrer();

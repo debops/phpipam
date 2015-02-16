@@ -7,12 +7,10 @@
 isUserAuthenticated ();
 
 # get VLAN details
-$vrf = getVRFDetailsById ($_REQUEST['vrfId']);
+$vrf = getVRFDetailsById ($_GET['subnetId']);
 
 # not existing
-if(!$vrf) {
-	die("<div class='alert alert-danger'>"._('Invalid VRF id')."!</div>");
-}
+if(!$vrf) { die("<h4>"._('Error')."</h4><hr><div class='alert alert-danger'>"._('Invalid VRF id')."!</div>"); }
 
 # get all site settings
 $settings = getAllSettings();

@@ -4,8 +4,11 @@
 isUserAuthenticated ();
 
 /* get posted search term */
-if($_REQUEST['ip']) { $searchTerm = $_REQUEST['ip']; }
-else				{ $searchTerm = ""; }
+if($_GET['ip']) { $searchTerm = $_GET['ip']; }
+else			{ $searchTerm = ""; }
+
+/* filter input */
+$_GET['ip'] = filter_user_input($_GET['ip'], true, true);
 
 ?>
 
@@ -13,18 +16,33 @@ else				{ $searchTerm = ""; }
 <hr>
 
 <!-- search form -->
-<form id="search" name="search" class='form-inline'>
+<form id="search" name="search" class='form-inline' role="form" style="margin-bottom:20px;">
 	<div class='input-group'>
-
 	<div class='form-group'>
-		<input class="search input-sm form-control" name="ip" value="<?php print $searchTerm; ?>" type="text" autofocus="autofocus" style='width:250px;'>
+		<input class="search input-md form-control" name="ip" value="<?php print $searchTerm; ?>" placeholder="<?php print _('Search term'); ?>" type="text" autofocus="autofocus" style='width:250px;'>
 		<span class="input-group-btn">
-			<button type="submit" class="btn btn-sm btn-default"><?php print _('search');?></button>
+			<button type="submit" class="btn btn-md btn-default"><?php print _('search');?></button>
 		</span>
 	</div>
+	</div>
 	
+	<div style="margin:5px;">
+		<?php
+		# if all are off print all on!
+		if($_REQUEST['subnets']!="on" && $_REQUEST['addresses']!="on" && $_REQUEST['vlans']!="on") {
+			$_REQUEST['subnets']="on";
+			$_REQUEST['addresses']="on";
+			$_REQUEST['vlans']="on";
+		}
+		?>
+		<input type="checkbox" name="subnets" 	value="on" <?php if($_REQUEST['subnets']=="on") 	{ print "checked='checked'"; } ?>> <?php print _('Subnets'); ?>
+		<input type="checkbox" name="addresses" value="on" <?php if($_REQUEST['addresses']=="on") 	{ print "checked='checked'"; } ?>> <?php print _('IP addresses'); ?>
+		<input type="checkbox" name="vlans" 	value="on" <?php if($_REQUEST['vlans']=="on") 		{ print "checked='checked'"; } ?>> <?php print _('VLANs'); ?>
 	</div>
 </form>
+
+<hr>
+
 
 <!-- result -->
 <div class="searchResult">

@@ -62,6 +62,28 @@ $mail['footer2'] = "
 </body>
 </html>";
 
+# set html footer - tripple td
+$mail['footer4'] = "
+<tr>
+	<td style='padding:8px;margin:0px;padding-top:30px;' colspan='4'>
+		<table>
+		<tr>
+			<td><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:13px;'>E-mail</font></td>
+			<td><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:13px;'><a href='mailto:$settings[siteAdminMail]' style='color:#08c;'>$settings[siteAdminName]</a></font></td>
+		</tr>
+		<tr>
+			<td><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:13px;'>www</font></td>
+			<td><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:13px;'><a href='$settings[siteURL]' style='color:#08c;'>$settings[siteURL]</a></font></td>
+		</tr>
+		</table>
+	</td>
+</tr>
+</table>
+
+</body>
+</html>";
+
+
 
 # alt header
 $mail['headerAlt'] = "";
@@ -74,7 +96,8 @@ $mail['footerAlt'] = "\r\n------------------------------\r\n$settings[siteAdminN
  *	phpMAiler initialize 
  *	--------------------
  */
-require_once 'phpMailer/class.phpmailer.php';
+//require_once 'phpMailer/class.phpmailer.php';
+require_once( dirname(__FILE__) . '/phpMailer/class.phpmailer.php' );
 // initialize
 $pmail = new PHPMailer(true);				//localhost
 $pmail->CharSet="UTF-8";					//set utf8
@@ -85,6 +108,11 @@ $pmail->Debugoutput = 'html';				//debug type
 if($mailsettings['mtype']=="smtp") {
 	//set smtp
 	$pmail->isSMTP();
+	//tls, sll?
+	if($mailsettings['msecure']=='ssl')	{
+	$mail->SMTPSecure = 'ssl';	
+	} elseif($mailsettings['msecure']=='tls')
+	$mail->SMTPSecure = 'tls';	
 	//server
 	$pmail->Host = $mailsettings['mserver'];
 	$pmail->Port = $mailsettings['mport'];
@@ -92,7 +120,7 @@ if($mailsettings['mtype']=="smtp") {
 	if($mailsettings['mauth']=="yes") {
 		$pmail->SMTPAuth = true;
 		$pmail->Username = $mailsettings['muser'];
-		$pmail->Username = $mailsettings['mpass'];
+		$pmail->Password = $mailsettings['mpass'];
 	} else {
 		$pmail->SMTPAuth = false;	
 	}
@@ -113,33 +141,38 @@ function sendIPnotifEmail($to, $subject, $content)
 	global $pmail;
 	
 	# reformat \n to breaks
-	$content = str_replace("\n", "<br>", $content);
+	$contentarray = explode('\r\n', $content);
 	
 	# get active user name */
 	$sender = getActiveUserDetails();
 	
 	# set html content
 	$mail['content']  = $mail['header'];
-	$mail['content'] .= "<tr><td style='padding:5px;margin:0px;color:#333;font-size:16px;text-shadow:1px 1px 1px white;border-bottom:1px solid #eeeeee;'><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:16px;'>$subject</font></td></tr>";
-	$mail['content'] .= "<tr><td style='padding:5px;padding-left:15px;margin:0px;padding-top:5px;line-height:18px;border-top:1px solid white;border-bottom:1px solid #eeeeee;padding-top:10px;padding-bottom:10px;'><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:13px;'>$content</font></td></tr>";
-	$mail['content'] .= "<tr><td style='padding:5px;padding-left:15px;margin:0px;font-style:italic;padding-bottom:3px;text-align:right;color:#ccc;text-shadow:1px 1px 1px white;border-top:1px solid white;'><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:11px;'>Sent by user ".$mail['sender']['real_name']." at ".date('Y/m/d H:i')."</font></td></tr>";
+	$mail['content'] .= "<tr><td style='padding:5px;margin:0px;color:#333;font-size:16px;text-shadow:1px 1px 1px white;border-bottom:1px solid #eeeeee;'><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:16px;'>$subject</font></td></tr>\n";
+	foreach($contentarray as $c) {
+	$mail['content'] .= "<tr><td style='padding:3px;padding-left:15px;margin:0px;'><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:13px;'>$c</font></td></tr>\n";
+	}
+	$mail['content'] .= "<tr><td style='padding:5px;padding-left:15px;margin:0px;font-style:italic;padding-bottom:3px;text-align:right;color:#ccc;text-shadow:1px 1px 1px white;border-top:1px solid white;'><font face='Helvetica, Verdana, Arial, sans-serif' style='font-size:11px;'>Sent by user ".$mail['sender']['real_name']." at ".date('Y/m/d H:i')."</font></td></tr>\n";
 	$mail['content'] .= $mail['footer'];
 	
 	# Alt content - no html
-	$mail['contentAltt']  = str_replace("<br>", "\r\n", $content);
 	$mail['contentAltt']  = str_replace("\t", " ", $mail['contentAltt']);
 	$mail['contentAltt']  = strip_tags($mail['contentAltt']);
 		
 	$mail['contentAlt']  = $mail['headerAlt'];
 	$mail['contentAlt'] .= "$subject"."\r\n------------------------------\r\n\r\n";
-	$mail['contentAlt'] .= "$mail[contentAltt]";
+	$mail['contentAlt'] .= $mail['contentAltt'];
 	$mail['contentAlt'] .= "\r\n\r\n"._("Sent by user")." ".$mail['sender']['real_name']." at ".date('Y/m/d H:i');
 	$mail['contentAlt'] .= $mail['footerAlt'];	
 
 	# set mail parameters
 	try {
 		$pmail->SetFrom($mailsettings['mAdminMail'], $mailsettings['mAdminName']);
-		$pmail->AddAddress($to);
+		# check for multiple recepients
+		$recipients = explode(",", $to);
+		foreach($recipients as $r) {
+		$pmail->AddAddress(trim($r));			
+		}
 		$pmail->ClearReplyTos();
 		$pmail->AddReplyTo($sender['email'], $sender['real_name']);
 		// CC ender
@@ -153,15 +186,17 @@ function sendIPnotifEmail($to, $subject, $content)
 		# pošlji
 		$pmail->Send();
 	} catch (phpmailerException $e) {
-	  	updateLogTable ("Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("Sending notification mail failed!", $e->errorMessage(), 2);
+	  	print "<div class='alert alert-danger'>".$e."</div>";
 	  	return false;
 	} catch (Exception $e) {
-	  	updateLogTable ("Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("Sending notification mail failed!", $e->errorMessage(), 2);
+	  	print "<div class='alert alert-danger'>".$e."</div>";
 		return false;
 	}
 	
 	# write log for ok
-	updateLogTable ("Sending notification mail to $mail[recipients] succeeded!", $severity = 0);
+	updateLogTable ("Sending notification mail to succeeded!", $to, 0);
 	return true;
 }
 
@@ -233,8 +268,9 @@ function sendUserAccDetailsEmail($userDetails, $subject)
 		// add admins to CC
 		$admins = getAllAdminUsers ();
 		foreach($admins as $admin) {
-			$pmail->AddCC($admin['email']);
-		}
+			if($admin['mailNotify']=="Yes") {
+			$pmail->AddAddress($admin['email']);
+		}	}
 		// content
 		$pmail->Subject = $subject;
 		$pmail->AltBody = $mail['contentAlt'];
@@ -244,15 +280,15 @@ function sendUserAccDetailsEmail($userDetails, $subject)
 		# pošlji
 		$pmail->Send();
 	} catch (phpmailerException $e) {
-	  	updateLogTable ("Sending notification mail for new account to $userDetails[email] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("Sending notification mail for new account failed!", $e->errorMessage(), 2);
 	  	return false;
 	} catch (Exception $e) {
-	  	updateLogTable ("Sending notification mail for new account to $userDetails[email] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("Sending notification mail for new account failed!", $e->errorMessage(), 2);
 		return false;
 	}
 	
 	# write log for ok
-	updateLogTable ("Sending notification mail for new account to $userDetails[email] succeeded!", $severity = 0);
+	updateLogTable ("Sending notification mail for new account succeeded!", $userDetails['email'], 0);
 	return true;
 }
 
@@ -319,8 +355,9 @@ function sendIPReqEmail($request)
 		// add admins to TO
 		$admins = getAllAdminUsers ();
 		foreach($admins as $admin) {
+			if($admin['mailNotify']=="Yes") {
 			$pmail->AddAddress($admin['email']);
-		}
+		}	}
 		$pmail->ClearReplyTos();
 		$pmail-> AddReplyTo($mailsettings['mAdminMail'], $mailsettings['mAdminName']);
 		// send copy to requester
@@ -335,10 +372,10 @@ function sendIPReqEmail($request)
 		# pošlji
 		$pmail->Send();
 	} catch (phpmailerException $e) {
-	  	updateLogTable ("New IP request mail sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("New IP request mail sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), 2);
 	  	return false;
 	} catch (Exception $e) {
-	  	updateLogTable ("New IP request mail sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("New IP request mail sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), 2);
 		return false;
 	}
 	
@@ -437,17 +474,151 @@ function sendIPResultEmail($request)
 		# pošlji
 		$pmail->Send();
 	} catch (phpmailerException $e) {
-	  	updateLogTable ("IP request response mail (confirm,reject) sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("IP request response mail (confirm,reject) sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), 2);
 	  	return false;
 	} catch (Exception $e) {
-	  	updateLogTable ("IP request response mail (confirm,reject) sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("IP request response mail (confirm,reject) sending failed", "Sending notification mail to $mail[recipients] failed!\n".$e->errorMessage(), 2);
 		return false;
 	}
 	
 	# write log for ok
-	updateLogTable ("IP request response mail (confirm,reject) sent ok", "Sending notification mail to $mail[recipients] succeeded!", $severity = 0);
+	updateLogTable ("IP request response mail (confirm,reject) sent ok", "Sending notification mail to $mail[recipients] succeeded!", 0);
 	return true;
 }
+
+
+
+/**
+ *	Send IP address details mail
+ *
+ *		type > IP, subnet, vlan, vrf
+ *		action
+ *		objectOld, objectNew > object details array
+ */ 
+function sendObjectUpdateMails($type, $action, $objectOld, $objectNew, $iprange = false)
+{
+	# get settings
+	global $settings;
+	global $mailsettings;
+	global $mail;
+	global $pmail;
+	
+	# ip range?
+	if($iprange) {
+		# subject
+		$subject = "New IP range $action notification";
+		# set reference object
+		$objectSelected = $objectNew;		
+	}
+	# set content based on action
+	elseif($action == "add") {
+		# subject
+		$subject = "New $type notification";
+		# unset unneeded variables
+		unset($objectOld);
+		unset($objectNew['lastSeen'],$objectNew['editDate'],$objectNew['isFolder']);
+		# set reference object
+		$objectSelected = $objectNew;	
+	}
+	elseif($action == "edit") {
+		# subject
+		$subject = "$type modification notification";
+		# unset unneeded variables	
+		unset($objectNew['lastSeen'],$objectNew['editDate'],$objectNew['isFolder'],$objectNew['id']);
+		unset($objectOld['lastSeen'],$objectOld['editDate'],$objectOld['isFolder'],$objectNew['id'],$objectOld['permissions']);
+
+		# set reference object
+		$objectSelected = $objectOld;	
+	}
+	elseif($action == "delete") {
+		# subject
+		$subject = "$type delete notification";
+		# unset unneeded variables	
+		unset($objectNew);
+		
+		# set reference object
+		$objectSelected = $objectOld;	
+	}
+	
+	# sec default tdstyle
+	$tdstyle = "padding:2px;padding-left:10px;margin:0px;border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;padding-top:3px;padding-bottom:3px;";
+	$font    = "Helvetica, Verdana, Arial, sans-serif";
+
+	# content
+	$content  = "<tr><td colspan='4' style='padding-top:30px;'></td></tr>\n";
+	$content .= "<tr><td style='$tdstyle'><strong>Field</strong></td><td style='$tdstyle'><strong>Old</strong></td><td style='$tdstyle'></td><td style='$tdstyle'><strong>New</strong></td></tr>\n";
+
+	$change = 0;
+	foreach($objectSelected as $k=>$l) {
+
+		$objectNew[$k] = filter_user_input ($objectNew[$k], false, true, false);
+		$objectOld[$k] = filter_user_input ($objectOld[$k], false, true, false);
+	
+		// only mail if change
+		if($objectOld[$k] != $objectNew[$k]) {	
+			
+			if(strlen($objectNew[$k])==0) { $objectNew[$k] = " /"; }
+			if(strlen($objectOld[$k])==0) { $objectOld[$k] = " /"; }
+			
+			$content .= "<tr>";
+			$content .= "<td style='$tdstyle'><font face='$font' style='font-size:12px;'>$k</font></td>";
+			$content .= "<td style='$tdstyle'><font face='$font' style='font-size:12px;'>$objectOld[$k]</font></td>";
+			$content .= "<td style='$tdstyle'><font face='$font' style='font-size:12px;'> => </font></td>";
+			$content .= "<td style='$tdstyle'><font face='$font' style='font-size:12px;'>$objectNew[$k]</font></td>";
+			$content .= "</tr>\n";	
+			
+			$change++;		
+		}
+	}
+	
+	
+	# set html content
+	$mail['content']  = $mail['header'];
+	$mail['content'] .= $content;
+	$mail['content'] .= $mail['footer4'];
+	
+	# Alt content - no html
+	$mail['contentAltt']  = str_replace("<br>", "\r\n", $content);
+	$mail['contentAltt']  = str_replace("\t", " ", $mail['contentAltt']);
+	$mail['contentAltt']  = strip_tags($mail['contentAltt']);
+		
+	$mail['contentAlt']  = $mail['headerAlt'];
+	$mail['contentAlt'] .= "$subject"."\r\n------------------------------\r\n\r\n";
+	$mail['contentAlt'] .= "$mail[contentAltt]";
+	$mail['contentAlt'] .= $mail['footerAlt'];	
+
+	# send only if change
+	if($change>0) {
+		# set mail parameters
+		try {
+			$pmail->SetFrom($mailsettings['mAdminMail'], $mailsettings['mAdminName']);
+			// add admins
+			$admins = getAllAdminUsers ();
+			foreach($admins as $admin) {
+				if($admin['mailChangelog']=="Yes") {
+				$pmail->AddAddress($admin['email']);
+			}	}
+			$pmail->ClearReplyTos();
+			// content
+			$pmail->Subject = $subject;
+			$pmail->AltBody = $mail['contentAlt'];
+	
+			$pmail->MsgHTML($mail['content']);
+			
+			# pošlji
+			$pmail->Send();
+		} catch (phpmailerException $e) {
+		  	updateLogTable ("Sending change notification mail failed!", $e->errorMessage(), 2);
+		  	return false;
+		} catch (Exception $e) {
+		  	updateLogTable ("Sending change notification mail failed!", $e->errorMessage(), 2);
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 
 
 
@@ -473,9 +644,11 @@ function sendStatusUpdateMail($content, $subject)
 		$pmail->SetFrom($mailsettings['mAdminMail'], $mailsettings['mAdminName']);
 		// add admins to CC
 		$admins = getAllAdminUsers ();
+		
 		foreach($admins as $admin) {
+			if($admin['mailNotify']=="Yes") {
 			$pmail->AddAddress($admin['email']);
-		}
+		}	}
 		// content
 		$pmail->Subject = $subject;
 		$pmail->AltBody = $mail['contentAlt'];
@@ -485,17 +658,16 @@ function sendStatusUpdateMail($content, $subject)
 		# pošlji
 		$pmail->Send();
 	} catch (phpmailerException $e) {
-	  	updateLogTable ("Sending notification mail for IP address state change failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("Sending notification mail for IP address state change failed!", $e->errorMessage(), 2);
 	  	return false;
 	} catch (Exception $e) {
-	  	updateLogTable ("Sending notification mail for IP address state change failed!\n".$e->errorMessage(), $severity = 2);
+	  	updateLogTable ("Sending notification mail for IP address state change failed!", $e->errorMessage(), 2);
 		return false;
 	}
 	
 	# write log for ok
-	updateLogTable ("Sending notification mail for IP address state change succeeded!", $severity = 0);
+	updateLogTable ("Sending notification mail for IP address state change succeeded!", null, 0);
 	return true;
 }
-
  
 ?>

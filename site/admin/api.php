@@ -34,6 +34,7 @@ $settings = getallSettings();
 	    <th><?php print _('App id'); ?></th>
 	    <th><?php print _('App code'); ?></th>
 	    <th><?php print _('App permissions'); ?></th>
+	    <th><?php print _('Comment'); ?></th>
 	    <th></th>
 	</tr>
 	
@@ -51,15 +52,16 @@ $settings = getallSettings();
 			if($a['app_permissions']==0)		{ $a['app_permissions'] = _("Disabled"); }
 			elseif($a['app_permissions']==1)	{ $a['app_permissions'] = _("Read"); }
 			elseif($a['app_permissions']==2)	{ $a['app_permissions'] = _("Read / Write"); }
+			elseif($a['app_permissions']==3)	{ $a['app_permissions'] = _("Read / Write / Admin"); }
 			
 			print '	<td>' . $a['app_permissions'] . '</td>'. "\n";
-			
+			print '	<td>' . $a['app_comment'] . '</td>'. "\n";			
 			
 			# add/remove APIs
 			print "	<td class='actions'>";
 			print "	<div class='btn-group'>";
-			print "		<button class='btn btn-sm btn-default editAPI'  data-container='body' data-appid='$a[id]' data-action='edit'   rel='tooltip' title='"._('edit app details')."'>	<i class='fa fa-pencil'></i></button>";
-			print "		<button class='btn btn-sm btn-default editAPI'  data-container='body' data-appid='$a[id]' data-action='delete' rel='tooltip' title='"._('remove app')."'>		<i class='fa fa-times'></i></button>";
+			print "		<button class='btn btn-xs btn-default editAPI'  data-container='body' data-appid='$a[id]' data-action='edit'   rel='tooltip' title='"._('edit app details')."'>	<i class='fa fa-pencil'></i></button>";
+			print "		<button class='btn btn-xs btn-default editAPI'  data-container='body' data-appid='$a[id]' data-action='delete' rel='tooltip' title='"._('remove app')."'>		<i class='fa fa-times'></i></button>";
 			print "	</div>";
 			print "</td>";
 			
@@ -99,7 +101,7 @@ $settings = getallSettings();
 	<hr>
 	
 	<h4><?php print _('API documentation'); ?></h4>
-	<pre><?php print file_get_contents(dirname(__FILE__) . '/../../api/README'); ?></pre>
+	<pre style="background:white;"><?php print file_get_contents(dirname(__FILE__) . '/../../api/README'); ?></pre>
 
 <?php } else { ?>
 <div class="alert alert-info"><?php print _('Please enable API module under server management'); ?></div>

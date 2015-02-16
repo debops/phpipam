@@ -1,4 +1,4 @@
-	<?php
+<?php
 
 /**
  *	Mail settings
@@ -10,9 +10,13 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin(false);
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
 /* get settings form post */
-$settings = $_POST;
 $sitesettings = getAllSettings();
+$settings = $_POST;
+
 
 /* set mail parameters */
 require_once '../../functions/phpMailer/class.phpmailer.php';
@@ -54,17 +58,21 @@ if($settings['mtype']=="localhost") {
 elseif($settings['mtype']=="smtp") {
 	// initialize
 	try {
-		$pmail->isSMTP();	
-		
+		//set smtp
+		$pmail->isSMTP();
+		//tls, sll?
+		if($mailsettings['msecure']=='ssl')	{
+		$mail->SMTPSecure = 'ssl';	
+		} elseif($mailsettings['msecure']=='tls')
+		$mail->SMTPSecure = 'tls';	
 		//server
-		$pmail->Host = $settings['mserver'];
-		$pmail->Port = $settings['mport'];
-		
+		$pmail->Host = $mailsettings['mserver'];
+		$pmail->Port = $mailsettings['mport'];
 		//auth or not?
-		if($settings['mauth']=="yes") {
+		if($mailsettings['mauth']=="yes") {
 			$pmail->SMTPAuth = true;
-			$pmail->Username = $settings['muser'];
-			$pmail->Username = $settings['mpass'];
+			$pmail->Username = $mailsettings['muser'];
+			$pmail->Password = $mailsettings['mpass'];
 		} else {
 			$pmail->SMTPAuth = false;	
 		}

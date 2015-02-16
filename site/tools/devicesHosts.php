@@ -5,20 +5,107 @@
  *
  */
 
-
 /* verify that user is authenticated! */
 isUserAuthenticated ();
 
 /* get hosts under device */
-$device = getDeviceById($_GET['deviceid']);
+$device = getDeviceById($_GET['sPage']);
+
+/* get custom fields */
+$custom = getCustomFields('devices');
 
 /* Get all IP addresses belonging to switch */
 $ipaddresses = getIPaddressesBySwitchName ( $device['id'] );
 
-# title
-print "<hr>";
+//count items
+$cnt = countIPaddressesBySwitchId($device['id']);
+
+if($_GET['sPage']!=0 && $device) {
+
+	//type
+	$type = TransformDeviceType($device['type']);
+	
+	# title
+	print "<h4>"._('Device details')."</h4>";
+	print "<hr>";
+	
+	# device details
+	print "<table class='ipaddress_subnet table-condensed table-full'>";
+	print '<tr>';
+	print "	<th>". _('Hostname').'</a></th>';
+	print "	<td>$device[hostname]</td>";
+	print "</tr>";
+	print "	<th>". _('IP address').'</th>';
+	print "	<td>$device[ip_addr]</td>";
+	print "</tr>";
+	print "	<th>". _('Description').'</th>';
+	print "	<td>$device[description]</td>";
+	print "</tr>";
+	print "	<th>". _('Number of hosts').'</th>';
+	print "	<td>$cnt</td>";
+	print "</tr>";
+	print "	<th>". _('Type').'</th>';
+	print "	<td>$type</td>";
+	print "</tr>";
+	print "	<th>". _('Vendor').'</th>';
+	print "	<td>$device[vendor]</td>";
+	print "</tr>";
+	print "	<th>". _('Model').'</th>';
+	print "	<td>$device[model]</td>";
+	print "</tr>";
+	print "	<th>". _('SW version').'</th>';
+	print "	<td>$device[version]</td>";
+	print "</tr>";
+	
+	print "<tr>";
+	print "	<td colspan='2'><hr></td>";
+	print "</tr>";
+	
+	if(sizeof($custom) > 0) {
+		foreach($custom as $field) {
+			
+			# fix for boolean
+			if($field['type']=="tinyint(1)" || $field['type']=="boolean") {
+				if($device[$field['name']]=="0")		{ $device[$field['name']] = "false"; }
+				elseif($device[$field['name']]=="1")	{ $device[$field['name']] = "true"; }
+				else									{ $device[$field['name']] = ""; }
+			}
+			
+			print "<tr>";
+			print "<th>$field[name]</th>";
+			print "<td>".$device[$field['name']]."</d>";
+			print "</tr>";
+		}
+	}
+
+	print "<tr>";
+	print "	<td colspan='2'><hr></td>";
+	print "</tr>";
+		
+	print "<tr>";
+	print "	<td></td>";
+	if($user['role'] == "Administrator") {
+
+		print "	<td class='actions'>";
+		print "	<div class='btn-group'>";
+		print "		<button class='btn btn-xs btn-default editSwitch' data-action='edit'   data-switchid='".$device['id']."'><i class='fa fa-gray fa-pencil'></i></button>";
+		print "		<button class='btn btn-xs btn-default editSwitch' data-action='delete' data-switchid='".$device['id']."'><i class='fa fa-gray fa-times'></i></button>";
+		print "	</div>";
+		print " </td>";
+	}
+	else {
+		print "	<td class='small actions'>";
+		print "	<div class='btn-group'>";
+		print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-pencil'></i></button>";
+		print "		<button class='btn btn-xs btn-default disabled'><i class='fa fa-gray fa-times'></i></button>";
+		print "	</div>";
+		print " </td>";		
+	}
+	print "</tr>";
 
 
+	print "</table>";
+}
 
 # main table frame
 print "<table id='switchMainTable' class='devices table table-striped table-top table-condensed'>";
@@ -79,9 +166,9 @@ print "<table id='switchMainTable' class='devices table table-striped table-top 
 	
 			# print
 			print "<tr>";
-			print "	<td class='ip'>".transform2long($ip['ip_addr'])."/$subnet[mask]</td>";
+			print "	<td class='ip'><a href='".create_link("subnets",$section['id'],$subnet['id'],"ipaddr",$ip['id'])."'>".transform2long($ip['ip_addr'])."</a></td>";
 			print "	<td class='port'>$ip[port]</td>";
-			print "	<td class='subnet'><a href='subnets/$section[id]/$subnet[id]/'>$subnet[description]</a></td>";
+			print "	<td class='subnet'><a href='".create_link("subnets",$section['id'],$subnet['id'])."'>".transform2long($subnet['subnet'])."/$subnet[mask]</a> <span class='text-muted'>($subnet[description])</span></td>";
 			print "	<td class='description'>$ip[description]</td>";
 
 			# print info button for hover

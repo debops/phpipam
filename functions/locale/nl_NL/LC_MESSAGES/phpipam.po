@@ -1,26 +1,26 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: 1.00.000\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Michiel Visser <michiel@connectionservices.nl>\n"
-"Language-Team: \n"
+"Language-Team: Michiel Visser <michiel@connectionservices.nl>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.7\n"
+"Language: Dutch\n"
 
 # PHPIPAM translations file - template
 # Copyright (C) phpipam 2013
 # This file is distributed under the same license as the phpipam package.
 # miha petkovsek <miha.petkovsek@gmail.com>, 2013.
 #
-# "Project-Id-Version: 0.9\n"
 # "Report-Msgid-Bugs-To: Miha Petkovsek <miha.petkovsek@gmail.com>\n"
 # "POT-Creation-Date: 2013-04-02 14:33+0200\n"
 # "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 # "Last-Translator: \n"
-# "Language: \n"
+# "Language: Nederlands (Dutch)\n"
 # "MIME-Version: 1.0\n"
 # "Content-Type: text/plain; charset=UTF-8\n"
 # "Content-Transfer-Encoding: 8bit\n"
@@ -4603,3 +4603,318 @@ msgstr "Map verwijderen"
 #: site/admin/CSVimportSubmit.php
 msgid "Errors marked with red will be ignored from importing"
 msgstr "In rood gemarkeerde fouten worden bij de import genegeerd"
+
+# ## 0.9 ###
+#: site/admin/userADsearchForm.php
+msgid "Search user in AD"
+msgstr "Zoek gebruiker in de AD"
+
+msgid "Following users were found"
+msgstr "De volgende gebruikers zijn gevonden"
+
+msgid "Select"
+msgstr "Kies"
+
+# ## 0.91.001 ###
+#: functions/functions-common.php
+msgid "Favourite subnets"
+msgstr "Favoriete subnetten"
+
+msgid "No favourite subnets selected"
+msgstr "Geen favoriete subnetten geselecteerd"
+
+msgid ""
+"You can add subnets to favourites by clicking star icon in subnet details"
+msgstr ""
+"Favoriete subnetten kunnen toegevoegd door vanuit de detailweergave op het "
+"ster-icoon te klikken"
+
+msgid "Click to remove from favourites"
+msgstr "Klik om uit de favorieten te verwijderen"
+
+msgid "Click to add to favourites"
+msgstr "Klik om aan de favorieten toe te voegen"
+
+#: site/tools/favouriteEdit.php
+msgid "Error editing favourite"
+msgstr "Fout bij bewerken van favoriet"
+
+#: site/sections.php
+msgid "Favourite networks"
+msgstr "Favoriete netwerken"
+
+# ## 0.92.001 ###
+#: site/ipaddr/ipDetailsChangelog.php
+msgid "Changelog"
+msgstr "Log van veranderingen"
+
+msgid "No changelogs available"
+msgstr "Geen veranderingen beschikbaar"
+
+msgid "No changelog entries are available for this host"
+msgstr "Geen veranderingen beschikbaar voor dit apparaat"
+
+msgid "No changelog entries are available for this subnet"
+msgstr "Geen veranderingen beschikbaar voor dit subnet"
+
+msgid "No changelog entries are available for this section"
+msgstr "Geen veranderingen beschikbaar voor deze sectie"
+
+msgid "No changelog entries are available"
+msgstr "Er zijn geen veranderingen beschikbaar"
+
+#: site/ipaddr/ipDetails.php
+msgid "Avalibility"
+msgstr "Beschikbaarheid"
+
+msgid "Last edited"
+msgstr "Laatst gewijzigd"
+
+msgid "Action"
+msgstr "Actie"
+
+msgid "Result"
+msgstr "Resultaat"
+
+msgid "Change"
+msgstr "Verander"
+
+#: site/tools/changelogPrint.php
+msgid "Output has been limited to last 50 lines"
+msgstr "Resultaat is beperkt tot de laatste 50 regels"
+
+msgid "Output has been limited to last 100 lines"
+msgstr "Resultaat is beperkt tot de laatste 100 regels"
+
+msgid "Output has been limited to last 250 lines"
+msgstr "Resultaat is beperkt tot de laatste 250 regels"
+
+msgid "Output has been limited to last 500 lines"
+msgstr "Resultaat is beperkt tot de laatste 500 regels"
+
+#: site/admin/settings.php
+msgid "Enable changelog"
+msgstr "Activeer bijhouden van veranderingen"
+
+#: site/tools/changelog.php
+msgid "Change logging is disabled. You can enable it under administration"
+msgstr ""
+"Het bijhouden van veranderingen is uitgeschakeld. Dit kan ingeschakeld "
+"worden in het Beheer"
+
+# ## 0.94.002 ###
+#: site/admin/settings.php
+msgid "Ping path"
+msgstr "Pad naar ping"
+
+msgid "Set path for ping executable file (default /bin/ping)"
+msgstr "Pad naar het uitvoerbare bestand voor ping (standaard /bin/ping)"
+
+msgid "Max scan threads"
+msgstr "Maximum gelijktijdige scan-processen"
+
+msgid "Set maximum nubmer of concurrent ICMP checks (default 128)"
+msgstr "Maximum aantal gelijktijdige ICMP-controles (standaard 128)"
+
+#: functions/functions-common.php
+msgid "Last 5 change log entries"
+msgstr "Laatste 5 veranderingen"
+
+# ## 0.95.001 ###
+#: site/admin/widgets.php
+msgid "You can manage widgets here"
+msgstr "Widgets kunnen hier beheerd worden"
+
+msgid "Create new widget"
+msgstr "Nieuwe widget maken"
+
+msgid "No widgets created yet"
+msgstr "Geen widgets aangemaakt"
+
+msgid "Create widget file in directory site/dashboard/widgets/"
+msgstr "Maak het widget-bestand in de map site/dashboard/widgets/"
+
+#: site/admin/widgetEdit.php
+msgid "Add new widget"
+msgstr "Nieuwe widget toevoegen"
+
+msgid "Edit widget"
+msgstr "Widget bewerken"
+
+msgid "Delete widget"
+msgstr "Widget verwijderen"
+
+#: site/admin/widgetEditResult.php
+msgid "Widget add error"
+msgstr "Fout bij toevoegen van widget"
+
+msgid "Widget edit error"
+msgstr "Fout bij bewerken van widget"
+
+msgid "Widget delete error"
+msgstr "Fout bij verwijderen van widget"
+
+msgid "Widget add success"
+msgstr "Widget met succes toegevoegd"
+
+msgid "Widget edit success"
+msgstr "Widget met succes aangepast"
+
+msgid "Widget delete success"
+msgstr "Widget met succes verwijderd"
+
+# ## 0.96.002 ###
+#: site/dashboard/widgets/requests.php
+msgid "Active IP address requests"
+msgstr "Actieve aanvragen voor IP-adressen"
+
+#: site/sections.php
+msgid "Click to reorder widgets"
+msgstr "Klik om widget-volgorde te wijzigen"
+
+msgid "Click to save widgets order"
+msgstr "Klik om de volgorde te bewaren"
+
+#: site/dashboard/widgetPopup.php
+msgid "Add new widget to dashboard"
+msgstr "Nieuw widget aan dashboard toevoegen"
+
+msgid "All available widgets are already on dashboard"
+msgstr "Alle beschikbare widgets staan op het dashboard"
+
+#: site/tools/userMenu.php
+msgid "Save order"
+msgstr "Bewaar volgorde"
+
+#: site/admin/widgets.php
+msgid "File"
+msgstr "Bestand"
+
+msgid "Admin only"
+msgstr "Alleen voor beheerders"
+
+msgid "Link to page"
+msgstr "Link naar pagina"
+
+msgid "Widget size"
+msgstr "Grootte van widget"
+
+# ## 0.96.005 ###
+#: site/ipaddr/scan/subnetScanDiscoveryPing.php
+msgid "No alive host found"
+msgstr "Geen actieve apparaten gevonden"
+
+msgid "Errors occured during scan"
+msgstr "Er is een fout opgetreden tijdens scannen"
+
+msgid "Excluded from check"
+msgstr "Van controle uitgesloten"
+
+# ## 0.97.001 ###
+#: site/login/loginCheck.php
+msgid "Invalid characters in username"
+msgstr "Ongeldige tekens in de gebruikersnaam"
+
+msgid "Invalid characters in password"
+msgstr "Ongeldige tekens in het wachtwoord"
+
+#: site/admin/adminMenu.php
+msgid "Mail settings"
+msgstr "E-mailinstellingen"
+
+msgid "Mail server settings"
+msgstr "Instellingen e-mailserver"
+
+msgid "Server type"
+msgstr "Type server"
+
+msgid "Localhost"
+msgstr "Lokaal (localhost)"
+
+msgid "SMTP"
+msgstr "SMTP"
+
+msgid "Select server type for sending mail messages"
+msgstr "Geef het servertype voor het versturen van e-mailberichten"
+
+msgid "Server authentication"
+msgstr "Server vereist authenticatie"
+
+msgid "Select yes if authentication is required"
+msgstr "Selecteer indien authenticatie vereist is"
+
+msgid "Set username for SMTP authentication"
+msgstr "Gebruikersnaam voor SMTP-authenticatie"
+
+msgid "Set password for SMTP authentication"
+msgstr "Wachtwoord voor SMTP-authenticatie"
+
+msgid "Mail sender settings"
+msgstr "Instellingen afzender"
+
+msgid "Send test email"
+msgstr "Stuur testbericht"
+
+msgid "Mail server type"
+msgstr "Type e-mailserver"
+
+msgid "SMTP settings"
+msgstr "SMTP-instellingen"
+
+msgid "Server address"
+msgstr "Serveradres"
+
+msgid "Sender name"
+msgstr "Naam afzender"
+
+msgid "Sender mail"
+msgstr "E-mailadres afzender"
+
+#: site/admin.settings.php
+msgid "Set administrator name"
+msgstr "Naam beheerder"
+
+msgid "Set administrator email"
+msgstr "E-mailadres beheerder"
+
+# ## 0.97.003 ###
+#: site/ipaddr/scan/subnetScan.php
+msgid "Separate multiple ports with ;"
+msgstr "Scheid meerdere poorten met ;"
+
+#: site/ipaddr/scan/subnetScanDiscoveryTelnet.php
+msgid "Please enter ports to scan"
+msgstr "Te scannen poorten"
+
+msgid "Invalid port"
+msgstr "Ongeldig poortnummer"
+
+# ## 0.98.001 ###
+#: site/admin/verifyDatabase.php
+msgid "Cannot get fix for table"
+msgstr "Kan geen reparatie verrichten voor tabel"
+
+msgid "Fix table"
+msgstr "Repareer tabel"
+
+msgid "Fix field"
+msgstr "Repareer veld"
+
+#: site/admin/verifyDatabaseFix.php
+msgid "Wrong parameters"
+msgstr "Verkeerde opties"
+
+#: site/sections.php
+msgid "Database errors detected"
+msgstr "Er zijn fouten in de database geconstateerd"
+
+# ## 0.99.002 ###
+#: site/tools/devicesPrint.php
+msgid "Show all hosts"
+msgstr "Toon alle apparaten"
+
+msgid "No hosts belonging to this device"
+msgstr "Geen computers aan dit apparaat gekoppeld"
+
+msgid "Sort by vendor"
+msgstr "Sorteer op leverancier"

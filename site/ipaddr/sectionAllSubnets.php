@@ -13,12 +13,22 @@ $custom = getCustomFields('subnets');
 /* get all site settings */
 $settings = getAllSettings();
 
+/* filter input */
+$_GET = filter_user_input($_GET, true, true, false);
+
+/* must be numeric */
+if(!is_numeric($_GET['section']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
+/* set hidden fields */
+$ffields = json_decode($settings['hiddenCustomFields'], true);		
+if(is_array($ffields['subnets']))	{ $ffields = $ffields['subnets']; }
+else								{ $ffields = array(); }
 
 # title
 print "<h4>"._('Available subnets')."</h4>";
 
 # check permission
-$permission = checkSectionPermission ($_REQUEST['section']);
+$permission = checkSectionPermission ($_GET['section']);
 if($permission != "0") {
 
 	# print  table structure
@@ -29,7 +39,7 @@ if($permission != "0") {
 		else								{ $colCount = 7; }
 		
 		# get Available subnets in section
-		$subnets = fetchSubnets($_REQUEST['section']);
+		$subnets = fetchSubnets($_GET['section']);
 		
 		# remove custom fields if all empty! */
 		foreach($custom as $field) {
@@ -64,7 +74,9 @@ if($permission != "0") {
 		print "	<th class='hidden-xs hidden-sm'>"._('Hosts check')."</th>";
 		if(sizeof($custom) > 0) {
 			foreach($custom as $field) {
-				print "	<th class='hidden-xs hidden-sm'>$field[name]</th>";
+				if(!in_array($field['name'], $ffields)) {
+					print "	<th class='hidden-xs hidden-sm'>$field[name]</th>";
+				}
 			}
 		}
 		print "	<th class='actions' style='width:140px;white-space:nowrap;'></th>";
@@ -75,7 +87,7 @@ if($permission != "0") {
 			print "<tr><td colspan='$colCount'><div class='alert alert-info'>"._('Section has no subnets')."!</div></td></tr>";
 				
 			# check Available subnets for subsection
-			$subsections = getAllSubSections($_REQUEST['section']);
+			$subsections = getAllSubSections($_GET['section']);
 			
 			$colspan = 6 + sizeof($custom);
 			if($settings['enableVRF'] == 1) { $colspan++; }

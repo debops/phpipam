@@ -18,6 +18,10 @@ $custom = getCustomFields('users');
 
 /* get languages */
 $langs = getLanguages ();
+
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+$_POST['action'] = filter_user_input($_POST['action'], false, false, true);
 ?>
 
 
@@ -92,6 +96,29 @@ if(isset($settings['defaultLang']) && !is_null($settings['defaultLang']) && $act
     	<td class="info2"><?php print _('Enter users email address'); ?></td>
     </tr>
 
+    <!-- role -->
+    <tr>
+    	<td><?php print _('User role'); ?></td> 
+    	<td>
+        <select name="role" class="form-control input-sm input-w-auto">
+            <option value="Administrator"   <?php if ($user['role'] == "Administrator") print "selected"; ?>><?php print _('Administrator'); ?></option>
+            <option value="User" 			<?php if ($user['role'] == "User" || $_POST['action'] == "add") print "selected"; ?>><?php print _('Normal User'); ?></option>
+        </select>
+        
+        
+        <input type="hidden" name="userId" value="<?php if(isset($user['id'])) { print $user['id']; } ?>">
+        <input type="hidden" name="action" value="<?php print $action; ?>">
+        
+        </td> 
+        <td class="info2"><?php print _('Select user role'); ?>
+	    	<ul>
+		    	<li><?php print _('Administrator is almighty'); ?></li>
+		    	<li><?php print _('Users have access defined based on groups'); ?></li>
+		    </ul>
+		</td>  
+	</tr>
+
+
 <!-- type -->
 <?php
 /* if domainauth is not enabled default to local user */
@@ -127,6 +154,39 @@ else {
 	else 							{ $disabled = ""; }
 ?>
 
+    <!-- password -->
+	<tr>
+		<td colspan="3"><hr></td>
+	</tr>
+	
+    <tr class="password">
+    	<td><?php print _('Password'); ?></td> 
+    	<td><input type="password" class="userPass form-control input-sm" name="password1" <?php print $disabled; ?>></td>
+    	<td class="info2"><?php print _("User's password"); ?> (<a href="#" id="randomPass"><?php print _('click to generate random'); ?>!</a>)</td>
+    </tr>
+
+    <!-- password repeat -->
+    <tr class="password">
+    	<td><?php print _('Password'); ?></td> 
+    	<td><input type="password" class="userPass form-control input-sm" name="password2" <?php print $disabled; ?>></td>   
+    	<td class="info2"><?php print _('Re-type password'); ?></td>
+    </tr>
+
+    <!-- password change request -->
+    <?php if($action == "add") { ?>
+    <tr class="password">
+    	<td></td> 
+    	<td class="info2" colspan="2">
+    		<input type="checkbox" name="passChange" value="On" checked> 
+			<?php print _('Require user to change password after initial login'); ?>
+		</td>
+    </tr>
+    <?php } ?>
+	<tr>
+		<td colspan="3"><hr></td>
+	</tr>
+	
+
 	<!-- Language -->
 	<tr>
 		<td><?php print _('Language'); ?></td>
@@ -143,47 +203,42 @@ else {
 		<td class="info2"><?php print _('Select language'); ?></td>
 	</tr>
 
-    <!-- password -->
-    <tr class="password">
-    	<td><?php print _('Password'); ?></td> 
-    	<td><input type="password" class="userPass form-control input-sm" name="password1" <?php print $disabled; ?>></td>
-    	<td class="info2"><?php print _("User's password"); ?> (<a href="#" id="randomPass"><?php print _('click to generate random'); ?>!</a>)</td>
-    </tr>
-
-    <!-- password repeat -->
-    <tr class="password">
-    	<td><?php print _('Password'); ?></td> 
-    	<td><input type="password" class="userPass form-control input-sm" name="password2" <?php print $disabled; ?>></td>   
-    	<td class="info2"><?php print _('Re-type password'); ?></td>
-    </tr>
-
     <!-- send notification mail -->
     <tr>
     	<td><?php print _('Notification'); ?></td> 
     	<td><input type="checkbox" name="notifyUser" <?php if($action == "add") { print 'checked'; } else if($action == "delete") { print 'disabled="disabled"';} ?>></td>   
     	<td class="info2"><?php print _('Send notification email to user with account details'); ?></td>
     </tr>
-
-    <!-- role -->
-    <tr>
-    	<td><?php print _('User role'); ?></td> 
+	
+	<!-- mailNotify -->
+	<tr>
+    	<td><?php print _('Mail State changes'); ?></td> 
     	<td>
-        <select name="role" class="form-control input-sm input-w-auto">
-            <option value="Administrator"   <?php if ($user['role'] == "Administrator") print "selected"; ?>><?php print _('Administrator'); ?></option>
-            <option value="User" 			<?php if ($user['role'] == "User" || $_POST['action'] == "add") print "selected"; ?>><?php print _('Normal User'); ?></option>
+        <select name="mailNotify" class="form-control input-sm input-w-auto">
+            <option value="No"><?php print _('No'); ?></option>
+            <option value="Yes"  <?php if ($user['mailNotify'] == "Yes") print "selected='selected'"; ?>><?php print _('Yes'); ?></option>
         </select>
         
         
-        <input type="hidden" name="userId" value="<?php if(isset($user['id'])) { print $user['id']; } ?>">
-        <input type="hidden" name="action" value="<?php print $action; ?>">
+        </td> 
+        <td class="info2"><?php print _('Select yes to receive notification change mail for State change'); ?></td> 		
+	</tr>
+
+	<!-- mailNotifyChangelog -->
+	<tr>
+    	<td><?php print _('Mail Changelog'); ?></td> 
+    	<td>
+        <select name="mailChangelog" class="form-control input-sm input-w-auto">
+            <option value="No"><?php print _('No'); ?></option>
+            <option value="Yes"  <?php if ($user['mailChangelog'] == "Yes") print "selected='selected'"; ?>><?php print _('Yes'); ?></option>
+        </select>
+        
         
         </td> 
-        <td class="info2"><?php print _('Select user role'); ?>
-	    	<ul>
-		    	<li><?php print _('Administrator is almighty'); ?></li>
-		    	<li><?php print _('Users have access defined based on groups'); ?></li>
-		    </ul>
-		</td>  
+        <td class="info2"><?php print _('Select yes to receive notification change mail for changelog'); ?></td> 		
+	</tr>
+	<tr>
+		<td colspan="3"><hr></td>
 	</tr>
 	
 	<!-- groups -->

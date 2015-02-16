@@ -9,7 +9,6 @@ checkAdmin();
 
 /* get all */
 $allActiveRequests = getAllActiveIPrequests();
-
 ?>
 
 <h4><?php print _('List of all active IP addresses requests'); ?></h4>

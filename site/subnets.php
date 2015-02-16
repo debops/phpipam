@@ -11,8 +11,10 @@
 isUserAuthenticated ();
 
 
+if(!is_numeric($_GET['section']))		{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }
+
 /* get requested section and format it to nice output */
-$sectionId = $_REQUEST['section'];
+$sectionId = $_GET['section'];
 
 /* if it is not numeric than get ID from provided name */
 if ( (!is_numeric($sectionId)) && ($sectionId != "Administration") ) {
@@ -24,7 +26,7 @@ if ( (!is_numeric($sectionId)) && ($sectionId != "Administration") ) {
  */
 if ($sectionId == 'Administration')
 {
-    /* Print all Admin actions af user is admin :) */
+    /* Print all Admin actions if user is admin :) */
     if (!checkAdmin()) {
         print '<div class="alert alert-danger">'._('Sorry, must be admin').'!</div>';
     }
@@ -36,7 +38,7 @@ else
 {    
 
 	/* print subsections if they exist */
-	$subsections = getAllSubSections($_REQUEST['section']);
+	$subsections = getAllSubSections($_GET['section']);
 	
 	# permissions
 	foreach($subsections as $k=>$ss) {
@@ -54,7 +56,7 @@ else
 		
 		foreach($subsections as $ss) {
 			print "<tr>";
-			print "	<td><i class='fa fa-gray fa-folder'></i> <a href='subnets/$ss[id]/' rel='tooltip' data-placement='right' title='$ss[description]'>$ss[name]</a></td>";
+			print "	<td><i class='fa fa-gray fa-folder'></i> <a href='".create_link("subnets",$ss['id'])."' rel='tooltip' data-placement='right' title='$ss[description]'>$ss[name]</a></td>";
 			print "</tr>";
 		}
 		
@@ -63,7 +65,7 @@ else
 
 	/* print Subnets */
 	
-    # get section name
+    # get section details
     $sectionName = getSectionDetailsById ($sectionId);
     
     # verify permissions
@@ -87,7 +89,7 @@ else
     	$mSection = getSectionDetailsById ($sectionName['masterSection']);
     	
 	    print "<div class='subnets' style='padding-top:10px;'>";
-	    print "	<a href='subnets/$mSection[id]/'><i class='fa fa-gray fa-angle-left fa-pad-left'></i> "._('Back to')." $mSection[name]</a><hr>";
+	    print "	<a href='".create_link("subnets",$mSection['id'])."'><i class='fa fa-gray fa-angle-left fa-pad-left'></i> "._('Back to')." $mSection[name]</a><hr>";
 	    print "</div>";
     }
     
@@ -143,7 +145,7 @@ else
 $sectionPermission = checkSectionPermission ($sectionId);
 if($sectionPermission == 3) {
 	print "<div class='action'>";
-	if(isset($_REQUEST['subnetId'])) {
+	if(isset($_GET['subnetId'])) {
 	print "	<button class='btn btn-xs btn-default pull-left' id='hideSubnets' rel='tooltip' title='"._('Hide subnet list')."' data-placement='right'><i class='fa fa-gray fa-sm fa-chevron-left'></i></button>";
 	}
 	print "	<span>"._('Add new');

@@ -10,6 +10,9 @@ require_once('../../functions/functions.php');
 /* verify that user is admin */
 checkAdmin();
 
+/* filter input */
+$_POST = filter_user_input($_POST, true, true, false);
+
 /* verifications */
 if(!isset($_POST['tableid']) || strlen(@$_POST['tableid'])<1 ) {
 	die("<div class='alert alert-danger'>"._("Wrong parameters")."</div>");

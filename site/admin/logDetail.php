@@ -13,6 +13,9 @@ checkAdmin();
 /* verify post */
 CheckReferrer();
 
+/* escape vars to prevent SQL injection */
+$_POST = filter_user_input ($_POST, true, true);
+
 /**
  * Fetch section info
  */
@@ -35,7 +38,7 @@ else {
 /**
  * get user details
  */
-$user = getUserDetailsByName($log['username']);
+$user = getUserDetailsByName($log['username'], false);
 ?>
 
 

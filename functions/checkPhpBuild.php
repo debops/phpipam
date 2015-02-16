@@ -9,6 +9,9 @@
  *      - mysqli
  *      - session
  *      - gmp
+ *		- SimpleXML
+ *		- json
+ *		- gettext
  *
  ************************************/
 
@@ -37,6 +40,11 @@ if (function_exists("apache_get_modules")) {
     }
 }
 
+/* check for PEAR functions */
+if ((@include_once 'PEAR.php') != true) {
+	$missingExt[] = "php PEAR support";
+}
+
 /* if any extension is missing print error and die! */
 if (sizeof($missingExt) != 1) {
 
@@ -46,15 +54,17 @@ if (sizeof($missingExt) != 1) {
     /* headers */
     $error   = "<html>";
     $error  .= "<head>";
-    $error  .= '<link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.css">';
-	$error  .= '<link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap-custom.css">';
+    $error  .= "<base href='$url' />";
+    $error  .= '<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css">';
+	$error  .= '<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-custom.css">';
 	$error  .= "</head>";
-    $error  .= "<body>";
-    $error  .= '<div id="header">';
-    $error  .= '<div class="hero-unit">';
-	$error  .= '<a href="/">phpIPAM error</a>';
+    $error  .= "<body style='margin:0px;'>";
+	$error  .= '<div class="row header-install" id="header"><div class="col-xs-12">';
+	$error  .= '<div class="hero-unit" style="padding:20px;margin-bottom:10px;">';
+	$error  .= '<a href="'.create_link(null,null,null,null,null,true).'">phpipam requirements error</a>';
 	$error  .= '</div>';
-	$error  .= '</div>';
+	$error  .= '</div></div>';
+
     /* error */
     $error  .= "<div class='alert alert-danger' style='margin:auto;margin-top:20px;width:500px;'><strong>"._('The following required PHP extensions are missing').":</strong><br><hr>";
     $error  .= '<ul>' . "\n";
@@ -76,11 +86,13 @@ if (sizeof($missingExt) != 1) {
  * We must also check database connection to se if all is configured properly
  *
  */
-$mysqli = @new mysqli($db['host'], $db['user'], $db['pass'], $db['name']); 
-
-/* check connection */
-if ($mysqli->connect_errno) {
-	/* die with error */
-    die('<div class="alert alert-danger"><strong>'._('Database connection failed').'!</strong><br><hr>Error: '. mysqli_connect_error() .'</div>');
+if($_GET['page']!="install") {
+	$mysqli = @new mysqli($db['host'], $db['user'], $db['pass'], $db['name']); 
+	
+	// check connection 
+	if ($mysqli->connect_errno) {
+		// die with error
+	    die('<div class="alert alert-danger"><strong>'._('Database connection failed').'!</strong><br><hr>Error: '. mysqli_connect_error() .'</div>');
+	}
 }
 ?>

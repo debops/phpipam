@@ -15,7 +15,7 @@ require_once( dirname(__FILE__) . '/../../../functions/functions.php' );
 
 /* if direct request that redirect to tools page */
 if($_SERVER['HTTP_X_REQUESTED_WITH']!="XMLHttpRequest")	{ 
-	header("Location: ".BASE."tools/favourites/");
+	header("Location: ".BASE.create_link("tools","favourites"));
 }
 
 /* print last 5 access logs */
@@ -49,18 +49,18 @@ else {
 			print "<tr class='favSubnet-$f[subnetId]'>";
 			
 			if($f['isFolder']==1) {
-				print "	<td><a href='folder/$f[sectionId]/$f[subnetId]/'><i class='fa fa-sfolder fa-folder'></i> $f[description]</a></td>";
+				print "	<td><a href='".create_link("folder",$f['sectionId'],$f['subnetId'])."'><i class='fa fa-sfolder fa-folder'></i> $f[description]</a></td>";
 			}
 			else {
 				//leaf?
 				if(sizeof(getAllSlaveSubnetsBySubnetId ($f['subnetId']))>0) {
-				print "	<td><a href='subnets/$f[sectionId]/$f[subnetId]/'><i class='fa fa-sfolder fa-folder-o'></i> ".transform2long($f['subnet'])."/$f[mask]</a></td>";		
+				print "	<td><a href='".create_link("subnets",$f['sectionId'],$f['subnetId'])."'><i class='fa fa-sfolder fa-folder-o'></i> ".transform2long($f['subnet'])."/$f[mask]</a></td>";		
 				} else {
-				print "	<td><a href='subnets/$f[sectionId]/$f[subnetId]/'><i class='fa fa-sfolder fa-sitemap' ></i> ".transform2long($f['subnet'])."/$f[mask]</a></td>";							
+				print "	<td><a href='".create_link("subnets",$f['sectionId'],$f['subnetId'])."'><i class='fa fa-sfolder fa-sitemap' ></i> ".transform2long($f['subnet'])."/$f[mask]</a></td>";							
 				}
 			}
 			print "	<td>$f[description]</td>";
-			print "	<td><a href='subnets/$f[sectionId]/'>$f[section]</a></td>";
+			print "	<td><a href='".create_link("subnets",$f['sectionId'])."'>$f[section]</a></td>";
 			if(strlen($f['vlanId'])>0 && $f['vlanId']!=0) {
 			# get vlan info
 			$vlan = getVlanById($f['vlanId']);

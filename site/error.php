@@ -58,8 +58,12 @@ $http_codes = array(
 );
 ?>
 
-<div class="alert alert alert-danger">
-	<strong><?php print _('Oops! Something went wrong!'); ?></strong><hr>
+<div class="container">
+<div class="row">
+<div class="col-xs-12 col-md-6 col-md-offset-3 alert alert alert-danger">
+	<strong><h3><?php print _('Oops! Something went wrong!'); ?></h3></strong><hr>
 	<br>
-	<?php print _('Provided http error code is'); ?>: <strong><?php print_r($_REQUEST['eid']); ?>: <?php print $http_codes[$_REQUEST['eid']]; ?></strong>
+	<?php print _('Provided http error code is'); ?>: <strong><?php print_r($_REQUEST['section']); ?>: <?php print $http_codes[$_REQUEST['section']]; ?></strong>
+</div>
+</div>
 </div>

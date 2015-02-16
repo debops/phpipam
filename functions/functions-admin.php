@@ -19,7 +19,7 @@ function verifyUserModInput ($userModDetails)
     # real name must be entered
     if (!$userModDetails['real_name']) 																			{ $errors[] = _('Real name field is mandatory!'); }
     # Both passwords must be same
-    if ($userModDetails['password1'] != $userModDetails['password2']) 											{ $errors[] = _("Passwords do not match!"); }
+    if ($userModDetails['password1orig'] != $userModDetails['password2orig']) 									{ $errors[] = _("Passwords do not match!"); }
     # pass must be at least 8 chars long for non-domain users
     if($userModDetails['domainUser'] != 1 ) { 
     	if ((strlen($userModDetails['password1orig']) < 8 ) && (strlen($userModDetails['password1orig']) != 0)) { $errors[] = _("Password must be at least 8 characters long!"); }
@@ -29,10 +29,8 @@ function verifyUserModInput ($userModDetails)
     if (!checkEmail($userModDetails['email'])) 																	{ $errors[] = _("Invalid email address!"); }
     # username must not already exist (if action is add)
     if ($userModDetails['action'] == "add") {
-        global $db;																	 				# get variables from config file
-        $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 				# open db connection
-        
-        $query    = 'select * from users where username = "'. $userModDetails['username'] .'";'; 	# set query and fetch results
+        global $database;
+        $query    = 'select * from users where `username` = "'. $userModDetails['username'] .'";'; 	# set query and fetch results
 
         /* execute */
         try { $details = $database->getArray( $query ); }
@@ -54,9 +52,8 @@ function verifyUserModInput ($userModDetails)
  */
 function deleteUserById($id, $name = "")
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection
- 
+    global $database;
+     
     $query    = 'delete from `users` where `id` = "'. $id .'";';						# set query, open db connection and fetch results */
 
 	/* execute */
@@ -82,9 +79,8 @@ function deleteUserById($id, $name = "")
  */
 function updateUserById ($userModDetails) {
 
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);    # open db connection
-
+    global $database;
+    
     # replace special chars
     $userModDetails['groups'] = mysqli_real_escape_string($database, $userModDetails['groups']);
 
@@ -109,10 +105,15 @@ function updateUserById ($userModDetails) {
 				}
 			}
 		}
+		
+		# reformat passChanged
+		if($userModDetails['domainUser']=="1")			{ $userModDetails['passChange'] = "No"; }	//never for domain users
+		elseif(@$userModDetails['passChange']=="On")	{ $userModDetails['passChange'] = "Yes"; }	//yes if requested
+		else											{ $userModDetails['passChange'] = "No"; }	//no change needed
     
         $query  = "insert into users ";
-        $query .= "(`username`, `password`, `role`, `real_name`, `email`, `domainUser`,`groups`,`lang` $myFieldsInsert[query]) values "; 
-        $query .= "('$userModDetails[username]', '$userModDetails[password1]', '$userModDetails[role]', '$userModDetails[real_name]', '$userModDetails[email]', '$userModDetails[domainUser]','$userModDetails[groups]','$userModDetails[lang]' $myFieldsInsert[values]);";
+        $query .= "(`username`, `password`, `role`, `real_name`, `email`, `domainUser`,`mailNotify`,`mailChangelog`,`groups`,`lang`,`passChange` $myFieldsInsert[query]) values "; 
+        $query .= "('$userModDetails[username]', '$userModDetails[password1]', '$userModDetails[role]', '$userModDetails[real_name]', '$userModDetails[email]', '$userModDetails[domainUser]', '$userModDetails[mailNotify]','$userModDetails[mailChangelog]','$userModDetails[groups]','$userModDetails[lang]','$userModDetails[passChange]' $myFieldsInsert[values]);";
     }
     else {
 
@@ -136,7 +137,7 @@ function updateUserById ($userModDetails) {
         if (strlen($userModDetails['password1']) != 0) {
         $query .= "`password` = '$userModDetails[password1]', "; 
         }
-        $query .= "`role`     = '$userModDetails[role]', `real_name`= '$userModDetails[real_name]', `email` = '$userModDetails[email]', `domainUser`= '$userModDetails[domainUser]', `lang`= '$userModDetails[lang]', `groups`='".$userModDetails['groups']."' "; 
+        $query .= "`role`     = '$userModDetails[role]', `real_name`= '$userModDetails[real_name]', `email` = '$userModDetails[email]', `domainUser`= '$userModDetails[domainUser]',`mailNotify`= '$userModDetails[mailNotify]',`mailChangelog`= '$userModDetails[mailChangelog]', `lang`= '$userModDetails[lang]', `groups`='".$userModDetails['groups']."' "; 
     	$query .= $myFieldsInsert['query'];  
         $query .= "where `id` = '$userModDetails[userId]';";
     }
@@ -166,15 +167,14 @@ function updateUserById ($userModDetails) {
  */
 function selfUpdateUser ($userModDetails)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);    # open db connection   
-
+    global $database;
+    
     /* set query */
     $query  = "update users set ";
     if(strlen($userModDetails['password1']) != 0) {
     $query .= "`password` = '$userModDetails[password1]',";
     }
-    $query .= "`real_name`= '$userModDetails[real_name]', `email` = '$userModDetails[email]', ";
+    $query .= "`real_name`= '$userModDetails[real_name]', `mailNotify`='$userModDetails[mailNotify]', `mailChangelog`='$userModDetails[mailChangelog]', `email` = '$userModDetails[email]', ";
     $query .= "`lang`= '$userModDetails[lang]' ";
     $query .= "where `id` = '$userModDetails[userId]';";
     
@@ -205,9 +205,8 @@ function selfUpdateUser ($userModDetails)
  */
 function setUserDashWidgets ($userId, $widgets)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);    # open db connection   
-
+    global $database;
+    
     /* set query */
     $query  = "update users set `widgets`= '$widgets' where `id` = '$userId';";
                     
@@ -234,7 +233,7 @@ function setUserDashWidgets ($userId, $widgets)
  */
 function modifyLang ($lang)
 {
-    global $db;                                                                      # get variables from config file
+    global $database;
     
     /* set query based on action */
     if($lang['action'] == "add")		{ $query = "insert into `lang` (`l_code`,`l_name`) values ('$lang[l_code]','$lang[l_name]');"; }
@@ -242,8 +241,6 @@ function modifyLang ($lang)
     elseif($lang['action'] == "delete")	{ $query = "delete from `lang` where `l_id`='$lang[l_id]'; "; }    
     else								{ return 'false'; }
     
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
-
     /* execute */
     try { $details = $database->executeQuery( $query ); }
     catch (Exception $e) { 
@@ -261,7 +258,7 @@ function modifyLang ($lang)
  */
 function modifyWidget ($w)
 {
-    global $db;                                                                      # get variables from config file
+    global $database;
     
     /* set query based on action */
     if($w['action'] == "add")			{ $query = "insert into `widgets` (`wtitle`,`wdescription`,`wfile`,`whref`,`wadminonly`,`wactive`,`wsize`) values ('$w[wtitle]','$w[wdescription]','$w[wfile]','$w[whref]','$w[wadminonly]','$w[wactive]','$w[wsize]');"; }
@@ -269,8 +266,6 @@ function modifyWidget ($w)
     elseif($w['action'] == "delete")	{ $query = "delete from `widgets` where `wid`='$w[wid]'; "; }    
     else								{ return 'false'; }
     
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);  
-
     /* execute */
     try { $details = $database->executeQuery( $query ); }
     catch (Exception $e) { 
@@ -280,6 +275,28 @@ function modifyWidget ($w)
     } 
     
     return true;
+}
+
+
+/**
+ *	Update user password on first login
+ */
+function update_user_password ($id, $password)
+{
+	global $database;
+	
+	# query
+	$query = "update `users` set `password`='$password', `passChange`='No' where `id` = $id;";
+	
+    /* execute */
+    try { $database->executeQuery( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    } 
+    
+    return true;	
 }
 
 
@@ -299,9 +316,8 @@ function modifyWidget ($w)
  */
 function getAllGroups() 
 {
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
-
+    global $database;
+    
 	/* execute query */
 	$query = "select * from `userGroups` order by `g_name` asc;";
     
@@ -340,22 +356,28 @@ function rekeyGroups($groups)
  */
 function getGroupById($id) 
 {
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
-
-	/* execute query */
-	$query = "select * from `userGroups` where `g_id`= '$id';";
-    
-   	/* get group */
-    try { $group = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        die("<div class='alert alert-danger'>"._('Error').": $error</div>");
-    }
-   	
-   	/* return false if none, else list */
-	if(sizeof($group) == 0) { return false; }
-	else					{ return $group[0]; }
+	# check if already in cache
+	if($vtmp = checkCache("group", $id)) {
+		return $vtmp;
+	}
+	# query
+	else {
+	    global $database;
+	    	
+		/* execute query */
+		$query = "select * from `userGroups` where `g_id`= '$id';";
+	    
+	   	/* get group */
+	    try { $group = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        die("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	    }
+	   	
+	   	/* return false if none, else list */
+		if(sizeof($group) == 0) { return false; }
+		else					{ writeCache("group", $id, $group[0]); return $group[0]; }
+	}
 }
  
 
@@ -473,9 +495,8 @@ function getSectionPermissionsByGroup ($gid, $name = true)
  */
 function modifyGroup($g)
 {
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']);    
-    
+    global $database;
+        
     # set query
     if($g['action'] == "add") 			{ $query = "insert into `userGroups` (`g_name`,`g_desc`) values ('$g[g_name]','$g[g_desc]'); "; }
     else if($g['action'] == "edit")		{ $query = "update `userGroups` set `g_name`='$g[g_name]', `g_desc`='$g[g_desc]' where `g_id` = '$g[g_id]';"; }
@@ -604,9 +625,8 @@ function removeUserFromGroup($gid, $uid)
  */
 function updateUserGroups($uid, $groups)
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection   
-
+    global $database;
+    
     # replace special chars
     $groups = mysqli_real_escape_string($database, $groups);
 
@@ -630,9 +650,8 @@ function updateUserGroups($uid, $groups)
  */
 function updateSectionGroups($sid, $groups)
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection   
-
+    global $database;
+    
     # replace special chars
    	$groups = mysqli_real_escape_string($database, $groups);
 
@@ -665,17 +684,18 @@ function updateSectionGroups($sid, $groups)
 /**
  * Add new subnet
  */
-function modifySubnetDetails ($subnetDetails, $lastId = false) 
+function modifySubnetDetails ($subnetDetails, $lastId = false, $api = false) 
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection   
-
-    # replace special chars
-    $subnetDetails['permissions'] = mysqli_real_escape_string($database, $subnetDetails['permissions']);
-    $subnetDetails['description'] = mysqli_real_escape_string($database, $subnetDetails['description']); 
+    global $database;
+    
+    /* escape vars to prevent SQL injection */
+	$subnetDetails = filter_user_input ($subnetDetails, true, true);
+	
+	/* trim user input */
+	$subnetDetails = trim_user_input ($subnetDetails);
 
     # set modify subnet details query
-    $query = setModifySubnetDetailsQuery ($subnetDetails, $sectionChange);
+    $query = setModifySubnetDetailsQuery ($subnetDetails, $api);
         
 	$log = prepareLogFromArray ($subnetDetails);																				# prepare log 
 	
@@ -720,59 +740,80 @@ function modifySubnetDetails ($subnetDetails, $lastId = false)
 /**
  * Add new subnet - set query
  */
-function setModifySubnetDetailsQuery ($subnetDetails)
+function setModifySubnetDetailsQuery ($subnetDetails, $api)
 {
     # add new subnet
     if ($subnetDetails['action'] == "add")
     {
-        # remove netmask and calculate decimal values!
-        $subnetDetails['subnet_temp'] = explode("/", $subnetDetails['subnet']);
-        $subnetDetails['subnet']      = Transform2decimal ($subnetDetails['subnet_temp'][0]);
-        $subnetDetails['mask']        = $subnetDetails['subnet_temp'][1];
-        
-        # custom fields
-        $myFields = getCustomFields('subnets');
-        $myFieldsInsert['query']  = '';
-        $myFieldsInsert['values'] = '';
-	
-        if(sizeof($myFields) > 0) {
-			/* set inserts for custom */
-			foreach($myFields as $myField) {
-				# empty?
-				if(strlen($subnetDetails[$myField['name']])==0) {	
-					$myFieldsInsert['query']  .= ', `'. $myField['name'] .'`';
-					$myFieldsInsert['values'] .= ", NULL";					
-				} else {
-					$myFieldsInsert['query']  .= ', `'. $myField['name'] .'`';
-					$myFieldsInsert['values'] .= ", '". $subnetDetails[$myField['name']] . "'";
-				}	
+    	# api?
+    	if($api) {	        
+	        $query  = 'insert into subnets '. "\n";
+	        $query .= '(`subnet`, `mask`, `sectionId`, `description`, `vlanId`, `vrfId`, `masterSubnetId`, `allowRequests`, `showName`, `permissions`, `discoverSubnet`, `pingSubnet`) ' . "\n";
+	        $query .= 'values (' . "\n";
+	        $query .= ' "'. $subnetDetails['subnet'] 		 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['mask'] 			 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['sectionId'] 	 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['description']    .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['vlanId'] 		 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['vrfId'] 		 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['masterSubnetId'] .'", ' . "\n"; 
+	        $query .= ''. isCheckbox($subnetDetails['allowRequests']) .','."\n";
+	        $query .= ''. isCheckbox($subnetDetails['showName']) .','."\n";  
+	        $query .= ' "'. $subnetDetails['permissions'] .'", '."\n"; 
+	        $query .= ''. isCheckbox($subnetDetails['discoverSubnet']) .','."\n";  
+	        $query .= ''. isCheckbox($subnetDetails['pingSubnet']) .''."\n";  
+	        $query .= ' );';	
+    	} else {
+	        # remove netmask and calculate decimal values!
+	        $subnetDetails['subnet_temp'] = explode("/", $subnetDetails['subnet']);
+	        $subnetDetails['subnet']      = Transform2decimal ($subnetDetails['subnet_temp'][0]);
+	        $subnetDetails['mask']        = $subnetDetails['subnet_temp'][1];
+	        
+	        # custom fields
+	        $myFields = getCustomFields('subnets');
+	        $myFieldsInsert['query']  = '';
+	        $myFieldsInsert['values'] = '';
+		
+	        if(sizeof($myFields) > 0) {
+				/* set inserts for custom */
+				foreach($myFields as $myField) {
+					# empty?
+					if(strlen($subnetDetails[$myField['name']])==0) {	
+						$myFieldsInsert['query']  .= ', `'. $myField['name'] .'`';
+						$myFieldsInsert['values'] .= ", NULL";					
+					} else {
+						$myFieldsInsert['query']  .= ', `'. $myField['name'] .'`';
+						$myFieldsInsert['values'] .= ", '". $subnetDetails[$myField['name']] . "'";
+					}	
+				}
 			}
-		}
-        
-        $query  = 'insert into subnets '. "\n";
-        # is folder?
-        if($subnetDetails['isFolder']) {
-        $query .= '(`isFolder`,`subnet`, `mask`, `sectionId`, `description`, `vlanId`, `vrfId`, `masterSubnetId`, `allowRequests`, `showName`, `permissions`, `pingSubnet` '.$myFieldsInsert['query'].') ' . "\n";       
-        $query .= 'values (' . "\n";
-        $query .= '1, ' . "\n"; 
-		}
-		else {
-        $query .= '(`subnet`, `mask`, `sectionId`, `description`, `vlanId`, `vrfId`, `masterSubnetId`, `allowRequests`, `showName`, `permissions`, `pingSubnet` '.$myFieldsInsert['query'].') ' . "\n";
-        $query .= 'values (' . "\n";
-        }
-        $query .= ' "'. $subnetDetails['subnet'] 		 .'", ' . "\n"; 
-        $query .= ' "'. $subnetDetails['mask'] 			 .'", ' . "\n"; 
-        $query .= ' "'. $subnetDetails['sectionId'] 	 .'", ' . "\n"; 
-        $query .= ' "'. $subnetDetails['description']    .'", ' . "\n"; 
-        $query .= ' "'. $subnetDetails['vlanId'] 		 .'", ' . "\n"; 
-        $query .= ' "'. $subnetDetails['vrfId'] 		 .'", ' . "\n"; 
-        $query .= ' "'. $subnetDetails['masterSubnetId'] .'", ' . "\n"; 
-        $query .= ''. isCheckbox($subnetDetails['allowRequests']) .','."\n";
-        $query .= ''. isCheckbox($subnetDetails['showName']) .','."\n";  
-        $query .= ' "'. $subnetDetails['permissions'] .'", '."\n"; 
-        $query .= ''. isCheckbox($subnetDetails['pingSubnet']) .''."\n";  
-        $query .= $myFieldsInsert['values'];
-        $query .= ' );';
+	        
+	        $query  = 'insert into subnets '. "\n";
+	        # is folder?
+	        if($subnetDetails['isFolder']) {
+	        $query .= '(`isFolder`,`subnet`, `mask`, `sectionId`, `description`, `vlanId`, `vrfId`, `masterSubnetId`, `allowRequests`, `showName`, `permissions`, `discoverSubnet`, `pingSubnet` '.$myFieldsInsert['query'].') ' . "\n";       
+	        $query .= 'values (' . "\n";
+	        $query .= '1, ' . "\n"; 
+			}
+			else {
+	        $query .= '(`subnet`, `mask`, `sectionId`, `description`, `vlanId`, `vrfId`, `masterSubnetId`, `allowRequests`, `showName`, `permissions`, `discoverSubnet`, `pingSubnet` '.$myFieldsInsert['query'].') ' . "\n";
+	        $query .= 'values (' . "\n";
+	        }
+	        $query .= ' "'. $subnetDetails['subnet'] 		 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['mask'] 			 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['sectionId'] 	 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['description']    .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['vlanId'] 		 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['vrfId'] 		 .'", ' . "\n"; 
+	        $query .= ' "'. $subnetDetails['masterSubnetId'] .'", ' . "\n"; 
+	        $query .= ''. isCheckbox($subnetDetails['allowRequests']) .','."\n";
+	        $query .= ''. isCheckbox($subnetDetails['showName']) .','."\n";  
+	        $query .= ' "'. $subnetDetails['permissions'] .'", '."\n"; 
+	        $query .= ''. isCheckbox($subnetDetails['discoverSubnet']) .','."\n";  
+	        $query .= ''. isCheckbox($subnetDetails['pingSubnet']) .''."\n";  
+	        $query .= $myFieldsInsert['values'];
+	        $query .= ' );';	
+    	}
     }
     # Delete subnet
     else if ($subnetDetails['action'] == "delete")
@@ -817,6 +858,7 @@ function setModifySubnetDetailsQuery ($subnetDetails)
         $query .= '`masterSubnetId` = "'. $subnetDetails['masterSubnetId'] 	.'", '. "\n";
         $query .= '`allowRequests`  = "'. isCheckbox($subnetDetails['allowRequests']) 	.'", '. "\n";
         $query .= '`showName`   	= "'. isCheckbox($subnetDetails['showName']) 		.'", '. "\n";
+        $query .= '`discoverSubnet` = "'. isCheckbox($subnetDetails['discoverSubnet'])  .'", '. "\n";
         $query .= '`pingSubnet`   	= "'. isCheckbox($subnetDetails['pingSubnet']) 		.'" '. "\n";
         $query .= $myFieldsInsert['query'];
         $query .= 'where id      	= "'. $subnetDetails['subnetId'] .'"; '."\n";
@@ -861,9 +903,8 @@ function setModifySubnetDetailsQuery ($subnetDetails)
  */
 function deleteSubnet ($subnetId) 
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection   
-
+    global $database;
+    
     # set modify subnet details query
     $query = "delete from `subnets` where `id` = '$subnetId';";
 
@@ -884,9 +925,8 @@ function deleteSubnet ($subnetId)
  */
 function modifySubnetMask ($subnetId, $mask) 
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection   
-
+    global $database;
+    
     # set modify subnet details query
     $query = "update `subnets` set `mask` = '$mask' where `id` = '$subnetId';";
 
@@ -913,9 +953,8 @@ function modifySubnetMask ($subnetId, $mask)
  */
 function truncateSubnet($subnetId) 
 {
-    global $db;                                                                      # get variables from config file
-    $database    = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* first update request */
     $query    = 'delete from `ipaddresses` where `subnetId` = '. $subnetId .';'; 
 
@@ -949,6 +988,15 @@ function printAdminSubnets( $subnets, $actions = true, $vrf = "0" )
 		}
 		}
 		
+		/* get custom fields */
+		$custom = getCustomFields('subnets');
+
+		global $settings;
+		/* set hidden fields */
+		$ffields = json_decode($settings['hiddenCustomFields'], true);		
+		if(is_array($ffields['subnets']))	{ $ffields = $ffields['subnets']; }
+		else								{ $ffields = array(); }
+		
 		# loop will be false if the root has no children (i.e., an empty menu!)
 		$loop = !empty( $children[$rootId] );
 		
@@ -957,9 +1005,10 @@ function printAdminSubnets( $subnets, $actions = true, $vrf = "0" )
 		$parent_stack = array();
 		
 		# display selected subnet as opened
-		if(isset($_REQUEST['subnetId']))
-		$allParents = getAllParents ($_REQUEST['subnetId']);
-		
+		if(isset($_GET['subnetId'])) {
+			if(!is_numeric($_GET['subnetId']))	{ die('<div class="alert alert-danger">'._("Invalid ID").'</div>'); }		
+			$allParents = getAllParents ($_GET['subnetId']);
+		}
 		# return table content (tr and td's)
 		while ( $loop && ( ( $option = each( $children[$parent] ) ) || ( $parent > $rootId ) ) )
 		{
@@ -986,57 +1035,56 @@ function printAdminSubnets( $subnets, $actions = true, $vrf = "0" )
 			# count levels
 			$count = count( $parent_stack ) + 1;
 			
-			# get subnet details
-				# get VLAN
-				$vlan = subnetGetVLANdetailsById($option['value']['vlanId']);
-				$vlan = $vlan['number'];
-				if(empty($vlan) || $vlan == "0") 	{ $vlan = ""; }			# no VLAN
+			# get VLAN
+			$vlan = subnetGetVLANdetailsById($option['value']['vlanId']);
+			$vlan = $vlan['number'];
+			if(empty($vlan) || $vlan == "0") 	{ $vlan = ""; }			# no VLAN
 
-				# description
-				if(strlen($option['value']['description']) == 0) 	{ $description = "/"; }													# no description
-				else 												{ $description = $option['value']['description']; }						# description		
-				
-				# requests
-				if($option['value']['allowRequests'] == 1) 			{ $requests = "<i class='fa fa-gray fa-check'></i>"; }												# requests enabled
-				else 												{ $requests = ""; }														# request disabled				
+			# description
+			if(strlen($option['value']['description']) == 0) 	{ $description = "/"; }													# no description
+			else 												{ $description = $option['value']['description']; }						# description		
+			
+			# requests
+			if($option['value']['allowRequests'] == 1) 			{ $requests = "<i class='fa fa-gray fa-check'></i>"; }												# requests enabled
+			else 												{ $requests = ""; }														# request disabled				
 
-				# hosts check
-				if($option['value']['pingSubnet'] == 1) 			{ $pCheck = "<i class='fa fa-gray fa-check'></i>"; }												# ping check enabled
-				else 												{ $pCheck = ""; }														# ping check disabled
+			# hosts check
+			if($option['value']['pingSubnet'] == 1) 			{ $pCheck = "<i class='fa fa-gray fa-check'></i>"; }												# ping check enabled
+			else 												{ $pCheck = ""; }														# ping check disabled
 
-				#vrf
-				if($vrf == "1") {
-					# get VRF details
-					if(($option['value']['vrfId'] != "0") && ($option['value']['vrfId'] != "NULL") ) {
-						$vrfTmp = getVRFDetailsById ($option['value']['vrfId']);
-						$vrfText = $vrfTmp['name'];
-					}
-					else {
-						$vrfText = "";
-					}
-				}				
+			#vrf
+			if($vrf == "1") {
+				# get VRF details
+				if(($option['value']['vrfId'] != "0") && ($option['value']['vrfId'] != "NULL") ) {
+					$vrfTmp = getVRFDetailsById ($option['value']['vrfId']);
+					$vrfText = $vrfTmp['name'];
+				}
+				else {
+					$vrfText = "";
+				}
+			}				
 			
 			# print table line
 			if(strlen($option['value']['subnet']) > 0) { 
 				$html[] = "<tr>";
 				# folder
 				if($option['value']['isFolder']==1) {
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-folder-open'></i> <a href='folder/".$option['value']['sectionId']."/".$option['value']['id']."/'>$description</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-folder-open'></i> <a href='".create_link("folder",$option['value']['sectionId'],$option['value']['id'])."'>$description</a></td>";
 					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-sfolder fa-folder-open'></i> $description</td>";
 				} 
 				else {
 				if($count==1) {
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i><a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i><a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i> $description</td>";	
 				} 
 				else {
 					# last?
 					if(!empty( $children[$option['value']['id']])) {
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i> <a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-folder-open-o'></i> $description</td>";	
 					}
 					else {
-					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-angle-right'></i> <a href='subnets/".$option['value']['sectionId']."/".$option['value']['id']."/'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
+					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-angle-right'></i> <a href='".create_link("subnets",$option['value']['sectionId'],$option['value']['id'])."'>  ".transform2long($option['value']['subnet']) ."/".$option['value']['mask']."</a></td>";
 					$html[] = "	<td class='level$count'><span class='structure' style='padding-left:$padding; margin-left:$margin;'></span><i class='fa fa-angle-right'></i> $description</td>";	
 					}
 				}
@@ -1048,6 +1096,15 @@ function printAdminSubnets( $subnets, $actions = true, $vrf = "0" )
 				}
 				$html[] = "	<td class='hidden-xs hidden-sm hidden-md'>$requests</td>";
 				$html[] = "	<td class='hidden-xs hidden-sm hidden-md'>$pCheck</td>";
+				# custom
+				if(sizeof($custom)>0) {
+					foreach($custom as $field) {
+						if(!in_array($field['name'], $ffields)) {
+				    		$html[] =  "	<td class='hidden-xs hidden-sm'>".$option['value'][$field['name']]."</td>"; 
+						}
+			    	}
+				}
+				# actions
 				if($actions) {
 				$html[] = "	<td class='actions' style='padding:0px;'>";
 				$html[] = "	<div class='btn-group btn-group-xs'>";
@@ -1084,9 +1141,8 @@ function printAdminSubnets( $subnets, $actions = true, $vrf = "0" )
  */
 function updateSubnetPermissions ($subnet)
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection   
-
+    global $database;
+    
     # replace special chars
     $subnet['permissions'] = mysqli_real_escape_string($database, $subnet['permissions']);
 
@@ -1127,9 +1183,8 @@ function updateSubnetPermissions ($subnet)
  */
 function UpdateSection ($update, $api = false) 
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection  
-    
+    global $database;
+        
      # replace special chars for permissions
     $update['permissions'] = mysqli_real_escape_string($database, $update['permissions']);   
     $update['description'] = mysqli_real_escape_string($database, $update['description']); 
@@ -1259,9 +1314,8 @@ function setUpdateSectionQuery ($update)
  */
 function UpdateSectionOrder ($order) 
 {
-    global $db;                                                                     # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);	# open db connection  
-
+    global $database;
+    
 	// set querries for each section
 	$query = "";
 	foreach($order as $key=>$o) {
@@ -1317,9 +1371,8 @@ function parseSectionPermissions($permissions)
  */
 function updateDeviceDetails($device)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* set querry based on action */
     if($device['action'] == "add") {
 
@@ -1332,7 +1385,7 @@ function updateDeviceDetails($device)
 			/* set inserts for custom */
 			foreach($myFields as $myField) {	
 				# empty?
-				if(strlen($ip[$myField['name']])==0) {		
+				if(strlen($device[$myField['name']])==0) { 	
 					$myFieldsInsert['query']  .= ', `'. $myField['name'] .'`';
 					$myFieldsInsert['values'] .= ", NULL";
 				} else {
@@ -1397,9 +1450,8 @@ function updateDeviceDetails($device)
  */
 function updateDevicetypeDetails($device)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* set querry based on action */
     if($device['action'] == "add") 			{ $query  = "insert into `deviceTypes` (`tname`,`tdescription`) values ('$device[tname]', '$device[tdescription]');"; }
     else if($device['action'] == "edit") 	{ $query  = "update `deviceTypes` set `tname` = '$device[tname]', `tdescription` = '$device[tdescription]' where `tid` = $device[tid]"; }
@@ -1469,9 +1521,8 @@ function reformatDeviceSections ($sections) {
  */
 function getDeviceTypes() 
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-	
+    global $database;
+    	
 	$query = "select * from `deviceTypes`;";
 
     /* execute */
@@ -1497,9 +1548,8 @@ function getDeviceTypes()
  */
 function TransformDeviceType($type) 
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-	
+    global $database;
+    	
 	$query = "select * from `deviceTypes` where `tid` = $type;";
 
     /* execute */
@@ -1529,11 +1579,11 @@ function TransformDeviceType($type)
 /**
  * Get Domain settings for authentication
  */
+if(!function_exists(getADSettings)) {
 function getADSettings()
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-
+    global $database;
+    
     /* Check connection */
     if ($database->connect_error) {
     	die('Connect Error (' . $database->connect_errno . '): '. $database->connect_error);
@@ -1554,6 +1604,7 @@ function getADSettings()
 	/* return settings */
 	return($settings[0]);
 }
+}
 
 
 /**
@@ -1561,9 +1612,8 @@ function getADSettings()
  */
 function updateADsettings($ad)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-
+    global $database;
+    
     /* Check connection */
     if ($database->connect_error) {
     	die('Connect Error (' . $database->connect_errno . '): '. $database->connect_error);
@@ -1604,9 +1654,8 @@ function updateADsettings($ad)
  */
 function updateVRFDetails($vrf)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* set querry based on action */
     if($vrf['action'] == "add") {
     	$query  = 'insert into `vrf` '. "\n";
@@ -1667,9 +1716,8 @@ function updateVRFDetails($vrf)
  */
 function updateVLANDetails($vlan, $lastId = false)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* set querry based on action */
     if($vlan['action'] == "add") {
     
@@ -1771,9 +1819,10 @@ function updateVLANDetails($vlan, $lastId = false)
  */
 function updateSettings($settings)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    global $database;
     
+    filter_user_input ($settings, true, true, false);
+        
     /* first update request */
     $query    = 'update `settings` set ' . "\n";
     $query   .= '`siteTitle` 		  = "'. $settings['siteTitle'] .'", ' . "\n";
@@ -1790,12 +1839,16 @@ function updateSettings($settings)
     $query   .= '`printLimit` 	      = "'. $settings['printLimit'] .'", ' . "\n"; 
     $query   .= '`visualLimit` 	      = "'. $settings['visualLimit'] .'", ' . "\n"; 
     $query   .= '`vlanDuplicate` 	  = "'. isCheckbox($settings['vlanDuplicate']) .'", ' . "\n"; 
+    $query   .= '`vlanMax` 	      	  = "'. $settings['vlanMax'] .'", ' . "\n"; 
     $query   .= '`api` 	  			  = "'. isCheckbox($settings['api']) .'", ' . "\n"; 
     $query   .= '`enableChangelog` 	  = "'. isCheckbox($settings['enableChangelog']) .'", ' . "\n"; 
     $query   .= '`subnetOrdering` 	  = "'. $settings['subnetOrdering'] .'", ' . "\n"; 
     $query   .= '`pingStatus` 	  	  = "'. $settings['pingStatus'] .'", ' . "\n"; 
     $query   .= '`scanPingPath` 	  = "'. $settings['scanPingPath'] .'", ' . "\n"; 
     $query   .= '`scanMaxThreads` 	  = "'. $settings['scanMaxThreads'] .'", ' . "\n"; 
+    $query   .= '`prettyLinks` 	  	  = "'. $settings['prettyLinks'] .'", ' . "\n"; 
+    $query   .= '`inactivityTimeout`  = "'. $settings['inactivityTimeout'] .'", ' . "\n"; 
+    $query   .= '`hideFreeRange` 	  = "'. isCheckbox($settings['hideFreeRange']) .'", ' . "\n"; 
     $query   .= '`defaultLang` 	  	  = "'. $settings['defaultLang'] .'" ' . "\n"; 
 	$query   .= 'where id = 1;' . "\n"; 
 
@@ -1823,19 +1876,42 @@ function updateSettings($settings)
 
 
 /**
+ *	post-install updates
+ */
+function postauth_update($adminpass, $siteTitle, $siteURL)
+{
+    global $database;
+    
+	$query  = "update `users` set `password`='$adminpass',`passChange`='No' where `username` = 'Admin';";		//to update admin pass
+	$query .= "update `settings` set `siteTitle`='$siteTitle',`siteURL`='$siteURL';";
+
+	/* execute */
+    try {
+    	$database->executeMultipleQuerries( $query );
+    }
+    catch (Exception $e) {
+    	$error =  $e->getMessage();
+    	updateLogTable ('Failed to update settings', $log, 2);
+    	return false;
+	}
+	return true;
+}
+
+
+/**
  * update mail settings
  */
 function updateMailSettings($settings)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* first update request */
     $query    = 'update `settingsMail` set ' . "\n";
     $query   .= '`mtype` 		  	= "'. $settings['mtype'] .'", ' . "\n";
     $query   .= '`mserver` 		  	= "'. $settings['mserver'] .'", ' . "\n";
     $query   .= '`mport` 		  	= "'. $settings['mport'] .'", ' . "\n";
     $query   .= '`mauth` 		  	= "'. $settings['mauth'] .'", ' . "\n";
+    $query   .= '`msecure` 		  	= "'. $settings['msecure'] .'", ' . "\n";
     $query   .= '`muser` 		  	= "'. $settings['muser'] .'", ' . "\n";
     $query   .= '`mpass` 		  	= "'. $settings['mpass'] .'", ' . "\n";
     $query   .= '`mAdminName` 	  	= "'. $settings['mAdminName'] .'", ' . "\n";
@@ -1883,9 +1959,8 @@ function isCheckbox($checkbox)
  */
 function searchAndReplace($query, $post)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* check how many records are in database */
     $query2 = 'select count(*) as count from `ipaddresses` where '. $post['field'] .' like "%'. $post['search'] .'%";';
     $count 	  = $database->getArray($query2); 
@@ -1911,8 +1986,7 @@ function searchAndReplace($query, $post)
  */
 function writeInstructions ($instructions) 
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']);     
+    global $database;
 
 	$instructions = $database->real_escape_string($instructions);	//this hides code
 	
@@ -1938,9 +2012,8 @@ function writeInstructions ($instructions)
  */
 function importCSVline ($line, $subnetId)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* get subnet details by Id */
     $subnetDetails = getSubnetDetailsById ($subnetId);
     $subnet = Transform2long($subnetDetails['subnet']) . "/" . $subnetDetails['mask'];
@@ -2022,9 +2095,8 @@ function importCSVline ($line, $subnetId)
  */
 function getIPaddrFields()
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* first update request */
     $query    = 'describe `ipaddresses`;';
 
@@ -2050,21 +2122,30 @@ function getIPaddrFields()
  */
 function getSelectedIPaddrFields()
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
-    /* first update request */
-    $query    = 'select IPfilter from `settings`;';
-
-    /* execute */
-    try { $fields = $database->getArray( $query ); }
-    catch (Exception $e) { 
-        $error =  $e->getMessage(); 
-        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
-        return false;
-    } 
+	global $settings;
+	# we only need it if it is not already set!
+	if(!isset($settings)) {
 	
-	return $fields[0]['IPfilter'];
+	    global $database;
+	    	    
+	    /* first update request */
+	    $query    = 'select IPfilter from `settings`;';
+	
+	    /* execute */
+	    try { $fields = $database->getArray( $query ); }
+	    catch (Exception $e) { 
+	        $error =  $e->getMessage(); 
+	        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+	        return false;
+	    } 
+		
+		return $fields[0]['IPfilter'];		
+	}
+	else {
+		return $settings['IPfilter'];
+	}
+	
+	return $settings['IPfilter'];
 }
 
 
@@ -2073,9 +2154,8 @@ function getSelectedIPaddrFields()
  */
 function updateSelectedIPaddrFields($fields)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* first update request */
     $query    = 'update `settings` set `IPfilter` = "'. $fields .'";';
 	
@@ -2107,9 +2187,8 @@ function updateSelectedIPaddrFields($fields)
  */
 function getCustomFields($table)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* first update request */
     $query    = "show full columns from `$table`;";
 
@@ -2132,7 +2211,8 @@ function getCustomFields($table)
 	
 	/* unset standard fields */
 	if($table == "users") {
-		unset($res['id'], $res['username'], $res['password'], $res['groups'], $res['role'], $res['real_name'], $res['email'], $res['domainUser'], $res['lang'],$res['editDate'],$res['widgets'],$res['favourite_subnets']);
+		unset($res['id'], $res['username'], $res['password'], $res['groups'], $res['role'], $res['real_name'], $res['email'], $res['domainUser'], $res['lang']);
+		unset($res['editDate'],$res['widgets'],$res['favourite_subnets'],$res['mailNotify'],$res['mailChangelog'], $res['passChange']);
 	}
 	elseif($table == "devices") {
 		unset($res['id'], $res['hostname'], $res['ip_addr'], $res['type'], $res['vendor'], $res['model'], $res['version'], $res['description'], $res['sections'], $res['editDate']);
@@ -2140,7 +2220,7 @@ function getCustomFields($table)
 	elseif($table == "subnets") {
 		unset($res['id'], $res['subnet'], $res['mask'], $res['sectionId'], $res['description'], $res['masterSubnetId']);
 		unset($res['vrfId'], $res['allowRequests'], $res['adminLock'], $res['vlanId'], $res['showName'],$res['permissions'],$res['editDate']);
-		unset($res['pingSubnet'], $res['isFolder']);
+		unset($res['pingSubnet'], $res['isFolder'], $res['discoverSubnet']);
 	}
 	elseif($table == "ipaddresses") {
 		unset($res['id'], $res['subnetId'], $res['ip_addr'], $res['description'], $res['dns_name'], $res['switch']);
@@ -2149,6 +2229,9 @@ function getCustomFields($table)
 	elseif($table == "vlans") {
 		unset($res['vlanId'], $res['name'], $res['number'], $res['description'],$res['editDate']);		
 	}
+	
+	/* reset if empty */
+	if(sizeof($res)==0) { $res = array(); }
 	
 	return $res;
 }
@@ -2175,8 +2258,13 @@ function getCustomFieldsNumArr($table)
  */
 function updateCustomField($field)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
+    global $database;
+
+    /* escape vars */
+    # set override
+    if($field['fieldType']!="set") {
+    	$field = filter_user_input ($field, true, true);
+    }
     
     /* set db type values */
     if($field['fieldType']=="bool" || $field['fieldType']=="text" || $field['fieldType']=="date" || $field['fieldType']=="datetime") 	
@@ -2196,7 +2284,10 @@ function updateCustomField($field)
     else if ($field['action']=="edit"&&@$field['NULL']=="NO") 	{ $query  = "ALTER TABLE `$field[table]` CHANGE COLUMN `$field[oldname]` `$field[name]` $field[ftype] $charset DEFAULT $field[fieldDefault] NOT NULL COMMENT '$field[Comment]';"; }
     else if ($field['action']=="edit") 							{ $query  = "ALTER TABLE `$field[table]` CHANGE COLUMN `$field[oldname]` `$field[name]` $field[ftype] $charset DEFAULT $field[fieldDefault] COMMENT '$field[Comment]';"; }
     else if ($field['action']=="add"&&@$field['NULL']=="NO") 	{ $query  = "ALTER TABLE `$field[table]` ADD COLUMN 	`$field[name]` 					$field[ftype] $charset DEFAULT $field[fieldDefault] NOT NULL COMMENT '$field[Comment]';"; }
-    else 														{ $query  = "ALTER TABLE `$field[table]` ADD COLUMN 	`$field[name]` 					$field[ftype] $charset DEFAULT $field[fieldDefault] NULL COMMENT '$field[Comment]';"; }
+    else if ($field['action']=="add")							{ $query  = "ALTER TABLE `$field[table]` ADD COLUMN 	`$field[name]` 					$field[ftype] $charset DEFAULT $field[fieldDefault] NULL COMMENT '$field[Comment]';"; }
+    else {
+	    return false;
+    }
     
     /* prepare log */ 
     $log = prepareLogFromArray ($field);
@@ -2219,15 +2310,14 @@ function updateCustomField($field)
  */
 function reorderCustomField($table, $next, $current)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     /* get field details */
     $old = getFullFieldData($table, $current);
     
     /* update request */
-    if($old['Null']=="NO")	{ $query  = 'ALTER TABLE `'.$table.'` MODIFY COLUMN `'. $current .'` VARCHAR(256) NOT NULL COMMENT "'.$old['Comment'].'" AFTER `'. $next .'`;'; }
-    else					{ $query  = 'ALTER TABLE `'.$table.'` MODIFY COLUMN `'. $current .'` VARCHAR(256) DEFAULT NULL COMMENT "'.$old['Comment'].'" AFTER `'. $next .'`;'; }
+    if($old['Null']=="NO")	{ $query  = 'ALTER TABLE `'.$table.'` MODIFY COLUMN `'. $current .'` '.$old['Type'].' NOT NULL COMMENT "'.$old['Comment'].'" AFTER `'. $next .'`;'; }
+    else					{ $query  = 'ALTER TABLE `'.$table.'` MODIFY COLUMN `'. $current .'` '.$old['Type'].' DEFAULT NULL COMMENT "'.$old['Comment'].'" AFTER `'. $next .'`;'; }
 
     try { $database->executeQuery( $query ); }
     catch (Exception $e) { 
@@ -2239,6 +2329,51 @@ function reorderCustomField($table, $next, $current)
 
 	updateLogTable ('Custom Field reordering success ('. $next .' put before '. $current .')', $log, 0);
     return true;  
+}
+
+
+/**
+ *	update filter for custom fields
+ */
+function save_filtered_custom_fields($table, $filtered)
+{	
+	# prepare
+	if(is_null($filtered))	{ $out = null; }
+	else					{ $out = $filtered; }
+	
+	# write
+	return write_custom_filter($table,$out);
+}
+
+
+/**
+ *	save filtered fields
+ */
+function write_custom_filter($table, $out)
+{
+	$settings = getAllSettings();
+	
+	if(strlen($settings['hiddenCustomFields'])>0)	{ $filterField = json_decode($settings['hiddenCustomFields'], true); }
+	else											{ $filterField = array(); }
+	
+	# set
+	if(is_null($out))	{ unset($filterField[$table]); }
+	else				{ $filterField[$table]=$out; }
+	
+	# encode
+	$filterField = json_encode($filterField);
+	
+	# write
+	global $database;
+	$query = "update `settings` set `hiddenCustomFields`='$filterField';";
+
+    try { $database->executeQuery( $query ); }
+    catch (Exception $e) { 
+        $error =  $e->getMessage(); 
+        print ("<div class='alert alert-danger'>"._('Error').": $error</div>");
+        return false;
+    } 
+	return true;	
 }
 
 
@@ -2257,9 +2392,8 @@ function reorderCustomField($table, $next, $current)
  */
 function getAPIkeys()
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     # set query
     $query  = 'select * from `api`;';
     # get result
@@ -2279,9 +2413,8 @@ function getAPIkeys()
  */
 function getAPIkeyByName($app_id, $reformat = false)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     # set query
     $query  = "select * from `api` where `app_id` = '$app_id';";
     # get result
@@ -2308,9 +2441,8 @@ function getAPIkeyByName($app_id, $reformat = false)
  */
 function getAPIkeyById($id)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     # set query
     $query  = "select * from `api` where `id` = $id;";
     # get result
@@ -2329,12 +2461,11 @@ function getAPIkeyById($id)
  */
 function modifyAPI($api)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     # set query based on action
-    if($api['action']=="add")			{ $query = "insert into `api` (`app_id`,`app_code`,`app_permissions`) values ('$api[app_id]','$api[app_code]','$api[app_permissions]');"; }
-    elseif($api['action']=="edit")		{ $query = "update `api` set `app_id`='$api[app_id]',`app_code`='$api[app_code]',`app_permissions`='$api[app_permissions]' where `id`=$api[id] ; "; }
+    if($api['action']=="add")			{ $query = "insert into `api` (`app_id`,`app_code`,`app_permissions`, `app_comment`) values ('$api[app_id]','$api[app_code]','$api[app_permissions]', '$api[app_comment]');"; }
+    elseif($api['action']=="edit")		{ $query = "update `api` set `app_id`='$api[app_id]',`app_code`='$api[app_code]',`app_permissions`='$api[app_permissions]', `app_comment`='$api[app_comment]' where `id`=$api[id] ; "; }
     elseif($api['action']=="delete")	{ $query = "delete from `api` where `id` = $api[id];"; }
     else 								{ return false; }
         
@@ -2369,20 +2500,20 @@ function verifyDatabase()
 	$fields['logs']			  = array("severity", "date", "username", "ipaddr", "command", "details");
 	$fields['requests']		  = array("subnetId", "ip_addr", "description", "dns_name", "owner", "requester", "comment", "processed", "accepted", "adminComment");
 	$fields['sections']		  = array("name", "description", "permissions", "strictMode", "subnetOrdering", "order", "showVLAN", "showVRF", "masterSection");
-	$fields['settings']		  = array("siteTitle", "siteAdminName", "siteAdminMail", "siteDomain", "siteURL", "domainAuth", "enableIPrequests", "enableVRF", "enableDNSresolving", "version", "dbverified", "donate", "IPfilter", "printLimit", "visualLimit", "vlanDuplicate", "subnetOrdering", "pingStatus", "defaultLang", "api", "editDate", "vcheckDate", "dhcpCompress", "enableChangelog", "scanPingPath", "scanMaxThreads");
+	$fields['settings']		  = array("siteTitle", "siteAdminName", "siteAdminMail", "siteDomain", "siteURL", "domainAuth", "enableIPrequests", "enableVRF", "enableDNSresolving", "version", "dbverified", "donate", "IPfilter", "printLimit", "visualLimit", "vlanDuplicate", "vlanMax", "subnetOrdering", "pingStatus", "defaultLang", "api", "editDate", "vcheckDate", "dhcpCompress", "enableChangelog", "scanPingPath", "scanMaxThreads", "prettyLinks", "hideFreeRange", "hiddenCustomFields", "inactivityTimeout");
 	$fields['settingsDomain'] = array("account_suffix", "base_dn", "domain_controllers", "use_ssl", "use_tls", "ad_port", "adminUsername", "adminPassword");
-	$fields['subnets'] 		  = array("subnet", "mask", "sectionId", "description", "masterSubnetId", "vrfId", "allowRequests", "vlanId", "showName", "permissions", "pingSubnet", "isFolder");
+	$fields['subnets'] 		  = array("subnet", "mask", "sectionId", "description", "masterSubnetId", "vrfId", "allowRequests", "vlanId", "showName", "permissions", "pingSubnet", "discoverSubnet", "isFolder");
 	$fields['devices'] 	  	  = array("hostname", "ip_addr", "type", "vendor", "model", "version", "description", "sections");
 	$fields['deviceTypes'] 	  = array("tid", "tname", "tdescription");
-	$fields['users'] 	  	  = array("username", "password", "groups", "role", "real_name", "email", "domainUser", "lang", "widgets", "favourite_subnets");
+	$fields['users'] 	  	  = array("username", "password", "groups", "role", "real_name", "email", "domainUser", "lang", "widgets", "favourite_subnets", "mailNotify", "mailChangelog", "passChange");
 	$fields['vrf'] 	  	  	  = array("vrfId","name", "rd", "description");
 	$fields['vlans']   	  	  = array("vlanId", "name", "number", "description");
 	$fields['userGroups']     = array("g_id", "g_name", "g_desc");
 	$fields['lang']     	  = array("l_id", "l_code", "l_name");
-	$fields['api']			  = array("app_id", "app_code", "app_permissions");
+	$fields['api']			  = array("app_id", "app_code", "app_permissions", "app_comment");
 	$fields['changelog']	  = array("cid", "ctype", "coid", "cuser", "caction", "cresult", "cdate", "cdiff");
 	$fields['widgets']		  = array("wid", "wtitle", "wdescription", "wfile", "wparams", "whref", "wsize", "wadminonly", "wactive");
-	$fields['settingsMail']	  = array("id", "mtype", "mauth", "mserver", "mport", "muser", "mpass", "mAdminName", "mAdminMail");
+	$fields['settingsMail']	  = array("id", "mtype", "mauth", "mserver", "mport", "muser", "mpass", "mAdminName", "mAdminMail", "msecure");
 	
 	/**
 	 * check that each database exist - if it does check also fields
@@ -2420,9 +2551,8 @@ function verifyDatabase()
  */
 function updateDBverify() 
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-    
+    global $database;
+        
     # set query based on action
     $query = "update `settings` set `dbverified`='1'; "; 
 	/* execute */
@@ -2488,9 +2618,8 @@ function getFieldFix($table, $field)
  */
 function fixTable($table)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-
+    global $database;
+    
 	//get fix
 	$query = getTableFix($table);
 		
@@ -2509,9 +2638,8 @@ function fixTable($table)
  */
 function fixField($table, $field)
 {
-    global $db;                                                                      # get variables from config file
-    $database = new database($db['host'], $db['user'], $db['pass'], $db['name']); 
-
+    global $database;
+    
 	//get fix
 	$query  = "alter table `$table` add ";
 	$query .= trim(getFieldFix($table, $field), ",");

@@ -8,8 +8,6 @@
 
 /* verify that user is admin */
 checkAdmin();
-
-
 ?>
 
 

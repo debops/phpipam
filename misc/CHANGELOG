@@ -1,3 +1,79 @@
+== 1.1.010
+
+	Bugfixes:
+	----------------------------
+	+ Fixed login fails with LDAP when escape characters are in password;
+	+ Fixed login not working with spaces in password for AD login;
+	+ Fixed Ivalid action when adding vlans from subnet popup menu;
+	+ Fixed custom fields not appearing properly on IP request editing;
+	+ Fixed Invalid ID error for IP address details on sorting;
+	+ Fixed warnings if no VLAN search results are present;
+	+ Fixed test mail not sending;
+	+ Fixed unable to login if $phpsessname not defined;
+	+ Fixed unable to login after upgrade;
+
+== 1.1
+
+	Enhancements:
+	----------------------------
+	+ Caching of SQL results to avoid multiple queries;
+	+ Reduced number of DB queries;
+	+ Added selected mail notifications to admins to be notified on IP/subnet change;
+	+ Added new subnetId index to ipaddresses table that significantly improves network loading;
+	+ Now using only 1 network connection towards MySQL server;
+	+ Updated pagination;
+	+ mod_rewrite no longer required, selectable URL structure under settings;
+	+ Added option not to display free ranges;
+	+ Added option to set maximum VLAN number;
+	+ Selectable custom fields to be visible/hidden in tables view and updated device/VLAN view;
+	+ Added additional confirmation before section, subnet, folder and IP address deletion;
+	+ New script added for cron checks that discovers new hosts for selected networks;
+	+ Added inactivity timeout to settings;
+	+ Changed install procedure and updated install scripts;
+	+ Added PEAR check for installation;
+	+ Added free range disaply for VLANs;
+	+ Addes SSL/TLS option for SMTP mail;
+	+ API:
+		+ Bugfixes;
+		+ Added API admin permissions;
+		+ read/delete actions for IP addresses;
+		+ read/delete actions for Vlans;
+		+ read/delete actions for VRFs;
+
+	Security Fixes:
+	----------------------------
+	+ Fixed known command injection vulnerabilities in the scan functions;
+	+ Fixed known SQL injection vulnerabilities;
+	+ Fixed known XSS vulnerabilities;
+	+ Fixed known action XSS events;
+	+ Moved to crypt method for storing password in database with salting;
+	+ Added option to force user to change pass after first login;
+	+ Admin password must be changed after installation;
+	+ Added captcha code request after 5x unsuccesfull login to prevent brute-force attacks;
+
+	Translations:
+	----------------------------
+	+ Added es_ES translation;
+
+	Bugfixes:
+	----------------------------
+	+ Fixed top 10 widgets not escaping strings;
+	+ Fixed section parent can be set to self that caused section to disapear;
+	+ Fixed username instead of password being sent to smtp server;
+	+ Fixed IE search bug with workaround;
+	+ Fixed subnet and bcast not showing on strict mode disabled;
+	+ Fixed top subnets missing on dashboard for non-admin users;
+	+ Fixed bug when installation was silently failing bacause pf missing _() function (missing gettext extension)
+	+ Fixed device custom field not populated on adding device;
+	+ Fixed XLS export silently failed when description longer than 31 characters;
+	+ Fixed overlapping check not working;
+	+ Fixed subnet free space calcultation;
+	+ Fixed visual subnet display not showing on /31 and /32 networks;
+	+ Fixed custom fields display on folder edit;
+	+ Fixed unable to edit IP addresses when fields are sorted;
+	+ Fixde ordering of custom fields defaults to varchar 256;
+	+ Fixed IPv6 subnet / broadcast calculation bug and next subnet suggestion;
+
 == 1.0
 	
 	New features:

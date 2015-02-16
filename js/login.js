@@ -25,14 +25,17 @@ function hideSpinner() {
 
 /*	Login redirect function if success
 ****************************************/
-function loginRedirect() { window.location="dashboard/"; }
+function loginRedirect() { 
+	var base = $('.iebase').html();
+	window.location=base; 
+}
 
 /*	submit login 
 *********************/
 $('form#login').submit(function() {
     //stop all active animations
     $('div#loginCheck').stop(true,true);
-    //get login data
+    
     var logindata = $(this).serialize();
     
     $('div#loginCheck').hide();

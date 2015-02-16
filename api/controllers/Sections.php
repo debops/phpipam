@@ -13,33 +13,22 @@ class Sections
 {
 	/* variables */
 	private $_params;
-	
+
+
 	/* set parameters, provided via post */
 	public function __construct($params)
 	{
 	  $this->_params = $params;
 	}
 
+
 	/** 
 	* create new section 
 	*/
 	public function createSections()
 	{
-		//init section class
-		$section = new Section();
-		//required parameters
-		$section->action      		= $this->_params['action'];
-		$section->name        		= $this->_params['name'];
-		$section->description 		= $this->_params['description'];
-		$section->strictMode  		= $this->_params['strictMode'];
-		$section->order  			= $this->_params['order'];
-		$section->subnetOrdering  	= $this->_params['subnetOrdering'];
-		$section->permissions	  	= $this->_params['permissions'];
-		
-		//create section
-		$res = $section->createSection(); 	
-		//return result
-		return $res;
+		/* not yet implemented */
+		throw new Exception('Action not yet implemented');	
 	}
 
 
@@ -70,23 +59,8 @@ class Sections
 	*/
 	public function updateSections()
 	{
-		//init section class
-		$section = new Section();
-		//required parameters
-		$section->id      			= $this->_params['id'];
-		$section->action      		= $this->_params['action'];
-		$section->name        		= $this->_params['name'];
-		$section->description 		= $this->_params['description'];
-		$section->strictMode  		= $this->_params['strictMode'];
-		$section->order  			= $this->_params['order'];
-		$section->subnetOrdering  	= $this->_params['subnetOrdering'];
-		$section->permissions	  	= $this->_params['permissions'];
-		
-		//create section
-		$res = $section->updateSection(); 	
-		//return result
-		return $res;
-
+		/* not yet implemented */
+		throw new Exception('Action not yet implemented');	
 	}	
 	
 	
@@ -98,8 +72,24 @@ class Sections
 		//init section class
 		$section = new Section();
 		//required parameters
-		$section->action      	= $this->_params['action'];
 		$section->id        	= $this->_params['id'];
+
+		//delete also IPs and subnets?
+		if(isset($this->_params['subnets'])) {
+			if($this->_params['subnets'] == false) 			{ $section->subnets = false; }
+			else											{ $section->subnets = true; }
+		} else {
+															{ $section->subnets = true; }
+		}		
+		//delete also addresses?
+		if($section->subnets == true) {
+			if(isset($this->_params['addresses'])) {
+				if($this->_params['addresses'] == false) 	{ $section->addresses = false; }
+				else										{ $section->addresses = true; }
+			} else {
+															{ $section->addresses = true; }
+			}				
+		}
 
 		//delete section
 		$res = $section->deleteSection(); 	

@@ -42,7 +42,6 @@ Requirements
     + + gettext				: Add support for gettext translations
 - PHP PEAR support (dev-php/pear)
 
-
 Install 
 =======
 - see INSTALL.txt file for details

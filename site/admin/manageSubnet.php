@@ -7,6 +7,16 @@
 /* verify that user is admin */
 if (!checkAdmin()) die('');
 
+
+/* get custom fields */
+$custom = getCustomFields('subnets');
+
+/* set hidden fields */
+$ffields = json_decode($settings['hiddenCustomFields'], true);		
+if(is_array($ffields['subnets']))	{ $ffields = $ffields['subnets']; }
+else								{ $ffields = array(); }
+
+
 /* print all sections with delete / edit button */
 print '<h4>'._('Subnet management').'</h4>' . "\n";
 print "<hr>";
@@ -55,6 +65,15 @@ if(sizeof($sections) > 0) {
 		# set colcount
 		if($settings['enableVRF'] == 1)		{ $colCount = "8"; }
 		else								{ $colCount = "7"; }
+
+		# just for count
+		if(sizeof($custom) > 0) {
+			foreach($custom as $field) {
+				if(!in_array($field['name'], $ffields)) {
+					$colCount++;
+				}
+			}
+		}
 		
 		# print name
 		print "<tbody id='subnet-$m'>";
@@ -81,6 +100,15 @@ if(sizeof($sections) > 0) {
 		}
 		print "	<th class='hidden-xs hidden-sm hidden-md'>"._('Requests')."</th>";
 		print "	<th class='hidden-xs hidden-sm hidden-md'>"._('Hosts check')."</th>";
+		# custom fields
+		if(sizeof($custom) > 0) {
+			foreach($custom as $field) {
+				if(!in_array($field['name'], $ffields)) {
+					print "	<th class='hidden-xs hidden-sm'>$field[name]</th>";
+				}
+			}
+		}
+
 		print "	<th class='actions'></th>";
 		print "</tr>";
 

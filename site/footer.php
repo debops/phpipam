@@ -7,6 +7,9 @@
 		<a href="https://sourceforge.net/projects/phpipam/">phpIPAM IP address management <?php print '[v'. VERSION. ']'; ?><?php if(REVISION > 0) { print " rev".REVISION; } ?></a>
 	</td>
 	
+	<?php
+	# exclude install
+	if($_GET['page']!="install") { ?>
 	<td>
 		<?php print _('In case of problems please contact').' <a href="mailto:'. $settings['siteAdminMail'] .'">'. $settings['siteAdminName'] .'</a>'; ?>
 	</td>
@@ -21,6 +24,7 @@ print '	<td id="donate" class="hidden-xs hidden-sm" rel="tooltip" data-html="tru
 <input type="image" src="css/images/btn_donate_SM.gif" name="submit">
 	</td>';	
 	
+	}
 	}
 	?>
 
