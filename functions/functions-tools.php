@@ -1200,6 +1200,16 @@ function getTypeDetailsById($id)
 }
 
 
+/**
+ * Convert given time in seconds to length of days, from now.
+ */
+function secondsToDays($seconds)
+{
+	$dtF = new DateTime("@".time());
+	$dtT = new DateTime("@$seconds");
+	return $dtF->diff($dtT)->format('%a');
+}
+
 
 
 

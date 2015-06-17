@@ -1087,6 +1087,8 @@ function getIpAddressesForVisual ($subnetId)
 	    $out[$ip['ip_addr']]['ip_addr']    	= $ip['ip_addr'];
 	    $out[$ip['ip_addr']]['desc']  		= $ip['description'];
 	    $out[$ip['ip_addr']]['dns_name']  	= $ip['dns_name'];
+	    $out[$ip['ip_addr']]['lastSeen']  	= $ip['lastSeen'];
+	    $out[$ip['ip_addr']]['excludePing'] = $ip['excludePing'];
     }
 
     /* return ip address array */
@@ -1401,6 +1403,64 @@ function calculateSubnetDetailsNew ( $subnet, $bitmask, $online, $offline, $rese
     $details['freehosts_percent'] = round( ( ($details['freehosts'] * 100) / $details['maxhosts']), 2 );
     $details['used_percent'] 	  = round( ( ($details['used'] * 100) / $details['maxhosts']), 2 );
     $details['online_percent'] 	  = round( ( ($details['online'] * 100) / $details['maxhosts']), 2 );
+    $details['reserved_percent']  = round( ( ($details['reserved'] * 100) / $details['maxhosts']), 2 );
+    $details['offline_percent']   = round( ( ($details['offline'] * 100) / $details['maxhosts']), 2 );
+    $details['dhcp_percent']      = round( ( ($details['dhcp'] * 100) / $details['maxhosts']), 2 );
+     
+    return( $details );
+}
+
+/**
+ * Calculate subnet details accounting for active hosts
+ *
+ * Calculate subnet details based on input!
+ *
+ * We must provide used hosts and subnet mask to calculate free hosts, and subnet to identify type
+ *
+ *	$bcastfix = remove bcast and subnets from stats (subnetDetailsGraph)
+ */
+function calculateSubnetDetailsNewActive ( $subnet, $bitmask, $online, $warning, $error, $neutral, $disconnected, $offline, $reserved, $dhcp, $bcastfix = 0 )
+{
+    $details['online']            = $online;		// number of online hosts
+    $details['warning']            = $warning;		// number of warning hosts
+    $details['error']            = $error;		// number of error hosts
+    $details['neutral']            = $neutral;		// number of neutral hosts
+    $details['disconnected']       = $disconnected;	// number of disconnected hosts
+    $details['reserved']          = $reserved;		// number of reserved hosts
+    $details['offline']           = $offline;		// number of offline hosts
+    $details['dhcp']              = $dhcp;   		// number of dhcp hosts 
+    
+    $details['used']			  = gmp_strval( gmp_add ($online,$warning) );
+    $details['used']			  = gmp_strval( gmp_add ($details['used'],$error) );
+    $details['used']			  = gmp_strval( gmp_add ($details['used'],$neutral) );
+    $details['used']			  = gmp_strval( gmp_add ($details['used'],$disconnected) );
+    $details['used']			  = gmp_strval( gmp_add ($details['used'],$reserved) );
+    $details['used']			  = gmp_strval( gmp_add ($details['used'],$offline) );
+    $details['used']			  = gmp_strval( gmp_add ($details['used'],$dhcp) );
+    
+    // calculate max hosts
+    if ( IdentifyAddress( $subnet ) == "IPv4") 	{ $type = 0; }
+    else 										{ $type = 1; }
+    
+    $details['maxhosts']          = MaxHosts( $bitmask, $type ); 
+    $details['maxhosts'] 		  = gmp_strval( gmp_sub ($details['maxhosts'],$bcastfix) );
+    
+    // calculate free hosts
+    $details['freehosts']         = gmp_strval( gmp_sub ($details['maxhosts'] , $details['used']) );
+
+	//reset maxhosts for /31 and /32 subnets
+	if (gmp_cmp($details['maxhosts'],1) == -1) {
+		$details['maxhosts'] = "1";
+	}
+
+    // calculate use percentage
+    $details['freehosts_percent'] = round( ( ($details['freehosts'] * 100) / $details['maxhosts']), 2 );
+    $details['used_percent'] 	  = round( ( ($details['used'] * 100) / $details['maxhosts']), 2 );
+    $details['online_percent'] 	  = round( ( ($details['online'] * 100) / $details['maxhosts']), 2 );
+    $details['warning_percent']   = round( ( ($details['warning'] * 100) / $details['maxhosts']), 2 );
+    $details['error_percent']     = round( ( ($details['error'] * 100) / $details['maxhosts']), 2 );
+    $details['neutral_percent']   = round( ( ($details['neutral'] * 100) / $details['maxhosts']), 2 );
+    $details['disconnected_percent'] = round( ( ($details['disconnected'] * 100) / $details['maxhosts']), 2 );
     $details['reserved_percent']  = round( ( ($details['reserved'] * 100) / $details['maxhosts']), 2 );
     $details['offline_percent']   = round( ( ($details['offline'] * 100) / $details['maxhosts']), 2 );
     $details['dhcp_percent']      = round( ( ($details['dhcp'] * 100) / $details['maxhosts']), 2 );

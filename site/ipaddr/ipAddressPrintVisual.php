@@ -3,6 +3,9 @@
 # get array of IP addresses
 $ipVisual = getIpAddressesForVisual($subnetId);
 
+# set ping statuses
+$statuses = explode(";", $settings['pingStatus']);
+
 # if empty
 if(sizeof($ipVisual) == '0')	{ $ipVisual = array(); }
 
@@ -48,10 +51,24 @@ if(sizeof($slaves) == 0 && $type == 0) {
 			$title = transform2long($ipVisual[$m]['ip_addr']);
 			if(strlen($ipVisual[$m]['dns_name'])>0)		{ $title .= "<br>".$ipVisual[$m]['dns_name']; }
 			if(strlen($ipVisual[$m]['desc'])>0)			{ $title .= "<br>".$ipVisual[$m]['desc']; }
+
+			# host state
+			$state = "unknown";
+			if ($SubnetDetails['pingSubnet']=="1" && ($class == 1 || $class == 2)) {
+				$tDiff = time() - strtotime($ipVisual[$m]['lastSeen']);
+				if ($ipVisual[$m]['excludePing'] == "1") { $state = "exclude"; $title .= "<br>"._("Pings disabled"); }
+				elseif ($tDiff < $statuses[0])           { $state = "alive";   $title .= "<hr>"._("Last seen").": ".secondsToDays(strtotime($ipVisual[$m]['lastSeen']))." "._("day(s) ago")."<br>(".$ipVisual[$m]['lastSeen'].")"; }
+				elseif ($tDiff < $statuses[1])           { $state = "warning"; $title .= "<hr>"._("Last seen").": ".secondsToDays(strtotime($ipVisual[$m]['lastSeen']))." "._("day(s) ago")."<br>(".$ipVisual[$m]['lastSeen'].")"; }
+				elseif ($tDiff < 2592000)                { $state = "offline"; $title .= "<hr>"._("Last seen").": ".secondsToDays(strtotime($ipVisual[$m]['lastSeen']))." "._("day(s) ago")."<br>(".$ipVisual[$m]['lastSeen'].")"; }
+				elseif ($ipVisual[$m]['lastSeen'] == "0000-00-00 00:00:00") { $state = "neutral"; $title .= "<hr>"._("Last seen").": "._("Never"); }
+				else { $state = "disconnected"; $title .= "<hr>"._("Last seen").": ".secondsToDays(strtotime($ipVisual[$m]['lastSeen']))." "._("day(s) ago")."<br>(".$ipVisual[$m]['lastSeen'].")"; }
+			}
+
     	}
     	else {
     		# print add
     		$class = 9;
+		$state = "unknown";
     		$id = $m;
     		$action = 'all-add';
     		$title = "";
@@ -61,7 +78,7 @@ if(sizeof($slaves) == 0 && $type == 0) {
 		
 		# print box
 		if($permission > 1) {
-			print "<span class='ip-$class modIPaddr'  data-action='$action' rel='tooltip' title='$title' data-position='top' data-html='true' data-subnetId='".$subnetId."' data-id='$id'>.".substr(strrchr(transform2long($m), "."), 1)."</span>";	
+			print "<span class='state-$state ip-$class modIPaddr'  data-action='$action' rel='tooltip' title='$title' data-position='top' data-html='true' data-subnetId='".$subnetId."' data-id='$id'>.".substr(strrchr(transform2long($m), "."), 1)."</span>";	
 		}	
 		else {
 			print "<span class='ip-$class '  data-action='$action' data-subnetId='".$subnetId."' data-id='$id'>.".substr(strrchr(transform2long($m), "."), 1)."</span>";				

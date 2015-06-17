@@ -183,7 +183,7 @@ if(sizeof($ip)>1) {
 	elseif($tDiff < $statuses[1])						{ $hStatus = "warning"; 	$hTooltip = _("Device warning")."<br>"._("Last seen").": ".$ip['lastSeen']; }
 	elseif($tDiff < 2592000)							{ $hStatus = "error"; 		$hTooltip = _("Device is offline")."<br>"._("Last seen").": ".$ip['lastSeen'];}
 	elseif($ip['lastSeen'] == "0000-00-00 00:00:00") 	{ $hStatus = "neutral"; 	$hTooltip = _("Device is offline")."<br>"._("Last seen").": "._("Never");}
-	else												{ $hStatus = "neutral"; 	$hTooltip = _("Device status unknown");}		    
+	else							{ $hStatus = "disconnected"; 		$hTooltip = _("Device is disconnected")."<br>"._("Last seen").": ".$ip['lastSeen'];}
 	
 	print "	<th>"._('Avalibility')."<br><span class='status status-ip status-$hStatus' style='pull-right'></span></th>";
 	print "	<td>";
