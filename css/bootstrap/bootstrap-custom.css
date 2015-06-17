@@ -937,6 +937,7 @@ div.ip_vis span.ip-9 {
 	background: white;
 }
 div.ip_vis span.ip-0 {
+	border: 1px solid #FF5851;
 	background: #F59C99;
 	color: white;
 }
@@ -945,10 +946,12 @@ div.ip_vis span.ip-1 {
 	color: white;
 }
 div.ip_vis span.ip-2 {
+	border: 1px solid #5FA1B7;
 	background: #9AC0CD;
 	color: white;
 }
 div.ip_vis span.ip-3 {
+	border: 1px solid #8E8E8E;
 	background: #a9a9a9;
 	color: white;
 }
