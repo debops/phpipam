@@ -1087,6 +1087,8 @@ function getIpAddressesForVisual ($subnetId)
 	    $out[$ip['ip_addr']]['ip_addr']    	= $ip['ip_addr'];
 	    $out[$ip['ip_addr']]['desc']  		= $ip['description'];
 	    $out[$ip['ip_addr']]['dns_name']  	= $ip['dns_name'];
+	    $out[$ip['ip_addr']]['lastSeen']  	= $ip['lastSeen'];
+	    $out[$ip['ip_addr']]['excludePing'] = $ip['excludePing'];
     }
 
     /* return ip address array */

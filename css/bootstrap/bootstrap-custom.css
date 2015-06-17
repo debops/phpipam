@@ -945,6 +945,29 @@ div.ip_vis span.ip-1 {
 	background: #A9C9A4;
 	color: white;
 }
+div.ip_vis span.state-exclude {
+	background: #B7B7B7;
+}
+div.ip_vis span.state-alive {
+	background: #A9C9A4;
+}
+div.ip_vis span.state-warning {
+	background: #FFCE57;
+}
+div.ip_vis span.state-offline {
+	background: #F59C99;
+}
+div.ip_vis span.state-neutral {
+	background: #A5D0ED;
+	text-shadow: none;
+}
+div.ip_vis span.state-disconnected {
+	background: #FFA1E3;
+	text-shadow: none;
+}
+div.ip_vis span.state-unknown {
+	text-shadow: none;
+}
 div.ip_vis span.ip-2 {
 	border: 1px solid #5FA1B7;
 	background: #9AC0CD;
@@ -992,8 +1015,11 @@ span.status {
 span.status-hidden {
 	display: none;
 }
+.status-disconnected {
+	background: #FFA1E3;
+}
 .status-neutral {
-	background: white;
+	background: #A5D0ED;
 }
 .status-success {
 	background: #A9C9A4;
