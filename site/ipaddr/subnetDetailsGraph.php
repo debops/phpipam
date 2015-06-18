@@ -71,6 +71,10 @@ $(function () {
     		$details['freehosts_percent'] = str_replace(",", ".", $details['freehosts_percent']);
     		print "{ label: '"._('Free')."',     data: $details[freehosts_percent], color: '#D8D8D8' }, ";		# free hosts
     	}
+    	if($details['neutral_percent']>0) {
+    	    $details['neutral_percent'] = str_replace(",", ".", $details['neutral_percent']);
+			print "{ label: '"._('Neutral')."',   data: $details[neutral_percent],    color: '#A5D0ED' }, ";		# active hosts
+    	}
     	if($details['online_percent']>0) {
     	    $details['online_percent'] = str_replace(",", ".", $details['online_percent']);
 			print "{ label: '"._('Active')."',   data: $details[online_percent],    color: '#A9C9A4' }, ";		# active hosts
@@ -82,10 +86,6 @@ $(function () {
     	if($details['error_percent']>0) {
     	    $details['error_percent'] = str_replace(",", ".", $details['error_percent']);
 			print "{ label: '"._('Error')."',   data: $details[error_percent],    color: '#F59C99' }, ";		# active hosts
-    	}
-    	if($details['neutral_percent']>0) {
-    	    $details['neutral_percent'] = str_replace(",", ".", $details['neutral_percent']);
-			print "{ label: '"._('Neutral')."',   data: $details[neutral_percent],    color: '#A5D0ED' }, ";		# active hosts
     	}
     	if($details['disconnected_percent']>0) {
     	    $details['disconnected_percent'] = str_replace(",", ".", $details['disconnected_percent']);
